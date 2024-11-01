@@ -54,26 +54,14 @@ const IllustrationImage = styled.div`
 `;
 
 export default ({
-  logoLinkUrl = "#",
+  logoLinkUrl = "/",
   illustrationImageSrc = illustration,
-  headingText = "Sign Up For Treact",
-  socialButtons = [
-    {
-      iconImageSrc: googleIconImageSrc,
-      text: "Sign Up With Google",
-      url: "https://google.com"
-    },
-    {
-      iconImageSrc: twitterIconImageSrc,
-      text: "Sign Up With Twitter",
-      url: "https://twitter.com"
-    }
-  ],
-  submitButtonText = "Sign Up",
+  headingText = "Ingrese sus datos",
+  submitButtonText = "Registrarse",
   SubmitButtonIcon = SignUpIcon,
   tosUrl = "#",
   privacyPolicyUrl = "#",
-  signInUrl = "#"
+  signInUrl = "login"
 }) => (
   <AnimationRevealPage>
     <Container>
@@ -85,41 +73,31 @@ export default ({
           <MainContent>
             <Heading>{headingText}</Heading>
             <FormContainer>
-              <SocialButtonsContainer>
-                {socialButtons.map((socialButton, index) => (
-                  <SocialButton key={index} href={socialButton.url}>
-                    <span className="iconContainer">
-                      <img src={socialButton.iconImageSrc} className="icon" alt="" />
-                    </span>
-                    <span className="text">{socialButton.text}</span>
-                  </SocialButton>
-                ))}
-              </SocialButtonsContainer>
-              <DividerTextContainer>
-                <DividerText>Or Sign up with your e-mail</DividerText>
-              </DividerTextContainer>
+              
               <Form>
+                <Input type="nombre" placeholder="Nombre" />
                 <Input type="email" placeholder="Email" />
-                <Input type="password" placeholder="Password" />
+                <Input type="password" placeholder="Contraseña" />
+                <Input type="telefono" placeholder="Telefono" />
                 <SubmitButton type="submit">
                   <SubmitButtonIcon className="icon" />
                   <span className="text">{submitButtonText}</span>
                 </SubmitButton>
                 <p tw="mt-6 text-xs text-gray-600 text-center">
-                  I agree to abide by treact's{" "}
+                  Al registrase, acepta los {" "}
                   <a href={tosUrl} tw="border-b border-gray-500 border-dotted">
-                    Terms of Service
+                    Terminos de servicio
                   </a>{" "}
-                  and its{" "}
+                  y su {" "}
                   <a href={privacyPolicyUrl} tw="border-b border-gray-500 border-dotted">
-                    Privacy Policy
+                    Politica de privacidad 
                   </a>
                 </p>
 
                 <p tw="mt-8 text-sm text-gray-600 text-center">
-                  Already have an account?{" "}
+                  ¿Ya tienes una cuenta?{" "}
                   <a href={signInUrl} tw="border-b border-gray-500 border-dotted">
-                    Sign In
+                    Iniciar sesion
                   </a>
                 </p>
               </Form>
