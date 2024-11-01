@@ -1,13 +1,13 @@
 let server, request, queryParams, url;
 
-function login() {
+export const iniciarSesion = (emailInput, passwordInput) => {
   server = "http://localhost:8080";
 
   request = "/login/iniciarSesion";
 
   queryParams = new URLSearchParams({
-    email: "joaquin@gmail.com",
-    password: "P@ssw0rd",
+    email: emailInput,
+    password: passwordInput,
   }).toString();
 
   url = `${server}${request}?${queryParams}`;
@@ -28,11 +28,12 @@ function login() {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
+      return data;
     })
     .catch((error) => {
-      console.error(error);
+      //console.error(error);
+      return error;
     });
-}
-
-login()
+    return null;
+};
