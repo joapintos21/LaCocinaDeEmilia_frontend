@@ -56,7 +56,19 @@ const IllustrationImage = styled.div`
 export default ({
   logoLinkUrl = "/",
   illustrationImageSrc = illustration,
-  headingText = "Ingrese sus datos",
+  headingText = "Registrarse",
+  /*socialButtons = [
+    {
+      iconImageSrc: googleIconImageSrc,
+      text: "Sign Up With Google",
+      url: "https://google.com"
+    },
+    {
+      iconImageSrc: twitterIconImageSrc,
+      text: "Sign Up With Twitter",
+      url: "https://twitter.com"
+    }
+  ],*/
   submitButtonText = "Registrarse",
   SubmitButtonIcon = SignUpIcon,
   tosUrl = "#",
@@ -73,12 +85,12 @@ export default ({
           <MainContent>
             <Heading>{headingText}</Heading>
             <FormContainer>
-              
               <Form>
-                <Input type="nombre" placeholder="Nombre" />
+                <Input type="text" placeholder="Nombre completo" />
+                <Input type="text" placeholder="Dirección" />
+                <Input type="text" placeholder="Numero de teléfono/celular" />
                 <Input type="email" placeholder="Email" />
                 <Input type="password" placeholder="Contraseña" />
-                <Input type="telefono" placeholder="Telefono" />
                 <SubmitButton type="submit">
                   <SubmitButtonIcon className="icon" />
                   <span className="text">{submitButtonText}</span>
@@ -95,9 +107,9 @@ export default ({
                 </p>
 
                 <p tw="mt-8 text-sm text-gray-600 text-center">
-                  ¿Ya tienes una cuenta?{" "}
+                  Ya tienes una cuenta?{" "}
                   <a href={signInUrl} tw="border-b border-gray-500 border-dotted">
-                    Iniciar sesion
+                    Iniciar sesión
                   </a>
                 </p>
               </Form>
