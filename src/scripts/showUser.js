@@ -1,5 +1,3 @@
-const server = 'http://localhost:8080'
-
 const request = '/usuarios/show'
 
 const queryParams = new URLSearchParams({
@@ -8,7 +6,7 @@ const queryParams = new URLSearchParams({
 
 let token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzMwNDE4MjkyLCJleHAiOjE3MzEwMjMwOTJ9.Jrhu4CxQEF30DpaCX-QURchLuMhvDmAD603l4-VkR98h8_ny-iBaTqH5rkMY-Oozrpqe9JyxRB_W4wk_DSmqag'
 
-const url = `${server}${request}?${queryParams}`;
+const url = `${request}?${queryParams}`;
 
 fetch(url, {
     method: 'GET', 

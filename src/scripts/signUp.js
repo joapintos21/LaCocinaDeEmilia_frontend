@@ -1,40 +1,37 @@
-function signUp() {
-  const server = "http://localhost:8080";
+let request, url, body;
 
-  const request = "/usuarios/create";
+export const crearUsuario = async (email, password, nombre, telefono, rol_id) => {
+  request = "/usuarios/create";
+  url = `${request}`;
 
-  const data = {
-    email: "pedro@gmail.com",
-    password: "P@ssw0rd",
-    nombre: "Pedro Bonilla",
-    telefono: "093557484",
-    rol_id: 1,
+  body = {
+    email: email,
+    password: password,
+    nombre: nombre,
+    telefono: telefono,
+    rol_id: rol_id,
   };
 
-  const url = `${server}${request}`;
-
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-    .then((response) => {
-      // Errores fuera del rango 200-299
-      if (!response.ok) {
-        throw new Error(
-          "Se produjo un error con la solicitud: " + response.statusText
-        );
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((error) => {
-      console.error(error);
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
     });
-}
 
-signUp();
+    // Maneja errores fuera del rango 200-299
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Se produjo un error desconocido.");
+    }
+
+    const data = await response.json();
+    return data; // Devuelve los datos de la respuesta
+
+  } catch (error) {
+    console.error(error);
+    throw error; // Lanza el error para que sea capturado en el evento
+  }
+};

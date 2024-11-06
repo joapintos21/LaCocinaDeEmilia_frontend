@@ -70,14 +70,28 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
    * changing the defaultLinks variable below below.
    * If you manipulate links here, all the styling on the links is already done for you. If you pass links yourself though, you are responsible for styling the links or use the helper styled components that are defined here (NavLink)
    */
+  const token = sessionStorage.getItem('userToken');
+  const user = sessionStorage.getItem('user');
+  const logout = () => {
+    sessionStorage.removeItem('userToken');
+    sessionStorage.removeItem('user');
+  }
   const defaultLinks = [
     <NavLinks key={1}>
       <NavLink href="/#">Productos</NavLink>
       <NavLink href="/#">Contactenos</NavLink>
-      <NavLink href="/login" tw="lg:ml-12!">
-        Iniciar sesion
-      </NavLink>
-      <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/signup">Registrarse</PrimaryLink>
+      {token ? (<>
+          <NavLink href="/#" tw="lg:ml-12!">
+            {JSON.parse(user).nombre}
+          </NavLink>
+          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/login"onClick={logout}>Cerrar sesion</PrimaryLink>
+        </>) : (<>
+          <NavLink href="/login" tw="lg:ml-12!">
+            Iniciar sesion
+          </NavLink>
+          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/signup">Registrarse</PrimaryLink>
+        </>)
+      }
     </NavLinks>
   ];
 

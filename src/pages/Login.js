@@ -14,7 +14,6 @@ import { ReactComponent as LoginIcon } from "feather-icons/dist/icons/log-in.svg
 import LoginComponent from "components/login/LoginComponent.js";
 
 const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center -m-8`;
-const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center -m-8`;
 const Content = tw.div`max-w-screen-xl m-0 sm:mx-20 sm:my-16 bg-white text-gray-900 shadow sm:rounded-lg flex justify-center flex-1`;
 const MainContainer = tw.div`lg:w-1/2 xl:w-5/12 p-6 sm:p-12`;
 const LogoLink = tw.a``;
@@ -37,7 +36,6 @@ const FormContainer = tw.div`w-full flex-1 mt-8`;
   .text {
     ${tw`ml-4`}
   }
-`;*/
 `;*/
 
 //const DividerTextContainer = tw.div`my-12 border-b text-center relative`;
@@ -66,13 +64,9 @@ const IllustrationImage = styled.div`
 
 export default ({
   logoLinkUrl = "/",
-  logoLinkUrl = "/",
   illustrationImageSrc = illustration,
   headingText = "Inicia sesión",
-  submitButtonText = "Iniciar sesion",
-  SubmitButtonIcon = LoginIcon,
   forgotPasswordUrl = "#",
-  signupUrl = "signup",
   signupUrl = "signup",
 
 }) => (
@@ -95,7 +89,6 @@ export default ({
               <p tw="mt-8 text-sm text-gray-600 text-center">
                 ¿Todavia no tienes una cuenta?{" "}
                 <a href={signupUrl} tw="border-b border-gray-500 border-dotted">
-                  Registrarse
                   Registrarse
                 </a>
               </p>

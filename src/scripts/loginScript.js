@@ -1,8 +1,6 @@
-let server, request, queryParams, url;
+let request, queryParams, url;
 
-export const iniciarSesion = (emailInput, passwordInput) => {
-  server = "http://localhost:8080";
-
+export const iniciarSesion = async (emailInput, passwordInput) => {
   request = "/login/iniciarSesion";
 
   queryParams = new URLSearchParams({
@@ -10,30 +8,27 @@ export const iniciarSesion = (emailInput, passwordInput) => {
     password: passwordInput,
   }).toString();
 
-  url = `${server}${request}?${queryParams}`;
+  url = `${request}?${queryParams}`;
 
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      // Errores fuera del rango 200-299
-      if (!response.ok) {
-        throw new Error(
-          "Se produjo un error con la solicitud: " + response.statusText
-        );
-      }
-      return response.json();
-    })
-    .then((data) => {
-      //console.log(data);
-      return data;
-    })
-    .catch((error) => {
-      //console.error(error);
-      return error;
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
-    return null;
+
+    // Maneja errores fuera del rango 200-299
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Se produjo un error desconocido.");
+    }
+
+    const data = await response.json();
+    return data; // Devuelve los datos de la respuesta
+
+  } catch (error) {
+    console.error(error);
+    throw error; // Lanza el error para que sea capturado en el evento
+  }
 };
