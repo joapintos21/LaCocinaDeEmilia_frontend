@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { verificar } from 'scripts/verificar';
 
@@ -11,17 +11,13 @@ const VerificarCuenta = () => {
         const params = new URLSearchParams(location.search);
         const token = params.get("token");
         verificar(token).then((data) => {
-            alert(data.mensaje);
-            navigate('/login');
+            console.log(data)
+            navigate('/login?mensaje=verificado');
         })
         
     }, [location, navigate]);
 
-    return (
-        <div>
-            <h2>Verificando cuenta...</h2>
-        </div>
-    );
+    return null;
 };
 
 export default VerificarCuenta;
