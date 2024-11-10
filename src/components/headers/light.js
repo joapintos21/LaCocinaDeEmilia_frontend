@@ -28,8 +28,8 @@ export const NavLink = tw.a`
 
 export const PrimaryLink = tw(NavLink)`
   lg:mx-0
-  px-8 py-3 rounded bg-primary-500 text-gray-100
-  hocus:bg-primary-700 hocus:text-gray-200 focus:shadow-outline
+  px-8 py-3 rounded bg-[#99cdb6] text-gray-100
+  hocus:bg-[#79bda0] hocus:text-gray-200 focus:shadow-outline
   border-b-0
 `;
 
@@ -78,8 +78,10 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
   }
   const defaultLinks = [
     <NavLinks key={1}>
-      <NavLink href="/#">Productos</NavLink>
-      <NavLink href="/#">Contactenos</NavLink>
+      <NavLink href="/blog">Blog</NavLink>
+      <NavLink href="/nosotros">Nosotros</NavLink>
+      <NavLink href="/pricing">Pricing</NavLink>
+      <NavLink href="/contacto">Contactenos</NavLink>
       {token ? (<>
           <NavLink href="/#" tw="lg:ml-12!">
             {JSON.parse(user).nombre}

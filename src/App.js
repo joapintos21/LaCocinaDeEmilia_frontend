@@ -104,6 +104,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "pages/Login";
 import SignUp from "pages/Signup";
 import VerificarCuenta from "pages/VerificarCuenta";
+import AboutUs from "pages/AboutUs";
+import ContactUs from "pages/ContactUs";
+import Pricing from "pages/Pricing";
+import BlogIndex from "pages/BlogIndex";
 
 export default function App() {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
@@ -118,6 +122,10 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/verificar" element={<VerificarCuenta />} />
+          <Route path="/nosotros" element={<AboutUs />} />
+          <Route path="/contacto" element={<ContactUs />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/blog" element={<BlogIndex />} />
           <Route path="/" element={<RestaurantLandingPage />} />
         </Routes>
       </Router>

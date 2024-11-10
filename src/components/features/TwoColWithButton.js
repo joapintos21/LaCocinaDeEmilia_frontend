@@ -35,10 +35,9 @@ const Heading = tw(
 const Description = tw.p`mt-4 text-center md:text-left text-sm md:text-base lg:text-lg font-medium leading-relaxed text-secondary-100`;
 
 const PrimaryButton = styled(PrimaryButtonBase)(props => [
-  tw`mt-8 md:mt-8 text-sm inline-block mx-auto md:mx-0`,
+  tw`mt-8 md:mt-8 text-sm inline-block mx-auto md:mx-0 bg-[#99cdb6] hover:bg-[#79bda0] text-gray-100`,
   props.buttonRounded && tw`rounded-full`
 ]);
-
 
 export default ({
   subheading = "Our Expertise",
