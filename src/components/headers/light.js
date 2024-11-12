@@ -82,6 +82,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       <NavLink href="/nosotros">Nosotros</NavLink>
       <NavLink href="/pricing">Pricing</NavLink>
       <NavLink href="/contacto">Contactenos</NavLink>
+      <NavLink href="/productos">Productos</NavLink>
       {token ? (<>
           <NavLink href="/#" tw="lg:ml-12!">
             {JSON.parse(user).nombre}
