@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import tw from "twin.macro";
 import { css } from "styled-components/macro"; //eslint-disable-line
 import AnimationRevealPage from "helpers/AnimationRevealPage.js";
@@ -6,7 +6,6 @@ import Hero from "components/hero/TwoColumnWithVideo.js";
 import Features from "components/features/ThreeColSimple.js";
 import MainFeature from "components/features/TwoColWithButton.js";
 import MainFeature2 from "components/features/TwoColSingleFeatureWithStats2.js";
-import TabGrid from "components/cards/TabCardGrid.js";
 import Testimonial from "components/testimonials/ThreeColumnWithProfileImage.js";
 import DownloadApp from "components/cta/DownloadApp.js";
 import Footer from "components/footers/FiveColumnWithInputForm.js";
@@ -15,6 +14,8 @@ import chefIconImageSrc from "images/chef-icon.svg";
 import celebrationIconImageSrc from "images/celebration-icon.svg";
 import shopIconImageSrc from "images/shop-icon.svg";
 import TabCategoryGrid from "components/cards/TabCategoryGrid";
+import { useDispatch, useSelector } from 'react-redux';
+import { obtenerCategorias } from 'scripts/obtenerCategorias';
 
 export default () => {
   const Subheading = tw.span`tracking-wider text-sm font-medium`;
@@ -22,6 +23,31 @@ export default () => {
   const HighlightedTextInverse = tw.span`bg-gray-100 text-primary-500 px-4 transform -skew-x-12 inline-block`;
   const Description = tw.span`inline-block mt-8`;
   const imageCss = tw`rounded-4xl`;
+  
+  const [categories, setCategories] = useState([]);
+  const dispatch = useDispatch();
+  const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
+    };
+    fetchCategorias();
+  }, [dispatch]);
+
+  // Transforma las categorías al formato requerido para `TabCategoryGrid`
+  useEffect(() => {
+    if (categoriasRedux && categoriasRedux.length > 0) {
+      const transformedCategories = categoriasRedux.map((categoria) => ({
+        imageSrc: categoria.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80", // Usa una URL por defecto si no hay `imageUrl`
+        title: categoria.titulo || "Sin nombre",
+        description: categoria.descripcion || "Sin descripción",
+        url: '#'
+      }));
+      setCategories(transformedCategories);
+    }
+  }, [categoriasRedux]);
+
   return (
     <AnimationRevealPage>
       <Hero
@@ -68,6 +94,7 @@ export default () => {
             Nuestras <HighlightedText>mejores categorías.</HighlightedText>
           </>
         }
+        categories={categories}
       />
       <Features
         heading={
