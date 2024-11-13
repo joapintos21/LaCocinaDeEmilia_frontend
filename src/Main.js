@@ -29,10 +29,15 @@ export default () => {
   const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
 
   useEffect(() => {
-    const fetchCategorias = async () => {
-      await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
-    };
-    fetchCategorias();
+    try {
+      const fetchCategorias = async () => {
+        await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
+      };
+      fetchCategorias();
+    } catch (e) {
+      console.log(e)
+    }
+    
   }, [dispatch]);
 
   // Transforma las categorías al formato requerido para `TabCategoryGrid`
