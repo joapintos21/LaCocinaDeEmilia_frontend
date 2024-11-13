@@ -9,6 +9,10 @@ import useAnimatedNavToggler from "../../helpers/useAnimatedNavToggler.js";
 import logo from "../../images/logo.svg";
 import { ReactComponent as MenuIcon } from "feather-icons/dist/icons/menu.svg";
 import { ReactComponent as CloseIcon } from "feather-icons/dist/icons/x.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "store/usuarioSlice"; // Importa la acción login desde el slice
+import { useNavigate } from "react-router-dom";
+
 
 const Header = tw.header`
   flex justify-between items-center
@@ -70,12 +74,36 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
    * changing the defaultLinks variable below below.
    * If you manipulate links here, all the styling on the links is already done for you. If you pass links yourself though, you are responsible for styling the links or use the helper styled components that are defined here (NavLink)
    */
-  const token = sessionStorage.getItem('userToken');
-  const user = sessionStorage.getItem('user');
-  const logout = () => {
-    sessionStorage.removeItem('userToken');
-    sessionStorage.removeItem('user');
-  }
+  
+  const Profile = () => {
+    const userInfo = useSelector((state) => state.usuario.userInfo);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+      dispatch(logout());
+      navigate('/login');
+    };
+  
+    return (
+      <>
+        {userInfo ? (<>
+          <NavLink href="/#" tw="lg:ml-12!">
+            {userInfo.nombre}
+          </NavLink>
+          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`} onClick={handleLogout}>Cerrar sesion</PrimaryLink>
+        </>) : (
+          <>
+            <NavLink href="/login" tw="lg:ml-12!">
+              Iniciar sesion
+            </NavLink>
+            <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/signup">Registrarse</PrimaryLink>
+          </>
+        )}
+      </>
+    );
+  };
+  
   const defaultLinks = [
     <NavLinks key={1}>
       <NavLink href="/blog">Blog</NavLink>
@@ -83,18 +111,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       <NavLink href="/pricing">Pricing</NavLink>
       <NavLink href="/contacto">Contactenos</NavLink>
       <NavLink href="/productos">Productos</NavLink>
-      {token ? (<>
-          <NavLink href="/#" tw="lg:ml-12!">
-            {JSON.parse(user).nombre}
-          </NavLink>
-          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/login"onClick={logout}>Cerrar sesion</PrimaryLink>
-        </>) : (<>
-          <NavLink href="/login" tw="lg:ml-12!">
-            Iniciar sesion
-          </NavLink>
-          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/signup">Registrarse</PrimaryLink>
-        </>)
-      }
+      <Profile />
     </NavLinks>
   ];
 
