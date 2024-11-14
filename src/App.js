@@ -1,6 +1,7 @@
 import React from "react";
 import GlobalStyles from 'styles/GlobalStyles';
 import { css } from "styled-components/macro"; //eslint-disable-line
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 /*
  * This is the entry point component of this project. You can change the below exported default App component to any of
@@ -111,6 +112,16 @@ import BlogIndex from "pages/BlogIndex";
 import Categorias from "pages/Productos";
 import Productos from "pages/Productos";
 
+const theme = createTheme({
+  palette: {
+    grey: {
+      200: "#f5f5f5",
+      500: "#9e9e9e",
+      700: "#616161",
+    },
+  },
+});
+
 export default function App() {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
   // return <AnimationRevealPage disabled>xxxxxxxxxx</AnimationRevealPage>;
@@ -119,6 +130,7 @@ export default function App() {
   return (
     <>
       <GlobalStyles />
+      <ThemeProvider theme={theme}>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -132,6 +144,7 @@ export default function App() {
           <Route path="/" element={<RestaurantLandingPage />} />
         </Routes>
       </Router>
+      </ThemeProvider>
     </>
   );
 }
