@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { css } from "styled-components/macro"; //eslint-disable-line
 
 import useAnimatedNavToggler from "../../helpers/useAnimatedNavToggler.js";
-
+import IconButton from '@mui/material/IconButton';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Cart from "components/Cart/Cart.js";
 import logo from "../../images/logo.svg";
 import { ReactComponent as MenuIcon } from "feather-icons/dist/icons/menu.svg";
 import { ReactComponent as CloseIcon } from "feather-icons/dist/icons/x.svg";
@@ -75,6 +77,10 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
    * If you manipulate links here, all the styling on the links is already done for you. If you pass links yourself though, you are responsible for styling the links or use the helper styled components that are defined here (NavLink)
    */
   
+  const [cartAnchorEl, setCartAnchorEl] = useState(null);
+  const handleCartOpen = (event) => setCartAnchorEl(event.currentTarget);
+  const handleCartClose = () => setCartAnchorEl(null);
+
   const Profile = () => {
     const userInfo = useSelector((state) => state.usuario.userInfo);
     const dispatch = useDispatch();
@@ -111,6 +117,9 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       <NavLink href="/pricing">Pricing</NavLink>
       <NavLink href="/contacto">Contactenos</NavLink>
       <NavLink href="/productos">Productos</NavLink>
+      <IconButton onClick={handleCartOpen}>
+      <ShoppingCartIcon />
+    </IconButton>
       <Profile />
     </NavLinks>
   ];
@@ -144,6 +153,14 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
           {showNavLinks ? <CloseIcon tw="w-6 h-6" /> : <MenuIcon tw="w-6 h-6" />}
         </NavToggle>
       </MobileNavLinksContainer>
+      <Cart
+        anchorEl={cartAnchorEl}
+        close={handleCartClose}
+        //dataCart={/* Aquí debes pasar los datos del carrito */}
+        //removeItem={/* Aquí debes definir la función para eliminar un artículo */}
+        //totalPrice={/* Aquí debes pasar el precio total */}
+        //checkout={/* Aquí debes definir la función para realizar el checkout */}
+      />
     </Header>
   );
 };
