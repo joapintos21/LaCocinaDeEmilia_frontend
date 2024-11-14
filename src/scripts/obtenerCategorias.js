@@ -4,17 +4,10 @@ export const obtenerCategorias = async (dispatch) => {
   let url = "/categorias";
 
   try {
-    // Obtén el token desde sessionStorage o localStorage
-    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Token no encontrado. Por favor, inicie sesión.');
-    }
-
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, // Agrega el token al encabezado
+        "Content-Type": "application/json"
       },
     });
 

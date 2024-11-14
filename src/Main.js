@@ -37,7 +37,6 @@ export default () => {
     } catch (e) {
       console.log(e)
     }
-    
   }, [dispatch]);
 
   // Transforma las categorías al formato requerido para `TabCategoryGrid`
