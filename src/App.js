@@ -110,6 +110,7 @@ import Pricing from "pages/Pricing";
 import BlogIndex from "pages/BlogIndex";
 import Categorias from "pages/Productos";
 import Productos from "pages/Productos";
+import PanelAdministrador from "pages/PanelAdministrador";
 
 export default function App() {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
@@ -129,6 +130,7 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<BlogIndex />} />
           <Route path="/productos" element={<Productos />} />
+          <Route path="/paneladministrador" element={<PanelAdministrador />} />
           <Route path="/" element={<RestaurantLandingPage />} />
         </Routes>
       </Router>
