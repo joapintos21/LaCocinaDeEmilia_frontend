@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { ReactComponent as LoginIcon } from "feather-icons/dist/icons/log-in.svg";
 import { iniciarSesion } from "scripts/loginScript.js";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 import { login } from "store/usuarioSlice"; // Importa la acción login desde el slice
 
 const Form = tw.form`mx-auto max-w-xs`;

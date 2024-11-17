@@ -9,6 +9,7 @@ import MainFeature2 from "components/features/TwoColSingleFeatureWithStats2.js";
 import Testimonial from "components/testimonials/ThreeColumnWithProfileImage.js";
 import DownloadApp from "components/cta/DownloadApp.js";
 import Footer from "components/footers/FiveColumnWithInputForm.js";
+import TabCardGrid from "components/cards/TabCardGrid";
 
 import chefIconImageSrc from "images/chef-icon.svg";
 import celebrationIconImageSrc from "images/celebration-icon.svg";
@@ -24,6 +25,22 @@ export default () => {
   const Description = tw.span`inline-block mt-8`;
   const imageCss = tw`rounded-4xl`;
   
+  const [cartItems, setCartItems] = useState([]);
+
+  const addToCart = (product) => {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.title === product.title);
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.title === product.title
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prevItems, { ...product, quantity: 1 }];
+    });
+  };
+
   const [categories, setCategories] = useState([]);
   const dispatch = useDispatch();
   const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
@@ -100,6 +117,7 @@ export default () => {
         }
         categories={categories}
       />
+       <TabCardGrid onAddToCart={addToCart} />
       <Features
         heading={
           <>

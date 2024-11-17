@@ -66,6 +66,7 @@ export default () => {
   const categoriasRedux = useSelector((state) => state.categorias);
   const [activeTab, setActiveTab] = useState("Todos");
   const { categoria } = useParams();
+  const [cartItems, setCartItems] = useState([]);
 
   // Cargar productos desde Redux
   useEffect(() => {
@@ -128,6 +129,57 @@ export default () => {
     }
 };
 
+/*
+const addToCart = (producto) => {
+  console.log("Producto recibido:", producto);
+  console.log("Descripción válida:", typeof producto.descripcion === "string" && producto.descripcion.trim() !== "");
+  console.log("Precio válido:", typeof producto.precio === "number" && producto.precio > 0);
+  console.log("Producto como JSON:", JSON.stringify(producto, null, 2));
+  if (!producto.descripcion || !producto.precio) {
+    console.error("El producto no tiene las propiedades necesarias:", producto);
+    return;
+  }
+
+  setCartItems((prevItems) => {
+    console.log("Estado previo del carrito:", prevItems);
+    const existingItem = prevItems.find((item) => item.descripcion === producto.descripcion);
+    if (existingItem) {
+      return prevItems.map((item) =>
+        item.descripcion === producto.descripcion
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+    }
+    console.log("Estado actual del carrito:", cartItems);
+    return [...prevItems, { ...producto, quantity: 1 }];
+  });
+};
+
+
+const handleRemoveItem = (itemToRemove) => {
+  setCartItems((prevItems) => prevItems.filter(item => item.id !== itemToRemove.id));
+};
+
+const handleCheckout = () => {
+  alert('Compra realizada con éxito');
+  setCartItems([]); // Limpia el carrito después del checkout
+};
+*/
+
+const addToCart = (product) => {
+  setCartItems((prevItems) => {
+    const existingItem = prevItems.find((item) => item.title === product.title);
+    if (existingItem) {
+      return prevItems.map((item) =>
+        item.title === product.title
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+    }
+    return [...prevItems, { ...product, quantity: 1 }];
+  });
+};
+
   return (
     <Container>
       <ContentWithPaddingXl>
@@ -187,7 +239,7 @@ export default () => {
                       }}
                       transition={{ duration: 0.3 }}
                     >
-                      <CardButton>Comprar</CardButton>
+                     <CardButton onClick={() => addToCart(card.title)}>Comprar</CardButton>  
                     </CardHoverOverlay>
                   </CardImageContainer>
                   <CardText>

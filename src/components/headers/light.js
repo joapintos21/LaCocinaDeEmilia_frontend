@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { css } from "styled-components/macro"; //eslint-disable-line
-
 import useAnimatedNavToggler from "../../helpers/useAnimatedNavToggler.js";
 import IconButton from '@mui/material/IconButton';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -43,10 +42,20 @@ export const LogoLink = styled(NavLink)`
   ${tw`flex items-center font-black border-b-0 text-2xl! ml-0!`};
 
   img {
+    width: 10rem;
+    height: 10rem;
+    ${tw`mr-3 rounded-full`}
+  }
+`;
+/*
+export const LogoLink = styled(NavLink)`
+  ${tw`flex items-center font-black border-b-0 text-2xl! ml-0!`};
+
+  img {
     ${tw`w-10 mr-3`}
   }
 `;
-
+*/
 export const MobileNavLinksContainer = tw.nav`flex flex-1 items-center justify-between`;
 export const NavToggle = tw.button`
   lg:hidden z-20 focus:outline-none hocus:text-primary-500 transition duration-300
@@ -130,12 +139,47 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
   const defaultLogoLink = (
     <LogoLink href="/">
       <img src={logo} alt="logo" />
-      La cocina de Emilia
     </LogoLink>
   );
 
   logoLink = logoLink || defaultLogoLink;
   links = links || defaultLinks;
+
+  const [cartItems, setCartItems] = useState([
+    {
+      name: "Producto Inicial",
+      price: 50,
+      quantity: 1,
+      thumbnail: "https://via.placeholder.com/150",
+    },
+  ]);
+
+// Agregar producto al carrito
+const addToCart = (product) => {
+  setCartItems((prevItems) => {
+    const existingItem = prevItems.find((item) => item.id === product.id);
+    if (existingItem) {
+      return prevItems.map((item) =>
+        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    }
+    return [...prevItems, { ...product, quantity: 1 }];
+  });
+};
+
+// Eliminar producto del carrito
+const handleRemoveItem = (itemToRemove) => {
+  setCartItems((prevItems) =>
+    prevItems.filter((item) => item.id !== itemToRemove.id)
+  );
+};
+
+// Finalizar compra
+const handleCheckout = () => {
+  alert("¡Compra realizada con éxito!");
+  setCartItems([]); // Vacía el carrito después del checkout
+};
+
 
   return (
     <Header className={className || "header-light"}>
@@ -156,10 +200,14 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       <Cart
         anchorEl={cartAnchorEl}
         close={handleCartClose}
-        //dataCart={/* Aquí debes pasar los datos del carrito */}
-        //removeItem={/* Aquí debes definir la función para eliminar un artículo */}
-        //totalPrice={/* Aquí debes pasar el precio total */}
-        //checkout={/* Aquí debes definir la función para realizar el checkout */}
+        dataCart={cartItems}
+        removeItem={handleRemoveItem}
+        totalPrice={cartItems.reduce((total, item) => total + item.price * item.quantity, 0)}
+        checkout={handleCheckout}
+        //dataCart={/* Falta pasar los datos del carrito */}
+        //removeItem={/* Falta definir la función para eliminar un artículo */}
+        //totalPrice={/* Falta pasar el precio total */}
+        //checkout={/* Falta definir la función para realizar el checkout */}
       />
     </Header>
   );

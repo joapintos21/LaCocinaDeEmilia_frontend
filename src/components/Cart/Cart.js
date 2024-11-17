@@ -35,7 +35,7 @@ class Cart extends React.Component {
           </figure>
           <ListItemText
             primary={item.name}
-            secondary={`Quantity: ${item.quantity} Item - USD ${item.price * item.quantity}`}
+            secondary={`Cantidad: ${item.quantity} Item - $${item.price * item.quantity}`}
             className={classes.itemText}
           />
           <ListItemSecondaryAction>
@@ -46,7 +46,7 @@ class Cart extends React.Component {
         </ListItem>
         <li>
           <Divider />
-        </li>
+        </li> 
       </Fragment>
     ));
     

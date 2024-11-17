@@ -109,7 +109,6 @@ import AboutUs from "pages/AboutUs";
 import ContactUs from "pages/ContactUs";
 import Pricing from "pages/Pricing";
 import BlogIndex from "pages/BlogIndex";
-import Categorias from "pages/Productos";
 import Productos from "pages/Productos";
 import PanelAdministrador from "pages/PanelAdministrador";
 
