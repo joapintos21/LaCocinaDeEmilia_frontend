@@ -88,7 +88,7 @@ const Producto = ({ producto }) => {
           </ButtonContainer>
         </Details>
       </Content>
-  );
-};
+  )
+}
 
 export default Producto;

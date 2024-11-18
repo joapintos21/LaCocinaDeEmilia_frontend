@@ -27,7 +27,7 @@ const PaginaProducto = () => {
       <Header />
       <Container>
         <ContentWithPaddingXl>
-          <Producto producto={producto} />;
+          <Producto producto={producto} />
         </ContentWithPaddingXl>
       </Container>
       <Footer />

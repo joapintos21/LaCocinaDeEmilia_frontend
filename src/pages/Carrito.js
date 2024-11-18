@@ -4,12 +4,17 @@ import AnimationRevealPage from "helpers/AnimationRevealPage.js";
 import Header from "components/headers/light.js";
 import Footer from "components/footers/FiveColumnWithInputForm.js";
 import Carrito from "components/Cart/CartPage";
+import { Container, ContentWithPaddingXl } from "components/misc/Layouts";
 
 export default () => {
   return (
     <AnimationRevealPage>
       <Header />
-        <Carrito/>
+      <Container>
+        <ContentWithPaddingXl>
+          <Carrito />
+        </ContentWithPaddingXl>
+      </Container>
       <Footer />
     </AnimationRevealPage>
   );
