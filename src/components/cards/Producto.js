@@ -34,7 +34,6 @@ const PrimaryButton = styled(PrimaryButtonBase)`
 `;
 
 const Producto = ({ producto }) => {
-  console.log(producto);
   const dispatch = useDispatch();
   const [cantidad, setCantidad] = useState(1);
 

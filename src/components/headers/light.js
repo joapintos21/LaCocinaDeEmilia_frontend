@@ -150,7 +150,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
         dataCart={cartItems}
         removeItem={handleRemoveItem}
         totalPrice={totalPrice}
-        checkout={handleCheckout}
+        checkout={() => navigate('/carrito')}
       />
     </Header>
   );
