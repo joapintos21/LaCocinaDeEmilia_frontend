@@ -35,11 +35,11 @@ class Cart extends React.Component {
           </figure>
           <ListItemText
             primary={item.name}
-            secondary={`Cantidad: ${item.quantity} Item - $${item.price * item.quantity}`}
+            secondary={`Cantidad: ${item.cantidad} Item - $${item.precio * item.cantidad}`}
             className={classes.itemText}
           />
           <ListItemSecondaryAction>
-            <IconButton aria-label="Comments" onClick={() => removeItem(item)}>
+            <IconButton aria-label="Comments" onClick={() => removeItem(item.id)}>
               <DeleteIcon />
             </IconButton>
           </ListItemSecondaryAction>

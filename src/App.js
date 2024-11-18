@@ -111,6 +111,7 @@ import Pricing from "pages/Pricing";
 import BlogIndex from "pages/BlogIndex";
 import Productos from "pages/Productos";
 import PanelAdministrador from "pages/PanelAdministrador";
+import PaginaProducto from "pages/PaginaProducto";
 
 const theme = createTheme({
   palette: {
@@ -141,6 +142,7 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<BlogIndex />} />
           <Route path="/productos" element={<Productos />} />
+          <Route path="/producto/:id" element={<PaginaProducto />} />
           <Route path="/paneladministrador" element={<PanelAdministrador />} />
           <Route path="/" element={<RestaurantLandingPage />} />
         </Routes>

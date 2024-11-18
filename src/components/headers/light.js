@@ -11,7 +11,8 @@ import logo from "../../images/logo.svg";
 import { ReactComponent as MenuIcon } from "feather-icons/dist/icons/menu.svg";
 import { ReactComponent as CloseIcon } from "feather-icons/dist/icons/x.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "store/usuarioSlice"; // Importa la acción login desde el slice
+import { logout } from "store/usuarioSlice";
+import { quitarItem, limpiarCarrito } from "store/carritoSlice";
 import { useNavigate } from "react-router-dom";
 
 
@@ -21,41 +22,26 @@ const Header = tw.header`
 `;
 
 export const NavLinks = tw.div`inline-block`;
-
-/* hocus: stands for "on hover or focus"
- * hocus:bg-primary-700 will apply the bg-primary-700 class on hover or focus
- */
 export const NavLink = tw.a`
   text-lg my-2 lg:text-sm lg:mx-6 lg:my-0
   font-semibold tracking-wide transition duration-300
   pb-1 border-b-2 border-transparent hover:border-primary-500 hocus:text-primary-500
 `;
-
 export const PrimaryLink = tw(NavLink)`
   lg:mx-0
   px-8 py-3 rounded bg-[#99cdb6] text-gray-100
   hocus:bg-[#79bda0] hocus:text-gray-200 focus:shadow-outline
   border-b-0
 `;
-
 export const LogoLink = styled(NavLink)`
   ${tw`flex items-center font-black border-b-0 text-2xl! ml-0!`};
-
   img {
     width: 10rem;
     height: 10rem;
     ${tw`mr-3 rounded-full`}
   }
 `;
-/*
-export const LogoLink = styled(NavLink)`
-  ${tw`flex items-center font-black border-b-0 text-2xl! ml-0!`};
 
-  img {
-    ${tw`w-10 mr-3`}
-  }
-`;
-*/
 export const MobileNavLinksContainer = tw.nav`flex flex-1 items-center justify-between`;
 export const NavToggle = tw.button`
   lg:hidden z-20 focus:outline-none hocus:text-primary-500 transition duration-300
@@ -66,59 +52,46 @@ export const MobileNavLinks = motion(styled.div`
     ${tw`flex flex-col items-center`}
   }
 `);
-
 export const DesktopNavLinks = tw.nav`
   hidden lg:flex flex-1 justify-between items-center
 `;
 
 export default ({ roundedHeaderButton = false, logoLink, links, className, collapseBreakpointClass = "lg" }) => {
-  /*
-   * This header component accepts an optionals "links" prop that specifies the links to render in the navbar.
-   * This links props should be an array of "NavLinks" components which is exported from this file.
-   * Each "NavLinks" component can contain any amount of "NavLink" component, also exported from this file.
-   * This allows this Header to be multi column.
-   * So If you pass only a single item in the array with only one NavLinks component as root, you will get 2 column header.
-   * Left part will be LogoLink, and the right part will be the the NavLinks component you
-   * supplied.
-   * Similarly if you pass 2 items in the links array, then you will get 3 columns, the left will be "LogoLink", the center will be the first "NavLinks" component in the array and the right will be the second "NavLinks" component in the links array.
-   * You can also choose to directly modify the links here by not passing any links from the parent component and
-   * changing the defaultLinks variable below below.
-   * If you manipulate links here, all the styling on the links is already done for you. If you pass links yourself though, you are responsible for styling the links or use the helper styled components that are defined here (NavLink)
-   */
-  
   const [cartAnchorEl, setCartAnchorEl] = useState(null);
+  const { showNavLinks, animation, toggleNavbar } = useAnimatedNavToggler();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Obtener información del usuario y carrito desde Redux
+  const userInfo = useSelector((state) => state.usuario.userInfo);
+  const cartItems = useSelector((state) => state.carrito.items);
+  const totalPrice = cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
+
+  // Manejo de carrito
   const handleCartOpen = (event) => setCartAnchorEl(event.currentTarget);
   const handleCartClose = () => setCartAnchorEl(null);
 
-  const Profile = () => {
-    const userInfo = useSelector((state) => state.usuario.userInfo);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-      dispatch(logout());
-      navigate('/login');
-    };
-  
-    return (
-      <>
-        {userInfo ? (<>
-          <NavLink href="/#" tw="lg:ml-12!">
-            {userInfo.nombre}
-          </NavLink>
-          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`} onClick={handleLogout}>Cerrar sesion</PrimaryLink>
-        </>) : (
-          <>
-            <NavLink href="/login" tw="lg:ml-12!">
-              Iniciar sesion
-            </NavLink>
-            <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/signup">Registrarse</PrimaryLink>
-          </>
-        )}
-      </>
-    );
+  const handleRemoveItem = (item) => {
+    dispatch(quitarItem(item));
   };
-  
+
+  const handleCheckout = () => {
+    alert("¡Compra realizada con éxito!");
+    dispatch(limpiarCarrito());
+    handleCartClose();
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
+
+  const defaultLogoLink = (
+    <LogoLink href="/">
+      <img src={logo} alt="logo" />
+    </LogoLink>
+  );
+
   const defaultLinks = [
     <NavLinks key={1}>
       <NavLink href="/paneladministrador">Panel</NavLink>
@@ -127,117 +100,66 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       <NavLink href="/contacto">Contactenos</NavLink>
       <NavLink href="/productos">Productos</NavLink>
       <IconButton onClick={handleCartOpen}>
-      <ShoppingCartIcon />
-    </IconButton>
-      <Profile />
+        <ShoppingCartIcon />
+      </IconButton>
+      {userInfo ? (
+        <>
+          <NavLink href="/#">{userInfo.nombre}</NavLink>
+          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`} onClick={handleLogout}>
+            Cerrar sesión
+          </PrimaryLink>
+        </>
+      ) : (
+        <>
+          <NavLink href="/login">Iniciar sesión</NavLink>
+          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`} href="/signup">
+            Registrarse
+          </PrimaryLink>
+        </>
+      )}
     </NavLinks>
   ];
-
-  const { showNavLinks, animation, toggleNavbar } = useAnimatedNavToggler();
-  const collapseBreakpointCss = collapseBreakPointCssMap[collapseBreakpointClass];
-
-  const defaultLogoLink = (
-    <LogoLink href="/">
-      <img src={logo} alt="logo" />
-    </LogoLink>
-  );
 
   logoLink = logoLink || defaultLogoLink;
   links = links || defaultLinks;
 
-  const [cartItems, setCartItems] = useState([
-    {
-      name: "Producto Inicial",
-      price: 50,
-      quantity: 1,
-      thumbnail: "https://via.placeholder.com/150",
-    },
-  ]);
-
-// Agregar producto al carrito
-const addToCart = (product) => {
-  setCartItems((prevItems) => {
-    const existingItem = prevItems.find((item) => item.id === product.id);
-    if (existingItem) {
-      return prevItems.map((item) =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-    }
-    return [...prevItems, { ...product, quantity: 1 }];
-  });
-};
-
-// Eliminar producto del carrito
-const handleRemoveItem = (itemToRemove) => {
-  setCartItems((prevItems) =>
-    prevItems.filter((item) => item.id !== itemToRemove.id)
-  );
-};
-
-// Finalizar compra
-const handleCheckout = () => {
-  alert("¡Compra realizada con éxito!");
-  setCartItems([]); // Vacía el carrito después del checkout
-};
-
-
   return (
     <Header className={className || "header-light"}>
-      <DesktopNavLinks css={collapseBreakpointCss.desktopNavLinks}>
+      <DesktopNavLinks css={collapseBreakPointCssMap[collapseBreakpointClass].desktopNavLinks}>
         {logoLink}
         {links}
       </DesktopNavLinks>
 
-      <MobileNavLinksContainer css={collapseBreakpointCss.mobileNavLinksContainer}>
+      <MobileNavLinksContainer css={collapseBreakPointCssMap[collapseBreakpointClass].mobileNavLinksContainer}>
         {logoLink}
-        <MobileNavLinks initial={{ x: "150%", display: "none" }} animate={animation} css={collapseBreakpointCss.mobileNavLinks}>
+        <MobileNavLinks
+          initial={{ x: "150%", display: "none" }}
+          animate={animation}
+          css={collapseBreakPointCssMap[collapseBreakpointClass].mobileNavLinks}
+        >
           {links}
         </MobileNavLinks>
         <NavToggle onClick={toggleNavbar} className={showNavLinks ? "open" : "closed"}>
           {showNavLinks ? <CloseIcon tw="w-6 h-6" /> : <MenuIcon tw="w-6 h-6" />}
         </NavToggle>
       </MobileNavLinksContainer>
+
       <Cart
         anchorEl={cartAnchorEl}
         close={handleCartClose}
         dataCart={cartItems}
         removeItem={handleRemoveItem}
-        totalPrice={cartItems.reduce((total, item) => total + item.price * item.quantity, 0)}
+        totalPrice={totalPrice}
         checkout={handleCheckout}
-        //dataCart={/* Falta pasar los datos del carrito */}
-        //removeItem={/* Falta definir la función para eliminar un artículo */}
-        //totalPrice={/* Falta pasar el precio total */}
-        //checkout={/* Falta definir la función para realizar el checkout */}
       />
     </Header>
   );
 };
 
-/* The below code is for generating dynamic break points for navbar.
- * Using this you can specify if you want to switch
- * to the toggleable mobile navbar at "sm", "md" or "lg" or "xl" above using the collapseBreakpointClass prop
- * Its written like this because we are using macros and we can not insert dynamic variables in macros
- */
-
+/* Ajuste de puntos de interrupción */
 const collapseBreakPointCssMap = {
-  sm: {
-    mobileNavLinks: tw`sm:hidden`,
-    desktopNavLinks: tw`sm:flex`,
-    mobileNavLinksContainer: tw`sm:hidden`
-  },
-  md: {
-    mobileNavLinks: tw`md:hidden`,
-    desktopNavLinks: tw`md:flex`,
-    mobileNavLinksContainer: tw`md:hidden`
-  },
-  lg: {
-    mobileNavLinks: tw`lg:hidden`,
-    desktopNavLinks: tw`lg:flex`,
-    mobileNavLinksContainer: tw`lg:hidden`
-  },
-  xl: {
-    mobileNavLinks: tw`lg:hidden`,
-    desktopNavLinks: tw`lg:flex`,
-    mobileNavLinksContainer: tw`lg:hidden`
-  }
+  sm: { mobileNavLinks: tw`sm:hidden`, desktopNavLinks: tw`sm:flex`, mobileNavLinksContainer: tw`sm:hidden` },
+  md: { mobileNavLinks: tw`md:hidden`, desktopNavLinks: tw`md:flex`, mobileNavLinksContainer: tw`md:hidden` },
+  lg: { mobileNavLinks: tw`lg:hidden`, desktopNavLinks: tw`lg:flex`, mobileNavLinksContainer: tw`lg:hidden` },
+  xl: { mobileNavLinks: tw`lg:hidden`, desktopNavLinks: tw`lg:flex`, mobileNavLinksContainer: tw`lg:hidden` },
 };
