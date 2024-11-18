@@ -5,12 +5,13 @@ import { combineReducers } from 'redux';
 import usuarioReducer from './usuarioSlice';
 import productoReducer from './productoSlice';
 import categoriaReducer from './categoriaSlice';
+import carritoReducer from './carritoSlice'; // Importa el cartSlice
 
 // Configuración de persistencia para el estado de la aplicación
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['usuario', 'productos', 'categorias'], // Persistir estos reducers
+    whitelist: ['usuario', 'productos', 'categorias', 'carrito'], // Incluye el cart en la persistencia
 };
 
 // Combina los reducers
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
     usuario: usuarioReducer,
     productos: productoReducer,
     categorias: categoriaReducer,
+    carrito: carritoReducer, // Agrega el cartReducer
 });
 
 // Aplica persistencia al rootReducer

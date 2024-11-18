@@ -6,17 +6,22 @@ import { css } from "styled-components/macro"; //eslint-disable-line
 import { Container, ContentWithPaddingXl } from "components/misc/Layouts.js";
 import { SectionHeading } from "components/misc/Headings.js";
 import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
-import { ReactComponent as SvgDecoratorBlob1 } from "images/svg-decorator-blob-5.svg";
-import { ReactComponent as SvgDecoratorBlob2 } from "images/svg-decorator-blob-7.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { obtenerProductos } from "scripts/obtenerProductosCategoria";
 import { buscarProducto } from "scripts/buscarProducto";
 
 const HeaderRow = tw.div`flex justify-between items-center flex-col xl:flex-row`;
 const Header = tw(SectionHeading)``;
 const TabsControl = tw.div`flex flex-wrap bg-gray-200 px-2 py-2 rounded leading-none mt-12 xl:mt-0`;
-const SearchInput = tw.input`w-1/3 px-4 py-2 mt-4 mb-4 border border-black rounded-md`;
+const SearchContainer = tw.div`flex justify-end items-center mt-4 mb-4`;
+const SearchInput = styled.input`
+  ${tw`border border-secondary-300 rounded-full px-4 py-2 w-64`}
+  transition: all 0.3s ease-in-out;
+  &:focus {
+    ${tw`border-primary-500 shadow-lg outline-none`}
+  }
+`;
 
 const TabControl = styled.div`
   ${tw`cursor-pointer px-6 py-3 mt-2 sm:mt-0 sm:mr-2 last:mr-0 text-gray-600 font-medium rounded-sm transition duration-300 text-sm sm:text-base w-1/2 sm:w-auto text-center`}
@@ -24,7 +29,6 @@ const TabControl = styled.div`
     ${tw`bg-gray-300 text-gray-700`}
   }
   ${props => props.active && tw`bg-primary-500! text-gray-100!`}
-  }
 `;
 
 const TabContent = tw(motion.div)`mt-6 flex flex-wrap sm:-mr-10 md:-mr-6 lg:-mr-12`;
@@ -45,19 +49,8 @@ const CardTitle = tw.h5`text-lg font-semibold group-hover:text-primary-500`;
 const CardContent = tw.p`mt-1 text-sm font-medium text-gray-600`;
 const CardPrice = tw.p`mt-4 text-xl font-bold`;
 
-const DecoratorBlob1 = styled(SvgDecoratorBlob1)`
-  ${tw`pointer-events-none -z-20 absolute right-0 top-0 h-64 w-64 opacity-15 transform translate-x-2/3 -translate-y-12 text-pink-400`}
-`;
-const DecoratorBlob2 = styled(SvgDecoratorBlob2)`
-  ${tw`pointer-events-none -z-20 absolute left-0 bottom-0 h-80 w-80 opacity-15 transform -translate-x-2/3 text-primary-500`}
-`;
 
 export default () => {
-  /*
-   * To customize the tabs, pass in data using the `tabs` prop. It should be an object which contains the name of the tab
-   * as the key and value of the key will be its content (as an array of objects).
-   * To see what attributes are configurable of each object inside this array see the example above for "Starters".
-   */
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -66,6 +59,7 @@ export default () => {
   const categoriasRedux = useSelector((state) => state.categorias);
   const [activeTab, setActiveTab] = useState("Todos");
   const { categoria } = useParams();
+  const navigate = useNavigate();
 
   // Cargar productos desde Redux
   useEffect(() => {
@@ -75,9 +69,11 @@ export default () => {
     fetchProductos();
   }, [dispatch]);
 
+  // Transformar productos desde Redux al formato requerido
   useEffect(() => {
     if (productosRedux && productosRedux.length > 0) {
       const transformedProducts = productosRedux.map((producto) => ({
+        id: producto.id,
         imageSrc: producto.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80",
         title: producto.descripcion || "Sin nombre",
         price: producto.precio || "$0.00",
@@ -98,48 +94,49 @@ export default () => {
     }, {})
   };
 
+  // Manejo de cambio de categoría por URL
   useEffect(() => {
     if (categoria) {
       setActiveTab(categoria === "todos" ? "Todos" : categoria.charAt(0).toUpperCase() + categoria.slice(1));
     }
   }, [categoria]);
 
-  // Función para manejar la búsqueda
+  // Manejo de búsqueda
   const handleSearch = async () => {
     if (searchText.trim() === "") {
         setFilteredProducts(products); // Restablece todos los productos si el campo de búsqueda está vacío
     } else {
-        try {
-            const resultados = await buscarProducto(searchText); // Usa el script de búsqueda
-
-            // Aplica la misma transformación a los resultados de búsqueda
-            const transformedResults = resultados.map((producto) => ({
-                imageSrc: producto.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80",
-                title: producto.descripcion || "Sin nombre",
-                price: producto.precio || "$0.00",
-                category: producto.categoria || "Otros",
-                url: '#'
-            }));
-
-            setFilteredProducts(transformedResults); // Muestra solo los resultados transformados de la búsqueda
-        } catch (error) {
-            console.error("Error en la búsqueda:", error);
-        }
+      try {
+        const resultados = await buscarProducto(searchText);
+        const transformedResults = resultados.map((producto) => ({
+          id: producto.id,
+          imageSrc: producto.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80",
+          title: producto.descripcion || "Sin nombre",
+          price: producto.precio || "$0.00",
+          category: producto.categoria || "Otros",
+          url: '#'
+        }));
+        setFilteredProducts(transformedResults);
+      } catch (error) {
+        console.error("Error en la búsqueda:", error);
+      }
     }
-};
+  };
 
   return (
     <Container>
       <ContentWithPaddingXl>
         <HeaderRow>
           <Header>Nuestros Productos</Header>
-          <SearchInput
-            type="text"
-            placeholder="Buscar productos..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()} // Permite buscar presionando Enter
-          />
+          <SearchContainer>
+            <SearchInput
+              type="text"
+              placeholder="Buscar productos..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            />
+          </SearchContainer>
         </HeaderRow>
         <HeaderRow>
           <TabsControl>
@@ -150,7 +147,7 @@ export default () => {
             ))}
           </TabsControl>
         </HeaderRow>
-
+  
         {Object.keys(tabs).map((tabKey, index) => (
           <TabContent
             key={index}
@@ -187,7 +184,7 @@ export default () => {
                       }}
                       transition={{ duration: 0.3 }}
                     >
-                      <CardButton>Comprar</CardButton>
+                     <CardButton onClick={() => navigate(`/producto/${card.id}`)}>Ver Producto</CardButton>  
                     </CardHoverOverlay>
                   </CardImageContainer>
                   <CardText>
@@ -201,8 +198,6 @@ export default () => {
           </TabContent>
         ))}
       </ContentWithPaddingXl>
-      <DecoratorBlob1 />
-      <DecoratorBlob2 />
     </Container>
-  );
-};
+  )
+}

@@ -9,7 +9,6 @@ import MainFeature2 from "components/features/TwoColSingleFeatureWithStats2.js";
 import Testimonial from "components/testimonials/ThreeColumnWithProfileImage.js";
 import DownloadApp from "components/cta/DownloadApp.js";
 import Footer from "components/footers/FiveColumnWithInputForm.js";
-
 import chefIconImageSrc from "images/chef-icon.svg";
 import celebrationIconImageSrc from "images/celebration-icon.svg";
 import shopIconImageSrc from "images/shop-icon.svg";
@@ -23,7 +22,7 @@ export default () => {
   const HighlightedTextInverse = tw.span`bg-gray-100 text-primary-500 px-4 transform -skew-x-12 inline-block`;
   const Description = tw.span`inline-block mt-8`;
   const imageCss = tw`rounded-4xl`;
-  
+
   const [categories, setCategories] = useState([]);
   const dispatch = useDispatch();
   const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
