@@ -1,32 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCategorias, addCategory, updateCategory, deleteCategory } from 'store/categoriaSlice';
+import obtenerCategorias from 'scripts/obtenerCategorias'; // Importamos la función para obtener categorías
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Button, Paper, Typography, TextField, Dialog, DialogActions, DialogContent, DialogTitle
+  Button, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 
 const CategoryManagement = () => {
-  // Datos simulados de categorías
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Ropa' },
-    { id: 2, name: 'Electrónica' },
-    { id: 3, name: 'Hogar' },
-    { id: 4, name: 'Deportes' },
-  ]);
+  const dispatch = useDispatch();
+  const categories = useSelector((state) => state.categories); // Obtenemos las categorías desde el store
 
-  // Estado para el formulario
   const [open, setOpen] = useState(false);
-  const [newCategory, setNewCategory] = useState({
-    id: null,
-    name: '',
-  });
+  const [newCategory, setNewCategory] = useState({ id: null, name: '' });
 
   // Función para abrir el formulario (para agregar o editar categoría)
   const handleOpen = (category = null) => {
     if (category) {
-      // Si es una categoría existente, editamos
       setNewCategory({ ...category });
     } else {
-      // Si no se pasa ninguna categoría, es para agregar una nueva
       setNewCategory({ id: null, name: '' });
     }
     setOpen(true);
@@ -47,16 +39,11 @@ const CategoryManagement = () => {
   const handleSaveCategory = () => {
     if (newCategory.name) {
       if (newCategory.id === null) {
-        // Si no tiene ID, es una nueva categoría
-        const newId = categories.length ? categories[categories.length - 1].id + 1 : 1; // Asigna un ID único
+        const newId = categories.length ? categories[categories.length - 1].id + 1 : 1;
         const categoryToAdd = { ...newCategory, id: newId };
-        setCategories([...categories, categoryToAdd]);
+        dispatch(addCategory(categoryToAdd));
       } else {
-        // Si tiene ID, es una categoría que se va a editar
-        const updatedCategories = categories.map((category) =>
-          category.id === newCategory.id ? { ...category, name: newCategory.name } : category
-        );
-        setCategories(updatedCategories);
+        dispatch(updateCategory(newCategory));
       }
       setNewCategory({ id: null, name: '' }); // Limpiar formulario
       handleClose(); // Cerrar el formulario
@@ -67,13 +54,21 @@ const CategoryManagement = () => {
 
   // Función para eliminar categoría
   const handleDelete = (id) => {
-    const updatedCategories = categories.filter(category => category.id !== id);
-    setCategories(updatedCategories);
+    dispatch(deleteCategory(id));
   };
+
+  // Cargar categorías desde la API usando la función obtenerCategorias
+  useEffect(() => {
+    const loadCategories = async () => {
+      const data = await obtenerCategorias(); // Llamamos a la función de la API
+      dispatch(setCategorias(data)); // Despachamos las categorías a Redux
+    };
+
+    loadCategories();
+  }, [dispatch]); // Solo se ejecuta una vez cuando el componente se monta
 
   return (
     <div>
-      {/* Botón para abrir el formulario de agregar categoría */}
       <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ marginBottom: 2 }}>
         Agregar Categoría
       </Button>
@@ -88,28 +83,34 @@ const CategoryManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {categories.map((category) => (
-              <TableRow key={category.id}>
-                <TableCell>{category.name}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleOpen(category)} // Abre el formulario en modo edición
-                    sx={{ marginRight: 2 }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => handleDelete(category.id)}
-                  >
-                    Eliminar
-                  </Button>
-                </TableCell>
+            {(Array.isArray(categories) && categories.length > 0) ? (
+              categories.map((category) => (
+                <TableRow key={category.id}>
+                  <TableCell>{category.name}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleOpen(category)} // Abre el formulario en modo edición
+                      sx={{ marginRight: 2 }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDelete(category.id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={2}>No hay categorías disponibles.</TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>

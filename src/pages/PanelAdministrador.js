@@ -1,4 +1,5 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import AnimationRevealPage from "helpers/AnimationRevealPage.js";
 import tw from "twin.macro";
 import Header from "components/headers/light.js";
@@ -9,8 +10,37 @@ import ProductManagement from "components/AdminPanel/ProductManagement"; // Aseg
 import CustomerManagement from "components/AdminPanel/CustomerManagement"; // Asegúrate de que el path sea correcto
 import CategoryManagement from "components/AdminPanel/CategoryManagement";
 import OrderManagement from "components/AdminPanel/OrderManagement";
+import { obtenerCategorias } from 'scripts/obtenerCategorias';
 
 export default () => {
+  const dispatch = useDispatch();
+  const [categories, setCategories] = useState([]);
+  const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
+
+  useEffect(() => {
+    try {
+      const fetchCategorias = async () => {
+        await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
+      };
+      fetchCategorias();
+    } catch (e) {
+      console.log(e)
+    }
+  }, [dispatch]);
+
+  // Transforma las categorías al formato requerido para `TabCategoryGrid`
+  useEffect(() => {
+    if (categoriasRedux && categoriasRedux.length > 0) {
+      const transformedCategories = categoriasRedux.map((categoria) => ({
+        imageSrc: categoria.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80", // Usa una URL por defecto si no hay `imageUrl`
+        title: categoria.titulo || "Sin nombre",
+        description: categoria.descripcion || "Sin descripción",
+        url: '#'
+      }));
+      setCategories(transformedCategories);
+    }
+  }, [categoriasRedux]);
+
   const HighlightedText = tw.span`bg-[#99cdb6] text-gray-100 px-4 transform -skew-x-12 inline-block`;
 
   return (
@@ -101,7 +131,8 @@ export default () => {
               >
                 Gestión de Categorías
               </Typography>
-              <CategoryManagement />
+              <CategoryManagement 
+              categories={categories} />
             </Paper>
 
             {/* Gestión de Productos Section */}
@@ -145,7 +176,6 @@ export default () => {
           </Container>
         </Box>
       </Box>
-      <Footer />
     </AnimationRevealPage>
   );
 };
