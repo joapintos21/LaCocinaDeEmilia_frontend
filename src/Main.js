@@ -45,7 +45,7 @@ export default () => {
         imageSrc: categoria.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80", // Usa una URL por defecto si no hay `imageUrl`
         title: categoria.titulo || "Sin nombre",
         description: categoria.descripcion || "Sin descripción",
-        url: '#'
+        url: `/productos?categoria=${categoria.titulo}`
       }));
       setCategories(transformedCategories);
     }

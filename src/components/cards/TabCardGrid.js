@@ -7,7 +7,7 @@ import { Container, ContentWithPaddingXl } from "components/misc/Layouts.js";
 import { SectionHeading } from "components/misc/Headings.js";
 import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { obtenerProductos } from "scripts/obtenerProductosCategoria";
 import { buscarProducto } from "scripts/buscarProducto";
 
@@ -48,7 +48,7 @@ const CardText = tw.div`p-4 text-gray-900`;
 const CardTitle = tw.h5`text-lg font-semibold group-hover:text-primary-500`;
 const CardContent = tw.p`mt-1 text-sm font-medium text-gray-600`;
 const CardPrice = tw.p`mt-4 text-xl font-bold`;
-
+const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 
 export default () => {
   const [products, setProducts] = useState([]);
@@ -58,8 +58,25 @@ export default () => {
   const productosRedux = useSelector((state) => state.productos);
   const categoriasRedux = useSelector((state) => state.categorias);
   const [activeTab, setActiveTab] = useState("Todos");
-  const { categoria } = useParams();
   const navigate = useNavigate();
+  const location = useLocation(); // Accede a la ubicación actual
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const categoriaParam = searchParams.get("categoria");
+
+    // Buscar la categoría que coincide con el parámetro
+    const matchingCategory = categoriasRedux.find(
+      category => category.titulo.toLowerCase() === categoriaParam.toLowerCase()
+    );
+
+    // Validar si la categoría existe en las tabs
+    if (categoriaParam && matchingCategory) {
+      setActiveTab(matchingCategory.titulo);
+    } else {
+      setActiveTab("Todos"); // Valor por defecto
+    }
+  }, [location, categoriasRedux]);
 
   // Cargar productos desde Redux
   useEffect(() => {
@@ -93,13 +110,6 @@ export default () => {
       return acc;
     }, {})
   };
-
-  // Manejo de cambio de categoría por URL
-  useEffect(() => {
-    if (categoria) {
-      setActiveTab(categoria === "todos" ? "Todos" : categoria.charAt(0).toUpperCase() + categoria.slice(1));
-    }
-  }, [categoria]);
 
   // Manejo de búsqueda
   const handleSearch = async () => {
@@ -141,7 +151,7 @@ export default () => {
         <HeaderRow>
           <TabsControl>
             {Object.keys(tabs).map((tabName, index) => (
-              <TabControl key={index} active={activeTab === tabName} onClick={() => setActiveTab(tabName)}>
+              <TabControl key={index} active={activeTab === tabName} onClick={() => setActiveTab(capitalize(tabName))}>
                 {tabName}
               </TabControl>
             ))}

@@ -14,7 +14,19 @@ const Image = styled.img`
 const Details = tw.div`mt-6 lg:mt-0 lg:ml-8 w-full lg:w-1/2`;
 const Title = tw.h1`text-3xl font-bold text-primary-500 mb-4`;
 const Description = tw.p`text-lg text-gray-700 mb-6 leading-relaxed`;
-const Price = tw.p`text-2xl font-semibold text-gray-900 mb-4`;
+const PriceContainer = tw.div`mb-4 flex flex-col`;
+const OriginalPrice = styled.p`
+  ${tw`text-lg font-medium line-through text-red-500`}
+`;
+const DiscountedPrice = styled.p`
+  ${tw`text-2xl font-semibold text-gray-900`}
+`;
+const DiscountList = styled.ul`
+  ${tw`mt-4`}
+`;
+const DiscountItem = styled.li`
+  ${tw`text-sm text-green-600`}
+`;
 const ButtonContainer = tw.div`flex space-x-4 mt-4`;
 const QuantityContainer = tw.div`flex items-center space-x-4`;
 
@@ -37,6 +49,20 @@ const Producto = ({ producto }) => {
   const dispatch = useDispatch();
   const [cantidad, setCantidad] = useState(1);
 
+  const calcularPrecioConDescuento = (precio, descuentos) => {
+    return descuentos.reduce((precioFinal, item) => {
+      const { tipo, valor } = item.descuento;
+      if (tipo === "PORCENTAJE") {
+        return precioFinal * (1 - valor);
+      } else if (tipo === "IMPORTE") {
+        return precioFinal - valor;
+      }
+      return precioFinal;
+    }, precio);
+  };
+
+  const precioConDescuento = calcularPrecioConDescuento(producto.precio, producto.descuentos || []);
+
   const handleAddToCart = () => {
     const productoConCantidad = { ...producto, cantidad };
     dispatch(agregarItem(productoConCantidad));
@@ -57,38 +83,60 @@ const Producto = ({ producto }) => {
   };
 
   return (
-      <Content>
-        <ImageContainer>
-          <Image
-            src={
-              producto.imageSrc ||
-              "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-            }
-            alt={producto.titulo}
+    <Content>
+      <ImageContainer>
+        <Image
+          src={
+            producto.imageSrc ||
+            "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          }
+          alt={producto.titulo}
+        />
+      </ImageContainer>
+      <Details>
+        <Title>{producto.descripcion || "Producto sin título"}</Title>
+        <Description>
+          {producto.descripcion || "Este producto no tiene descripción disponible."}
+        </Description>
+        <PriceContainer>
+          {producto.descuentos && producto.descuentos.length > 0 && (
+            <>
+              <OriginalPrice>${producto.precio.toFixed(2)}</OriginalPrice>
+              <DiscountedPrice>${precioConDescuento.toFixed(2)}</DiscountedPrice>
+            </>
+          )}
+          {!producto.descuentos || producto.descuentos.length === 0 ? (
+            <DiscountedPrice>${producto.precio.toFixed(2)}</DiscountedPrice>
+          ) : null}
+        </PriceContainer>
+        {producto.descuentos && producto.descuentos.length > 0 && (
+          <DiscountList>
+            {producto.descuentos.map((item) => (
+              <DiscountItem key={item.id}>
+                {item.descuento.descripcion} -{" "}
+                {item.descuento.tipo === "PORCENTAJE"
+                  ? `${(item.descuento.valor * 100).toFixed(2)}%`
+                  : `$${item.descuento.valor.toFixed(2)}`}
+              </DiscountItem>
+            ))}
+          </DiscountList>
+        )}
+        <QuantityContainer>
+          <QuantityButton onClick={decrementarCantidad}>-</QuantityButton>
+          <QuantityInput
+            type="number"
+            value={cantidad}
+            onChange={handleCantidadChange}
+            min="1"
           />
-        </ImageContainer>
-        <Details>
-          <Title>{producto.descripcion || "Producto sin título"}</Title>
-          <Description>
-            {producto.descripcion || "Este producto no tiene descripción disponible."}
-          </Description>
-          <Price>${producto.precio || "0.00"}</Price>
-          <QuantityContainer>
-            <QuantityButton onClick={decrementarCantidad}>-</QuantityButton>
-            <QuantityInput
-              type="number"
-              value={cantidad}
-              onChange={handleCantidadChange}
-              min="1"
-            />
-            <QuantityButton onClick={incrementarCantidad}>+</QuantityButton>
-          </QuantityContainer>
-          <ButtonContainer>
-            <PrimaryButton onClick={handleAddToCart}>Agregar al carrito</PrimaryButton>
-          </ButtonContainer>
-        </Details>
-      </Content>
-  )
-}
+          <QuantityButton onClick={incrementarCantidad}>+</QuantityButton>
+        </QuantityContainer>
+        <ButtonContainer>
+          <PrimaryButton onClick={handleAddToCart}>Agregar al carrito</PrimaryButton>
+        </ButtonContainer>
+      </Details>
+    </Content>
+  );
+};
 
 export default Producto;
