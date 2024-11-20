@@ -1,25 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setCategorias, addCategory, updateCategory, deleteCategory } from 'store/categoriaSlice';
-import obtenerCategorias from 'scripts/obtenerCategorias'; // Importamos la función para obtener categorías
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Button, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle
-} from '@mui/material';
+  setCategorias,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+} from "store/categoriaSlice";
+import { crearCategoria } from "scripts/crearCategoria";
+import { actualizarCategoria } from "scripts/actualizarCategoria";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Paper,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 const CategoryManagement = () => {
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
-  const categories = useSelector((state) => state.categories); // Obtenemos las categorías desde el store
+  const categories = useSelector((state) => state.categorias); // Obtenemos las categorías desde el store
 
   const [open, setOpen] = useState(false);
-  const [newCategory, setNewCategory] = useState({ id: null, name: '' });
+  const [newCategory, setNewCategory] = useState({ id: null, titulo: "", descripcion: "" });
 
   // Función para abrir el formulario (para agregar o editar categoría)
   const handleOpen = (category = null) => {
     if (category) {
       setNewCategory({ ...category });
     } else {
-      setNewCategory({ id: null, name: '' });
+      setNewCategory({ id: null, name: "" });
     }
     setOpen(true);
   };
@@ -37,18 +55,42 @@ const CategoryManagement = () => {
 
   // Función para agregar o editar categoría
   const handleSaveCategory = () => {
-    if (newCategory.name) {
+    if (newCategory.titulo) {
       if (newCategory.id === null) {
-        const newId = categories.length ? categories[categories.length - 1].id + 1 : 1;
-        const categoryToAdd = { ...newCategory, id: newId };
+        const categoryToAdd = { ...newCategory, titulo: newCategory.titulo, descripcion: newCategory.descripcion};
         dispatch(addCategory(categoryToAdd));
+        crearCategoria(
+          newCategory.titulo,
+          newCategory.descripcion,
+          sessionStorage.getItem("token")
+        )
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Error al crear la categoria:", error.message);
+            setError(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+          });
       } else {
+        actualizarCategoria(
+          newCategory.id,
+          newCategory.titulo,
+          newCategory.descripcion,
+          sessionStorage.getItem("token")
+        )
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Error al actualizar la categoria:", error.message);
+            setError(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+          });
         dispatch(updateCategory(newCategory));
       }
-      setNewCategory({ id: null, name: '' }); // Limpiar formulario
+      setNewCategory({ titulo: "", descripcion: "" }); // Limpiar formulario
       handleClose(); // Cerrar el formulario
     } else {
-      alert('Por favor, complete todos los campos.');
+      alert("Por favor, complete todos los campos.");
     }
   };
 
@@ -57,19 +99,14 @@ const CategoryManagement = () => {
     dispatch(deleteCategory(id));
   };
 
-  // Cargar categorías desde la API usando la función obtenerCategorias
-  useEffect(() => {
-    const loadCategories = async () => {
-      const data = await obtenerCategorias(); // Llamamos a la función de la API
-      dispatch(setCategorias(data)); // Despachamos las categorías a Redux
-    };
-
-    loadCategories();
-  }, [dispatch]); // Solo se ejecuta una vez cuando el componente se monta
-
   return (
     <div>
-      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ marginBottom: 2 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => handleOpen()}
+        sx={{ marginBottom: 2 }}
+      >
         Agregar Categoría
       </Button>
 
@@ -83,10 +120,11 @@ const CategoryManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {(Array.isArray(categories) && categories.length > 0) ? (
+            {Array.isArray(categories) && categories.length > 0 ? (
               categories.map((category) => (
                 <TableRow key={category.id}>
-                  <TableCell>{category.name}</TableCell>
+                  <TableCell>{category.titulo}</TableCell>
+                  <TableCell>{category.descripcion}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -108,7 +146,9 @@ const CategoryManagement = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={2}>No hay categorías disponibles.</TableCell>
+                <TableCell colSpan={2}>
+                  No hay categorías disponibles.
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -117,12 +157,22 @@ const CategoryManagement = () => {
 
       {/* Formulario para agregar o editar una categoría */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newCategory.id ? 'Editar Categoría' : 'Agregar Categoría'}</DialogTitle>
+        <DialogTitle>
+          {newCategory.id ? "Editar Categoría" : "Agregar Categoría"}
+        </DialogTitle>
         <DialogContent>
           <TextField
-            label="Nombre"
-            name="name"
-            value={newCategory.name}
+            label="Titulo"
+            name="titulo"
+            value={newCategory.titulo}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Descripcion"
+            name="descripcion"
+            value={newCategory.descripcion}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
@@ -133,7 +183,7 @@ const CategoryManagement = () => {
             Cancelar
           </Button>
           <Button onClick={handleSaveCategory} color="primary">
-            {newCategory.id ? 'Guardar Cambios' : 'Agregar'}
+            {newCategory.id ? "Guardar Cambios" : "Agregar"}
           </Button>
         </DialogActions>
       </Dialog>

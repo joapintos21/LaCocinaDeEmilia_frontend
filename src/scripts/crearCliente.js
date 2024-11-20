@@ -1,6 +1,6 @@
 let request, queryParams, url;
 
-export const iniciarSesion = async (emailInput, passwordInput) => {
+export const crearCliente = async (emailInput, passwordInput) => {
   request = "/usuarios/create";
 
   queryParams = new URLSearchParams({

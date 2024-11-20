@@ -1,21 +1,22 @@
-let request, queryParams, url;
+let request, url, body;
 
-export const iniciarSesion = async (emailInput, passwordInput) => {
+export const crearCategoria = async (titulo, descripcion, token) => {
   request = "/categorias/create";
+  url = `${request}`;
 
-  queryParams = new URLSearchParams({
-    email: emailInput,
-    password: passwordInput,
-  }).toString();
-
-  url = `${request}?${queryParams}`;
+  body = {
+    titulo: titulo,
+    descripcion: descripcion
+  };
 
   try {
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}` // Pasa el token en el header
       },
+      body: JSON.stringify(body),
     });
 
     // Maneja errores fuera del rango 200-299

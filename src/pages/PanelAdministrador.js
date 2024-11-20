@@ -18,18 +18,6 @@ export default () => {
   const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
 
   useEffect(() => {
-    try {
-      const fetchCategorias = async () => {
-        await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
-      };
-      fetchCategorias();
-    } catch (e) {
-      console.log(e)
-    }
-  }, [dispatch]);
-
-  // Transforma las categorías al formato requerido para `TabCategoryGrid`
-  useEffect(() => {
     if (categoriasRedux && categoriasRedux.length > 0) {
       const transformedCategories = categoriasRedux.map((categoria) => ({
         imageSrc: categoria.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80", // Usa una URL por defecto si no hay `imageUrl`
@@ -40,8 +28,6 @@ export default () => {
       setCategories(transformedCategories);
     }
   }, [categoriasRedux]);
-
-  const HighlightedText = tw.span`bg-[#99cdb6] text-gray-100 px-4 transform -skew-x-12 inline-block`;
 
   return (
     <AnimationRevealPage>
