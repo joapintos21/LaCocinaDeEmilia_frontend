@@ -48,7 +48,6 @@ const CardButton = tw(PrimaryButtonBase)`text-sm`;
 const CardText = tw.div`p-4 text-gray-900`;
 const CardTitle = tw.h5`text-lg font-semibold group-hover:text-primary-500`;
 const CardPrice = tw.p`mt-4 text-xl font-bold`;
-const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 
 export default () => {
   const [products, setProducts] = useState([]);
@@ -182,7 +181,7 @@ export default () => {
               <TabControl
                 key={index}
                 active={activeTab === tabName}
-                onClick={() => setActiveTab(capitalize(tabName))}
+                onClick={() => setActiveTab(tabName)}
               >
                 {tabName}
               </TabControl>
