@@ -1,33 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Button, Paper, Typography, TextField, Dialog, DialogActions, DialogContent, DialogTitle
-} from '@mui/material';
+  setCategorias,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+} from "store/categoriaSlice";
+import { crearCategoria } from "scripts/crearCategoria";
+import { actualizarCategoria } from "scripts/actualizarCategoria";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Paper,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 const CategoryManagement = () => {
-  // Datos simulados de categorías
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Ropa' },
-    { id: 2, name: 'Electrónica' },
-    { id: 3, name: 'Hogar' },
-    { id: 4, name: 'Deportes' },
-  ]);
+  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const categories = useSelector((state) => state.categorias); // Obtenemos las categorías desde el store
 
-  // Estado para el formulario
   const [open, setOpen] = useState(false);
-  const [newCategory, setNewCategory] = useState({
-    id: null,
-    name: '',
-  });
+  const [newCategory, setNewCategory] = useState({ id: null, titulo: "", descripcion: "" });
 
   // Función para abrir el formulario (para agregar o editar categoría)
   const handleOpen = (category = null) => {
     if (category) {
-      // Si es una categoría existente, editamos
       setNewCategory({ ...category });
     } else {
-      // Si no se pasa ninguna categoría, es para agregar una nueva
-      setNewCategory({ id: null, name: '' });
+      setNewCategory({ id: null, name: "" });
     }
     setOpen(true);
   };
@@ -45,36 +55,58 @@ const CategoryManagement = () => {
 
   // Función para agregar o editar categoría
   const handleSaveCategory = () => {
-    if (newCategory.name) {
+    if (newCategory.titulo) {
       if (newCategory.id === null) {
-        // Si no tiene ID, es una nueva categoría
-        const newId = categories.length ? categories[categories.length - 1].id + 1 : 1; // Asigna un ID único
-        const categoryToAdd = { ...newCategory, id: newId };
-        setCategories([...categories, categoryToAdd]);
+        const categoryToAdd = { ...newCategory, titulo: newCategory.titulo, descripcion: newCategory.descripcion};
+        dispatch(addCategory(categoryToAdd));
+        crearCategoria(
+          newCategory.titulo,
+          newCategory.descripcion,
+          sessionStorage.getItem("token")
+        )
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Error al crear la categoria:", error.message);
+            setError(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+          });
       } else {
-        // Si tiene ID, es una categoría que se va a editar
-        const updatedCategories = categories.map((category) =>
-          category.id === newCategory.id ? { ...category, name: newCategory.name } : category
-        );
-        setCategories(updatedCategories);
+        actualizarCategoria(
+          newCategory.id,
+          newCategory.titulo,
+          newCategory.descripcion,
+          sessionStorage.getItem("token")
+        )
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Error al actualizar la categoria:", error.message);
+            setError(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+          });
+        dispatch(updateCategory(newCategory));
       }
-      setNewCategory({ id: null, name: '' }); // Limpiar formulario
+      setNewCategory({ titulo: "", descripcion: "" }); // Limpiar formulario
       handleClose(); // Cerrar el formulario
     } else {
-      alert('Por favor, complete todos los campos.');
+      alert("Por favor, complete todos los campos.");
     }
   };
 
   // Función para eliminar categoría
   const handleDelete = (id) => {
-    const updatedCategories = categories.filter(category => category.id !== id);
-    setCategories(updatedCategories);
+    dispatch(deleteCategory(id));
   };
 
   return (
     <div>
-      {/* Botón para abrir el formulario de agregar categoría */}
-      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ marginBottom: 2 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => handleOpen()}
+        sx={{ marginBottom: 2 }}
+      >
         Agregar Categoría
       </Button>
 
@@ -88,40 +120,59 @@ const CategoryManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {categories.map((category) => (
-              <TableRow key={category.id}>
-                <TableCell>{category.name}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleOpen(category)} // Abre el formulario en modo edición
-                    sx={{ marginRight: 2 }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => handleDelete(category.id)}
-                  >
-                    Eliminar
-                  </Button>
+            {Array.isArray(categories) && categories.length > 0 ? (
+              categories.map((category) => (
+                <TableRow key={category.id}>
+                  <TableCell>{category.titulo}</TableCell>
+                  <TableCell>{category.descripcion}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleOpen(category)} // Abre el formulario en modo edición
+                      sx={{ marginRight: 2 }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDelete(category.id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={2}>
+                  No hay categorías disponibles.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
       {/* Formulario para agregar o editar una categoría */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newCategory.id ? 'Editar Categoría' : 'Agregar Categoría'}</DialogTitle>
+        <DialogTitle>
+          {newCategory.id ? "Editar Categoría" : "Agregar Categoría"}
+        </DialogTitle>
         <DialogContent>
           <TextField
-            label="Nombre"
-            name="name"
-            value={newCategory.name}
+            label="Titulo"
+            name="titulo"
+            value={newCategory.titulo}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Descripcion"
+            name="descripcion"
+            value={newCategory.descripcion}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
@@ -132,7 +183,7 @@ const CategoryManagement = () => {
             Cancelar
           </Button>
           <Button onClick={handleSaveCategory} color="primary">
-            {newCategory.id ? 'Guardar Cambios' : 'Agregar'}
+            {newCategory.id ? "Guardar Cambios" : "Agregar"}
           </Button>
         </DialogActions>
       </Dialog>

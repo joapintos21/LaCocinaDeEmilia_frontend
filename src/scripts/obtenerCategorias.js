@@ -25,3 +25,5 @@ export const obtenerCategorias = async (dispatch) => {
     throw error; // Lanza el error para que sea capturado en el evento
   }
 };
+
+export default obtenerCategorias;
