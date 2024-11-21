@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    items: [], // Array de productos en el carrito
+    items: [], // Array de productos y packs en el carrito
     cantidadProductos: 0, // Cantidad total de productos en el carrito
     precioTotal: 0, // Precio total del carrito
 };
@@ -12,7 +12,9 @@ const carritoSlice = createSlice({
     reducers: {
         agregarItem: (state, action) => {
             const newItem = action.payload;
-            const existingItem = state.items.find(item => item.id === newItem.id);
+            const existingItem = state.items.find(
+                item => item.id === newItem.id && item.tipo === newItem.tipo
+            );
 
             if (existingItem) {
                 existingItem.cantidad += newItem.cantidad || 1; // Si no se especifica cantidad, agrega 1 por defecto
@@ -21,6 +23,7 @@ const carritoSlice = createSlice({
                 state.items.push({
                     id: newItem.id,
                     descripcion: newItem.descripcion,
+                    tipo: newItem.tipo, // Tipo del item: "producto" o "pack"
                     precio: newItem.precio,
                     cantidad: newItem.cantidad || 1,
                     precioTotal: newItem.precio * (newItem.cantidad || 1),
@@ -31,18 +34,30 @@ const carritoSlice = createSlice({
             state.precioTotal += newItem.precio * (newItem.cantidad || 1);
         },
         quitarItem: (state, action) => {
-            const id = action.payload;
-            const existingItem = state.items.find(item => item.id === id);
-
-            if (existingItem) {
+            const { id, tipo } = action.payload; // El payload incluye el id y el tipo (producto o pack)
+        
+            // Busca el elemento en el carrito
+            const existingItemIndex = state.items.findIndex(
+                item => item.id === id && item.tipo === tipo
+            );
+        
+            if (existingItemIndex !== -1) {
+                // Si el elemento existe, actualizamos el estado
+                const existingItem = state.items[existingItemIndex];
+        
+                // Resta la cantidad y el precio total del estado global
                 state.cantidadProductos -= existingItem.cantidad;
                 state.precioTotal -= existingItem.precioTotal;
-                state.items = state.items.filter(item => item.id !== id);
+        
+                // Elimina el elemento del array de items
+                state.items.splice(existingItemIndex, 1);
             }
         },
         incrementarCantidad: (state, action) => {
-            const id = action.payload;
-            const existingItem = state.items.find(item => item.id === id);
+            const { id, tipo } = action.payload; // Ahora el payload incluye el tipo
+            const existingItem = state.items.find(
+                item => item.id === id && item.tipo === tipo
+            );
 
             if (existingItem) {
                 existingItem.cantidad += 1;
@@ -52,8 +67,10 @@ const carritoSlice = createSlice({
             }
         },
         decrementarCantidad: (state, action) => {
-            const id = action.payload;
-            const existingItem = state.items.find(item => item.id === id);
+            const { id, tipo } = action.payload; // Ahora el payload incluye el tipo
+            const existingItem = state.items.find(
+                item => item.id === id && item.tipo === tipo
+            );
 
             if (existingItem) {
                 if (existingItem.cantidad > 1) {
@@ -62,8 +79,10 @@ const carritoSlice = createSlice({
                     state.cantidadProductos -= 1;
                     state.precioTotal -= existingItem.precio;
                 } else {
-                    // Si la cantidad es 1, elimina el producto
-                    state.items = state.items.filter(item => item.id !== id);
+                    // Si la cantidad es 1, elimina el producto o pack
+                    state.items = state.items.filter(
+                        item => item.id !== id || item.tipo !== tipo
+                    );
                     state.cantidadProductos -= 1;
                     state.precioTotal -= existingItem.precio;
                 }

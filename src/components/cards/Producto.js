@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import { useDispatch } from "react-redux";
 import { agregarItem } from "store/carritoSlice";
+import { calcularPrecioConDescuento } from "utils/descuentoUtils";
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -49,22 +50,10 @@ const Producto = ({ producto }) => {
   const dispatch = useDispatch();
   const [cantidad, setCantidad] = useState(1);
 
-  const calcularPrecioConDescuento = (precio, descuentos) => {
-    return descuentos.reduce((precioFinal, item) => {
-      const { tipo, valor } = item.descuento;
-      if (tipo === "PORCENTAJE") {
-        return precioFinal * (1 - valor);
-      } else if (tipo === "IMPORTE") {
-        return precioFinal - valor;
-      }
-      return precioFinal;
-    }, precio);
-  };
-
   const precioConDescuento = calcularPrecioConDescuento(producto.precio, producto.descuentos || []);
 
   const handleAddToCart = () => {
-    const productoConCantidad = { ...producto, cantidad };
+    const productoConCantidad = { ...producto, cantidad, tipo:"producto" };
     dispatch(agregarItem(productoConCantidad));
     alert("Producto agregado al carrito");
   };
