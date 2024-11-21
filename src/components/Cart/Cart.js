@@ -62,7 +62,7 @@ const Cart = ({
           <ListItemSecondaryAction>
             <IconButton
               aria-label="Delete"
-              onClick={() => removeItem(item.id)}
+              onClick={() => removeItem(item)}
             >
               <DeleteIcon />
             </IconButton>

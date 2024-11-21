@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage'; // Esto utiliza localStorage
 import { combineReducers } from 'redux';
 import usuarioReducer from './usuarioSlice';
 import productoReducer from './productoSlice';
+import packReducer from './packSlice';
 import categoriaReducer from './categoriaSlice';
 import carritoReducer from './carritoSlice'; // Importa el cartSlice
 
@@ -11,7 +12,7 @@ import carritoReducer from './carritoSlice'; // Importa el cartSlice
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['usuario', 'productos', 'categorias', 'carrito'], // Incluye el cart en la persistencia
+    whitelist: ['usuario', 'productos', 'categorias', 'carrito', 'packs'], // Incluye el cart en la persistencia
 };
 
 // Combina los reducers
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
     usuario: usuarioReducer,
     productos: productoReducer,
     categorias: categoriaReducer,
-    carrito: carritoReducer, // Agrega el cartReducer
+    carrito: carritoReducer,
+    packs: packReducer
 });
 
 // Aplica persistencia al rootReducer

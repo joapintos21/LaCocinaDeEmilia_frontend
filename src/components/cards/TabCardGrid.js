@@ -9,6 +9,7 @@ import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { obtenerProductos } from "scripts/obtenerProductosCategoria";
+import { obtenerPacks } from "scripts/obtenerPacks";
 import { buscarProducto } from "scripts/buscarProducto";
 
 const HeaderRow = tw.div`flex justify-between items-center flex-col xl:flex-row`;
@@ -46,47 +47,57 @@ const CardHoverOverlay = styled(motion.div)`
 const CardButton = tw(PrimaryButtonBase)`text-sm`;
 const CardText = tw.div`p-4 text-gray-900`;
 const CardTitle = tw.h5`text-lg font-semibold group-hover:text-primary-500`;
-const CardContent = tw.p`mt-1 text-sm font-medium text-gray-600`;
 const CardPrice = tw.p`mt-4 text-xl font-bold`;
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 
 export default () => {
   const [products, setProducts] = useState([]);
+  const [packs, setPacks] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const productosRedux = useSelector((state) => state.productos);
+  const packsRedux = useSelector((state) => state.packs);
   const categoriasRedux = useSelector((state) => state.categorias);
   const [activeTab, setActiveTab] = useState("Todos");
   const navigate = useNavigate();
-  const location = useLocation(); // Accede a la ubicación actual
+  const location = useLocation();
 
+  // Manejar el parámetro "categoria" en la URL
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const categoriaParam = searchParams.get("categoria");
-
-    // Buscar la categoría que coincide con el parámetro
-    const matchingCategory = categoriasRedux.find(
-      category => category.titulo.toLowerCase() === categoriaParam.toLowerCase()
-    );
-
-    // Validar si la categoría existe en las tabs
-    if (categoriaParam && matchingCategory) {
-      setActiveTab(matchingCategory.titulo);
+  
+    if (categoriaParam) {
+      const matchingCategory = categoriasRedux.find(
+        category => category.titulo.toLowerCase() === categoriaParam.toLowerCase()
+      );
+      if (matchingCategory) {
+        setActiveTab(matchingCategory.titulo);
+      } else if (categoriaParam.toLowerCase() === "packs") {
+        setActiveTab("Packs");
+      } else {
+        setActiveTab("Todos");
+      }
     } else {
-      setActiveTab("Todos"); // Valor por defecto
+      setActiveTab("Todos");
     }
   }, [location, categoriasRedux]);
 
-  // Cargar productos desde Redux
+  // Cargar productos y packs desde Redux
   useEffect(() => {
     const fetchProductos = async () => {
       await obtenerProductos(dispatch);
     };
     fetchProductos();
+
+    const fetchPacks = async () => {
+      await obtenerPacks(dispatch);
+    };
+    fetchPacks();
   }, [dispatch]);
 
-  // Transformar productos desde Redux al formato requerido
+  // Transformar productos y packs al formato requerido
   useEffect(() => {
     if (productosRedux && productosRedux.length > 0) {
       const transformedProducts = productosRedux.map((producto) => ({
@@ -95,18 +106,35 @@ export default () => {
         title: producto.descripcion || "Sin nombre",
         price: producto.precio || "$0.00",
         category: producto.categoria || "Otros",
-        url: '#'
+        url: `/producto/${producto.id}`
       }));
       setProducts(transformedProducts);
-      setFilteredProducts(transformedProducts); // Inicialmente, todos los productos están filtrados
     }
-  }, [productosRedux]);
 
-  // Crear tabs dinámicamente con categorías, agregando "Todos"
+    if (packsRedux && packsRedux.length > 0) {
+      const transformedPacks = packsRedux.map((pack) => ({
+        id: pack.id,
+        imageSrc: "https://via.placeholder.com/150", // Pack no tiene imágenes
+        title: pack.nombre || "Pack sin nombre",
+        price: pack.precio || "$0.00",
+        category: "Packs",
+        url: `/pack/${pack.id}`
+      }));
+      setPacks(transformedPacks);
+    }
+  }, [productosRedux, packsRedux]);
+
+  // Combinar productos y packs en las tabs
+  useEffect(() => {
+    const combinedItems = [...products, ...packs];
+    setFilteredProducts(combinedItems);
+  }, [products, packs]);
+
   const tabs = {
     Todos: filteredProducts,
+    Packs: packs,
     ...categoriasRedux.reduce((acc, categoria) => {
-      acc[categoria.titulo] = filteredProducts.filter((product) => product.category === categoria.titulo);
+      acc[categoria.titulo] = products.filter((product) => product.category === categoria.titulo);
       return acc;
     }, {})
   };
@@ -151,7 +179,11 @@ export default () => {
         <HeaderRow>
           <TabsControl>
             {Object.keys(tabs).map((tabName, index) => (
-              <TabControl key={index} active={activeTab === tabName} onClick={() => setActiveTab(capitalize(tabName))}>
+              <TabControl
+                key={index}
+                active={activeTab === tabName}
+                onClick={() => setActiveTab(capitalize(tabName))}
+              >
                 {tabName}
               </TabControl>
             ))}
@@ -179,7 +211,13 @@ export default () => {
           >
             {tabs[tabKey].map((card, index) => (
               <CardContainer key={index}>
-                <Card className="group" href={card.url} initial="rest" whileHover="hover" animate="rest">
+                <Card
+                  className="group"
+                  href={card.url}
+                  initial="rest"
+                  whileHover="hover"
+                  animate="rest"
+                >
                   <CardImageContainer imageSrc={card.imageSrc}>
                     <CardHoverOverlay
                       variants={{
@@ -194,12 +232,11 @@ export default () => {
                       }}
                       transition={{ duration: 0.3 }}
                     >
-                     <CardButton onClick={() => navigate(`/producto/${card.id}`)}>Ver Producto</CardButton>  
+                      <CardButton onClick={() => navigate(card.url)}>Ver más</CardButton>
                     </CardHoverOverlay>
                   </CardImageContainer>
                   <CardText>
                     <CardTitle>{card.title}</CardTitle>
-                    <CardContent>{card.content}</CardContent>
                     <CardPrice>${card.price}</CardPrice>
                   </CardText>
                 </Card>
@@ -209,5 +246,5 @@ export default () => {
         ))}
       </ContentWithPaddingXl>
     </Container>
-  )
-}
+  );
+};
