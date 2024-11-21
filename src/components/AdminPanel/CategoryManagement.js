@@ -8,6 +8,7 @@ import {
 } from "store/categoriaSlice";
 import { crearCategoria } from "scripts/crearCategoria";
 import { actualizarCategoria } from "scripts/actualizarCategoria";
+import { borrarCategoria } from "scripts/borrarCategoria";
 import {
   Table,
   TableBody,
@@ -96,6 +97,17 @@ const CategoryManagement = () => {
 
   // Función para eliminar categoría
   const handleDelete = (id) => {
+    borrarCategoria(
+      id,
+      sessionStorage.getItem("token")
+    )
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error("Error al eliminar la categoria:", error.message);
+        setError(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+      });
     dispatch(deleteCategory(id));
   };
 
