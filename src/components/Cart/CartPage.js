@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,8 +6,10 @@ import {
   incrementarCantidad,
   decrementarCantidad,
   quitarItem,
+  setCostoEnvio,
 } from "store/carritoSlice";
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
+import ZonasMapa from "images/ZONAS.png";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full items-center`;
@@ -33,7 +35,32 @@ const CartPage = () => {
   // Get products and packs from their respective slices
   const productosRedux = useSelector((state) => state.productos);
   const packsRedux = useSelector((state) => state.packs);
+  
+  const [isOpen, setIsOpen] = useState(false);
 
+  const SectionTitle = tw.h3`text-lg font-bold cursor-pointer flex justify-between items-center`;
+  const CollapsibleContent = styled.div`
+    ${({ isOpen }) => (isOpen ? tw`block` : tw`hidden`)}
+    ${tw`mt-4`}
+  `;  
+
+  const costoEnvio = useSelector((state) => state.carrito.costoEnvio);
+
+  const opcionesEnvio = [
+    { id: 1, zona: "Verde", costo: 180, descripcion: "Zona Verde (gratis a partir de $1500 en compras)" },
+    { id: 2, zona: "Roja", costo: 200, descripcion: "Zona Roja" },
+    { id: 3, zona: "Amarilla", costo: 250, descripcion: "Zona Amarilla" },
+    { id: 4, zona: "Otros", costo: 0, descripcion: "Otros (Consultar)" },
+  ];
+
+  const handleSeleccionEnvio = (costo, zona) => {
+    if (zona === "Verde" && cartItems.reduce((acc, item) => acc + item.precioTotal, 0) >= 1500) {
+      dispatch(setCostoEnvio(0)); // Envío gratuito
+    } else {
+      dispatch(setCostoEnvio(costo));
+    }
+  };
+  
   // Function to get discounts based on item type
   const obtenerDescuentos = (item) => {
     if (item.tipo === "producto") {
@@ -101,6 +128,38 @@ const CartPage = () => {
         ) : (
           <p tw="text-gray-600">Tu carrito está vacío</p>
         )}
+      </Content>
+      <h2 tw="text-xl font-bold mb-6">Envío</h2>
+      <Content>
+        <SectionTitle onClick={() => setIsOpen(!isOpen)}>
+          Opciones de Envío
+          <span>{isOpen ? "▲" : "▼"}</span>
+        </SectionTitle>
+        <CollapsibleContent isOpen={isOpen}>
+          <div tw="mt-6 w-full text-left">
+            <h3 tw="text-lg font-semibold mb-4">Opciones de Envío</h3>
+            <img
+              src={ZonasMapa}
+              alt="Mapa de zonas de envío"
+              tw="w-full h-auto rounded-lg shadow mb-4"
+            />
+            {opcionesEnvio.map((opcion) => (
+              <div key={opcion.id}>
+                <input
+                  type="radio"
+                  name="envio"
+                  value={opcion.costo}
+                  onChange={() => handleSeleccionEnvio(opcion.costo, opcion.zona)}
+                  checked={
+                    costoEnvio === opcion.costo ||
+                    (opcion.zona === "Verde" && costoEnvio === 0)
+                  }
+                />
+                <label tw="ml-2">{opcion.descripcion}</label>
+              </div>
+            ))}
+          </div>
+        </CollapsibleContent>
       </Content>
     </Container>
   );

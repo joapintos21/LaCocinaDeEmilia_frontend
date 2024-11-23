@@ -4,6 +4,9 @@ import styled from "styled-components";
 import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import { useDispatch } from "react-redux";
 import { agregarItem } from "store/carritoSlice";
+import { calcularPrecioConDescuento } from "utils/descuentoUtils";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -81,7 +84,7 @@ const Producto = ({ producto }) => {
 
   return (
     <Content>
-       <BackButton onClick={() => navigate("/productos")}>
+      <BackButton onClick={() => navigate("/productos")}>
           <ArrowBackIcon fontSize="small" /> <span>Volver a productos</span>
        </BackButton>
       <ImageContainer>
