@@ -138,7 +138,7 @@ export default () => {
         </FiveColumns>
         <Divider/>
         <CopyrightAndCompanyInfoRow>
-          <CopyrightNotice>&copy; Copyright 2020, Treact Inc.</CopyrightNotice>
+          <CopyrightNotice>&copy; Copyright 2024, La cocina de Emilia</CopyrightNotice>
           <CompanyInfo>An Internet Company.</CompanyInfo>
         </CopyrightAndCompanyInfoRow>
       </Content>
