@@ -44,8 +44,20 @@ const CartPage = () => {
     ${tw`mt-4`}
   `;  
 
+  // Function to get discounts based on item type
+  const obtenerDescuentos = (item) => {
+    if (item.tipo === "producto") {
+      const producto = productosRedux.find((prod) => prod.id === item.id);
+      return producto ? producto.descuentos || [] : [];
+    } else if (item.tipo === "pack") {
+      const pack = packsRedux.find((pck) => pck.id === item.id);
+      return pack ? pack.descuentos || [] : [];
+    }
+    return [];
+  };
+
   const costoEnvio = useSelector((state) => state.carrito.costoEnvio);
-  const subtotal = cartItems.reduce((acc, item) => acc + item.precioTotal, 0);
+  const subtotal = cartItems.reduce((acc, item) => acc + calcularPrecioConDescuento(item.precioTotal, obtenerDescuentos(item)), 0);
   const total = subtotal + costoEnvio;
   const [zonaSeleccionada, setZonaSeleccionada] = useState(null);
   
@@ -57,7 +69,7 @@ const CartPage = () => {
   ];
 
   const handleSeleccionEnvio = (costo, idZona) => {
-    const subtotal = cartItems.reduce((acc, item) => acc + item.precioTotal, 0);
+    const subtotal = cartItems.reduce((acc, item) => acc + calcularPrecioConDescuento(item.precioTotal, obtenerDescuentos(item)), 0);
   
     if (idZona === 1) { // Zona Verde
       if (subtotal >= 1500) {
@@ -84,18 +96,6 @@ const CartPage = () => {
       }
     }
   }, [cartItems.length, subtotal, zonaSeleccionada, dispatch]);
-
-  // Function to get discounts based on item type
-  const obtenerDescuentos = (item) => {
-    if (item.tipo === "producto") {
-      const producto = productosRedux.find((prod) => prod.id === item.id);
-      return producto ? producto.descuentos || [] : [];
-    } else if (item.tipo === "pack") {
-      const pack = packsRedux.find((pck) => pck.id === item.id);
-      return pack ? pack.descuentos || [] : [];
-    }
-    return [];
-  };
 
   const handleIncrement = (item) => {
     dispatch(incrementarCantidad(item));
