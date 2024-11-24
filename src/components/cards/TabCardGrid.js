@@ -9,7 +9,6 @@ import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { obtenerProductos } from "scripts/obtenerProductosCategoria";
-import { obtenerPacks } from "scripts/obtenerPacks";
 import { buscarProducto } from "scripts/buscarProducto";
 
 const HeaderRow = tw.div`flex justify-between items-center flex-col xl:flex-row`;
@@ -89,11 +88,6 @@ export default () => {
       await obtenerProductos(dispatch);
     };
     fetchProductos();
-
-    const fetchPacks = async () => {
-      await obtenerPacks(dispatch);
-    };
-    fetchPacks();
   }, [dispatch]);
 
   // Transformar productos y packs al formato requerido

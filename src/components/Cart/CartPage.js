@@ -2,12 +2,9 @@ import React from "react";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  incrementarCantidad,
-  decrementarCantidad,
-  quitarItem,
-} from "store/carritoSlice";
+import { decrementarCantidad, quitarItem } from "store/carritoSlice";
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
+import { handleAddToCart, handleQuitarDeCarrito } from "utils/carritoUtils";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full items-center`;
@@ -26,6 +23,12 @@ const Button = tw.button`px-2 py-1 bg-gray-200 rounded hover:bg-gray-300`;
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
+  const user = useSelector((state) => state.usuario); // ID del cliente desde el store
+  let userId = null;
+  if(user.isLoggedIn){
+    userId = user.userInfo.id;
+  }
 
   // Get cart items
   const cartItems = useSelector((state) => state.carrito.items);
@@ -47,16 +50,18 @@ const CartPage = () => {
   };
 
   const handleIncrement = (item) => {
-    dispatch(incrementarCantidad(item));
+    handleAddToCart(item, 1, token, userId, item.tipo, dispatch);
   };
 
   const handleDecrement = (item) => {
-    if (item.cantidad > 1) {
-      dispatch(decrementarCantidad(item));
-    } else {
-      dispatch(quitarItem(item));
-    }
+    handleQuitarDeCarrito(userId, item.id, 1, item.tipo, token);
+    dispatch(decrementarCantidad(item));
   };
+
+  const handleQuitarCarrito = (item) => {
+    handleQuitarDeCarrito(userId, item.id, item.cantidad, item.tipo, token);
+    dispatch(quitarItem(item));
+  }
 
   return (
     <Container>
@@ -89,7 +94,7 @@ const CartPage = () => {
                     <Button onClick={() => handleIncrement(item)}>+</Button>
                   </Quantity>
                   <Button
-                    onClick={() => dispatch(quitarItem(item))}
+                    onClick={() => handleQuitarCarrito(item)}
                     tw="bg-red-500 text-white hover:bg-red-700"
                   >
                     Quitar

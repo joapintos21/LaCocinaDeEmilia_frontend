@@ -94,7 +94,9 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 
   const defaultLinks = [
     <NavLinks key={1}>
-      <NavLink href="/paneladministrador">Panel</NavLink>
+      {userInfo && userInfo.rol === "Administrador" && (
+        <NavLink href="/paneladministrador">Panel</NavLink>
+      )}
       <NavLink href="/nosotros">Nosotros</NavLink>
       <NavLink href="/pricing">Pricing</NavLink>
       <NavLink href="/contacto">Contactenos</NavLink>

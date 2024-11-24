@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
-import { useDispatch } from "react-redux";
-import { agregarItem } from "store/carritoSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
+import { handleAddToCart } from "utils/carritoUtils";
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -48,15 +48,24 @@ const PrimaryButton = styled(PrimaryButtonBase)`
 
 const Producto = ({ producto }) => {
   const dispatch = useDispatch();
+  const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
+  const user = useSelector((state) => state.usuario); // ID del cliente desde el store
+  let clienteId = null;
+  if(user.isLoggedIn){
+    clienteId = user.userInfo.id;
+  }
+
   const [cantidad, setCantidad] = useState(1);
 
   const precioConDescuento = calcularPrecioConDescuento(producto.precio, producto.descuentos || []);
 
-  const handleAddToCart = () => {
-    const productoConCantidad = { ...producto, cantidad, tipo:"producto" };
-    dispatch(agregarItem(productoConCantidad));
-    alert("Producto agregado al carrito");
-  };
+  const handleAgregarACarrito = () => {
+    handleAddToCart(producto, cantidad, token, clienteId, "producto", dispatch).then(() => {
+      alert("Producto agregado al carrito");
+    }).catch((e) => {
+      alert(e.message);
+    });
+  }
 
   const incrementarCantidad = () => {
     setCantidad((prevCantidad) => prevCantidad + 1);
@@ -121,7 +130,7 @@ const Producto = ({ producto }) => {
           <QuantityButton onClick={incrementarCantidad}>+</QuantityButton>
         </QuantityContainer>
         <ButtonContainer>
-          <PrimaryButton onClick={handleAddToCart}>Agregar al carrito</PrimaryButton>
+          <PrimaryButton onClick={handleAgregarACarrito}>Agregar al carrito</PrimaryButton>
         </ButtonContainer>
       </Details>
     </Content>
