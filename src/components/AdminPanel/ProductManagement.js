@@ -9,7 +9,7 @@ import {
 import { crearProducto } from 'scripts/crearProducto';
 import { actualizarProducto } from 'scripts/actualizarProducto';
 import { borrarProducto } from 'scripts/borrarProducto';
-import { obtenerProductos } from 'scripts/obtenerProductosCategoria'; // Usamos este script para obtener productos
+import { obtenerProductos } from 'scripts/obtenerProductosCategoria'; 
 import {
   Table,
   TableBody,
@@ -24,32 +24,39 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
+  Box,
+  Grid,
+  InputAdornment,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add'; 
+import SearchIcon from '@mui/icons-material/Search';
 
 const ProductManagement = () => {
   const [error, setError] = useState('');
   const dispatch = useDispatch();
-  const productos = useSelector((state) => state.productos); // Accedemos al estado de productos
-  const categorias = useSelector((state) => state.categorias); // Accedemos a las categorías
+  const productos = useSelector((state) => state.productos);
+  const categorias = useSelector((state) => state.categorias); // Asumimos que las categorías están en Redux
 
   const [open, setOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
     id: null,
     descripcion: '',
     precio: '',
-    categoria_id: '',
+    categoria: '',
     visible: true,
   });
 
-  // Recargar productos al montar el componente
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+
   useEffect(() => {
     obtenerProductos(sessionStorage.getItem("token"))
       .then((data) => {
-        dispatch(setProductos(data)); // Guardamos los productos en el store
+        dispatch(setProductos(data));
       })
       .catch((error) => {
         console.error("Error al obtener productos:", error);
@@ -57,56 +64,46 @@ const ProductManagement = () => {
       });
   }, [dispatch]);
 
-  // Función para abrir el formulario (para agregar o editar producto)
   const handleOpen = (product = null) => {
     if (product) {
-      // Si estamos editando un producto, aseguramos que 'categoria_id' se setee correctamente
       setNewProduct({ ...product });
     } else {
-      // Si estamos creando un nuevo producto, dejamos el valor vacío para 'categoria_id'
       setNewProduct({
         id: null,
         descripcion: '',
         precio: '',
-        categoria_id: '', // Aquí dejamos vacío para un nuevo producto
+        categoria: '',
         visible: true,
       });
     }
     setOpen(true);
   };
 
-  // Función para cerrar el formulario
   const handleClose = () => {
     setOpen(false);
   };
 
-  // Función para manejar cambios en los campos del formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewProduct({ ...newProduct, [name]: value });
   };
 
-  // Función para manejar el cambio en la selección de categoría
   const handleCategoryChange = (e) => {
-    setNewProduct({ ...newProduct, categoria_id: e.target.value });
+    setNewProduct({ ...newProduct, categoria: e.target.value });
   };
 
-  // Función para agregar o editar producto
   const handleSaveProduct = () => {
-    if (newProduct.descripcion && newProduct.precio && newProduct.categoria_id) {
+    if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
       const productToSave = {
         ...newProduct,
         precio: parseFloat(newProduct.precio),
-        categoria_id: parseInt(newProduct.categoria_id),
       };
 
       if (newProduct.id === null) {
-        // Crear nuevo producto
-        crearProducto(newProduct.descripcion, newProduct.precio, newProduct.categoria_id, newProduct.visible, sessionStorage.getItem("token"))
+        crearProducto(newProduct.descripcion, newProduct.precio, newProduct.categoria, newProduct.visible, sessionStorage.getItem("token"))
           .then((data) => {
             if (data && data.id) {
-              // Despachamos la acción para agregar el producto al store
-              dispatch(addProduct(data)); // Asegúrate de pasar el objeto correcto
+              dispatch(addProduct(data)); 
               console.log('Producto creado:', data);
             } else {
               setError('Error al crear el producto en la base de datos.');
@@ -117,10 +114,8 @@ const ProductManagement = () => {
             setError(error.message);
           });
       } else {
-        // Editar producto existente
         dispatch(updateProduct(productToSave));
-
-        actualizarProducto(newProduct.id, newProduct.descripcion, newProduct.precio, newProduct.categoria_id, newProduct.visible, sessionStorage.getItem("token"))
+        actualizarProducto(newProduct.id, newProduct.descripcion, newProduct.precio, newProduct.categoria, newProduct.visible, sessionStorage.getItem("token"))
           .then((data) => {
             console.log('Producto actualizado:', data);
           })
@@ -129,15 +124,13 @@ const ProductManagement = () => {
             setError(error.message);
           });
       }
-
-      setNewProduct({ descripcion: '', precio: '', categoria_id: '', visible: true });
+      setNewProduct({ descripcion: '', precio: '', categoria: '', visible: true });
       handleClose();
     } else {
       setError('Por favor, complete todos los campos.');
     }
   };
 
-  // Función para eliminar producto
   const handleDelete = (id) => {
     borrarProducto(id, sessionStorage.getItem("token"))
       .then((data) => {
@@ -147,31 +140,91 @@ const ProductManagement = () => {
         console.error('Error al eliminar el producto:', error.message);
         setError(error.message);
       });
-
-    dispatch(deleteProduct(id)); // Actualizamos el store después de eliminar el producto
+    dispatch(deleteProduct(id));
   };
 
-  // Función para obtener el nombre de la categoría a partir del categoria_id del producto
-  const getCategoryNameById = (categoria_id) => {
-    const categoria = categorias.find((categoria) => categoria.id === categoria_id); // Buscamos por el id de categoría
-    return categoria ? categoria.titulo : 'Categoría no encontrada'; // Si no se encuentra, mostrar un mensaje de error
-  };
+  const filteredProducts = productos.filter((product) => {
+    const matchesSearchTerm =
+      product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory
+      ? product.categoria.toLowerCase().includes(selectedCategory.toLowerCase())
+      : true;
+    const matchesMinPrice = minPrice ? product.precio >= minPrice : true;
+    const matchesMaxPrice = maxPrice ? product.precio <= maxPrice : true;
+
+    return (
+      matchesSearchTerm &&
+      matchesCategory &&
+      matchesMinPrice &&
+      matchesMaxPrice
+    );
+  });
 
   return (
-    <div>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => handleOpen()}
-        sx={{ marginBottom: 2 }}
-      >
-        Agregar Producto
-      </Button>
+    <div style={{ marginTop: '20px' }}>
+      {/* Filtros y búsqueda */}
+      <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: '2px solid #ccc', position: 'relative' }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={2} md={1} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Button variant="contained" color="success" onClick={() => handleOpen()}>
+              <AddIcon />
+            </Button>
+          </Grid>
+          {/* Barra de búsqueda por descripción */}
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              label="Buscar por descripción"
+              variant="outlined"
+              fullWidth
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          {/* Buscador por categoría */}
+          <Grid item xs={12} sm={4} md={3}>
+            <TextField
+              label="Buscar por categoría"
+              variant="outlined"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          {/* Filtros de precios */}
+          <Grid item xs={12} sm={3} md={2}>
+            <TextField
+              label="Precio mínimo"
+              type="number"
+              variant="outlined"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={3} md={2}>
+            <TextField
+              label="Precio máximo"
+              type="number"
+              variant="outlined"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+        </Grid>
+      </Box>
 
       {/* Tabla de productos */}
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ maxHeight: 400, overflowY: 'auto' }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'rgb(153, 205, 182)', zIndex: 1 }}>
             <TableRow>
               <TableCell>Descripción</TableCell>
               <TableCell>Precio</TableCell>
@@ -181,27 +234,18 @@ const ProductManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(productos) && productos.length > 0 ? (
-              productos.map((product) => (
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.descripcion}</TableCell>
                   <TableCell>{product.precio}</TableCell>
-                  <TableCell>{getCategoryNameById(product.categoria_id)}</TableCell> {/* Mostrar el nombre de la categoría */}
+                  <TableCell>{product.categoria}</TableCell>
                   <TableCell>{product.visible ? 'Sí' : 'No'}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => handleOpen(product)} // Abre el formulario en modo edición
-                      sx={{ marginRight: 2 }}
-                    >
+                    <Button variant="outlined" color="primary" onClick={() => handleOpen(product)}>
                       Editar
                     </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => handleDelete(product.id)}
-                    >
+                    <Button variant="outlined" color="secondary" onClick={() => handleDelete(product.id)}>
                       Eliminar
                     </Button>
                   </TableCell>
@@ -209,71 +253,78 @@ const ProductManagement = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5}>No hay productos disponibles.</TableCell>
+                <TableCell colSpan={5} style={{ textAlign: 'center' }}>No hay productos disponibles.</TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {/* Formulario para agregar o editar producto */}
+      {/* Diálogo para agregar/editar producto */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newProduct.id ? 'Editar Producto' : 'Agregar Producto'}</DialogTitle>
+        <DialogTitle>{newProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</DialogTitle>
         <DialogContent>
           <TextField
             label="Descripción"
             name="descripcion"
+            variant="outlined"
             value={newProduct.descripcion}
             onChange={handleInputChange}
             fullWidth
-            sx={{ marginBottom: 2 }}
+            style={{ marginBottom: '10px' }}
           />
           <TextField
             label="Precio"
             name="precio"
-            type="number"
+            variant="outlined"
             value={newProduct.precio}
             onChange={handleInputChange}
             fullWidth
-            sx={{ marginBottom: 2 }}
+            type="number"
+            style={{ marginBottom: '10px' }}
           />
-
-          {/* Campo de selección para la categoría con el título mostrado y el id asignado */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel>Categoría</InputLabel>
-            <Select
-              value={newProduct.categoria_id} // Aquí se asegura de que el valor de categoría se actualice
-              onChange={handleCategoryChange}
-              label="Categoría"
-            >
-              {categorias.map((categoria) => (
-                <MenuItem key={categoria.id} value={categoria.id}>
-                  {categoria.titulo} {/* Usamos el campo 'titulo' para mostrar la categoría */}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Campo de visibilidad */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel>Visibilidad</InputLabel>
-            <Select
-              value={newProduct.visible}
-              onChange={(e) => setNewProduct({ ...newProduct, visible: e.target.value })}
-            >
-              <MenuItem value={true}>Visible</MenuItem>
-              <MenuItem value={false}>No Visible</MenuItem>
-            </Select>
-          </FormControl>
-
+          <TextField
+            label="Categoría"
+            name="categoria"
+            variant="outlined"
+            value={newProduct.categoria}
+            onChange={handleCategoryChange}
+            fullWidth
+            select
+            SelectProps={{
+              native: true,
+            }}
+            style={{ marginBottom: '10px' }}
+          >
+            <option value="">Seleccionar categoría</option>
+            {categorias.map((categoria) => (
+              <option key={categoria.id} value={categoria.titulo}>
+                {categoria.titulo}
+              </option>
+            ))}
+          </TextField>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={newProduct.visible}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, visible: e.target.checked })
+                }
+                color="primary"
+              />
+            }
+            label="Visible"
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={handleSaveProduct}>Guardar</Button>
+          <Button onClick={handleClose} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleSaveProduct} color="primary">
+            {newProduct.id ? 'Guardar cambios' : 'Agregar producto'}
+          </Button>
         </DialogActions>
       </Dialog>
-
-      {error && <div style={{ color: 'red' }}>{error}</div>}
     </div>
   );
 };
