@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import GlobalStyles from 'styles/GlobalStyles';
 import { css } from "styled-components/macro"; //eslint-disable-line
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -114,6 +114,12 @@ import PanelAdministrador from "pages/PanelAdministrador";
 import PaginaProducto from "pages/PaginaProducto";
 import Carrito from "pages/Carrito";
 import PaginaPack from "pages/PaginaPack";
+import obtenerCategorias from "scripts/obtenerCategorias";
+import { useDispatch, useSelector } from "react-redux";
+import { obtenerPacks } from "scripts/obtenerPacks";
+import { obtenerPedidoEnProgreso } from "scripts/obtenerPedidoEnProgreso";
+import ScrollToTop from "helpers/ScrollToTop";
+import { limpiarCarrito } from "store/carritoSlice";
 
 const theme = createTheme({
   palette: {
@@ -128,6 +134,34 @@ const theme = createTheme({
 export default function App() {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
   // return <AnimationRevealPage disabled>xxxxxxxxxx</AnimationRevealPage>;
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.usuario.userInfo);
+  const token = sessionStorage.getItem("token");
+
+  useEffect(() => {
+    try {
+      const fetchCategorias = async () => {
+        await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
+      };
+      fetchCategorias();
+
+      const fetchPacks = async () => {
+        await obtenerPacks(dispatch);
+      };
+      fetchPacks();
+      
+      if(user && user.rol === "Cliente"){
+        const fetchPedido = async () => {
+          await obtenerPedidoEnProgreso(user.id, token, dispatch); // Llama al script para cargar las categorías en Redux
+        };
+        fetchPedido();
+      }else{
+        dispatch(limpiarCarrito())
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }, [dispatch, user, token]);
 
 
   return (
@@ -135,6 +169,7 @@ export default function App() {
       <GlobalStyles />
       <ThemeProvider theme={theme}>
       <Router>
+      <ScrollToTop />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

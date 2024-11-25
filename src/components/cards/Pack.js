@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
-import { useDispatch } from "react-redux";
-import { agregarItem } from "store/carritoSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
+import { handleAddToCart } from "utils/carritoUtils";
 
 const Content = tw.div`flex flex-col items-center`;
 const Details = tw.div`w-full`;
@@ -45,15 +45,22 @@ const PrimaryButton = styled(PrimaryButtonBase)`
 const Pack = ({ pack }) => {
   const dispatch = useDispatch();
   const [cantidad, setCantidad] = useState(1);
+  const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
+  const user = useSelector((state) => state.usuario); // ID del cliente desde el store
+  let userId = null;
+  if(user.isLoggedIn){
+    userId = user.userInfo.id;
+  }
 
   const precioConDescuento = calcularPrecioConDescuento(pack.precio, pack.descuentos || []);
 
-
-  const handleAddToCart = () => {
-    const packConCantidad = { ...pack, cantidad, tipo: "pack" };
-    dispatch(agregarItem(packConCantidad));
-    alert("Pack agregado al carrito");
-  };
+  const handleAgregarACarrito = () => {
+    handleAddToCart(pack, cantidad, token, userId, "pack", dispatch).then(() => {
+      alert("Pack agregado al carrito");
+    }).catch((e) => {
+      alert(e.message);
+    });
+  }
 
   const incrementarCantidad = () => {
     setCantidad((prevCantidad) => prevCantidad + 1);
@@ -124,7 +131,7 @@ const Pack = ({ pack }) => {
           <QuantityButton onClick={incrementarCantidad}>+</QuantityButton>
         </QuantityContainer>
         <ButtonContainer>
-          <PrimaryButton onClick={handleAddToCart}>Agregar al carrito</PrimaryButton>
+          <PrimaryButton onClick={handleAgregarACarrito}>Agregar al carrito</PrimaryButton>
         </ButtonContainer>
       </Details>
     </Content>

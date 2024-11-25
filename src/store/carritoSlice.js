@@ -14,17 +14,17 @@ const carritoSlice = createSlice({
         agregarItem: (state, action) => {
             const newItem = action.payload;
             const existingItem = state.items.find(
-                item => item.id === newItem.id && item.tipo === newItem.tipo
+                (item) => item.id === newItem.id && item.tipo === newItem.tipo
             );
 
             if (existingItem) {
-                existingItem.cantidad += newItem.cantidad || 1; // Si no se especifica cantidad, agrega 1 por defecto
+                existingItem.cantidad += newItem.cantidad || 1; // Incrementa la cantidad
                 existingItem.precioTotal += newItem.precio * (newItem.cantidad || 1);
             } else {
                 state.items.push({
                     id: newItem.id,
                     descripcion: newItem.descripcion,
-                    tipo: newItem.tipo, // Tipo del item: "producto" o "pack"
+                    tipo: newItem.tipo, // "producto" o "pack"
                     precio: newItem.precio,
                     cantidad: newItem.cantidad || 1,
                     precioTotal: newItem.precio * (newItem.cantidad || 1),
@@ -34,30 +34,29 @@ const carritoSlice = createSlice({
             state.cantidadProductos += newItem.cantidad || 1;
             state.precioTotal += newItem.precio * (newItem.cantidad || 1);
         },
+
         quitarItem: (state, action) => {
-            const { id, tipo } = action.payload; // El payload incluye el id y el tipo (producto o pack)
-        
-            // Busca el elemento en el carrito
+            const { id, tipo } = action.payload;
+
             const existingItemIndex = state.items.findIndex(
-                item => item.id === id && item.tipo === tipo
+                (item) => item.id === id && item.tipo === tipo
             );
-        
+
             if (existingItemIndex !== -1) {
-                // Si el elemento existe, actualizamos el estado
                 const existingItem = state.items[existingItemIndex];
-        
-                // Resta la cantidad y el precio total del estado global
+
                 state.cantidadProductos -= existingItem.cantidad;
                 state.precioTotal -= existingItem.precioTotal;
-        
-                // Elimina el elemento del array de items
+
                 state.items.splice(existingItemIndex, 1);
             }
         },
+
         incrementarCantidad: (state, action) => {
-            const { id, tipo } = action.payload; // Ahora el payload incluye el tipo
+            const { id, tipo } = action.payload;
+
             const existingItem = state.items.find(
-                item => item.id === id && item.tipo === tipo
+                (item) => item.id === id && item.tipo === tipo
             );
 
             if (existingItem) {
@@ -67,10 +66,12 @@ const carritoSlice = createSlice({
                 state.precioTotal += existingItem.precio;
             }
         },
+
         decrementarCantidad: (state, action) => {
-            const { id, tipo } = action.payload; // Ahora el payload incluye el tipo
+            const { id, tipo } = action.payload;
+
             const existingItem = state.items.find(
-                item => item.id === id && item.tipo === tipo
+                (item) => item.id === id && item.tipo === tipo
             );
 
             if (existingItem) {
@@ -82,13 +83,14 @@ const carritoSlice = createSlice({
                 } else {
                     // Si la cantidad es 1, elimina el producto o pack
                     state.items = state.items.filter(
-                        item => item.id !== id || item.tipo !== tipo
+                        (item) => item.id !== id || item.tipo !== tipo
                     );
                     state.cantidadProductos -= 1;
                     state.precioTotal -= existingItem.precio;
                 }
             }
         },
+
         limpiarCarrito: (state) => {
             state.items = [];
             state.cantidadProductos = 0;
@@ -99,6 +101,34 @@ const carritoSlice = createSlice({
         setCostoEnvio: (state, action) => {
             state.costoEnvio = action.payload;
         },
+
+        setCarrito: (state, action) => {
+            // Transforma los datos del backend al formato esperado por el estado del carrito
+            const { productos, packs, total } = action.payload;
+
+            const items = [
+                ...productos.map((producto) => ({
+                    id: producto.id,
+                    descripcion: producto.descripcion,
+                    tipo: 'producto', // Identifica como producto
+                    precio: producto.precio,
+                    cantidad: producto.cantidad,
+                    precioTotal: producto.precio * producto.cantidad,
+                })),
+                ...packs.map((pack) => ({
+                    id: pack.id,
+                    descripcion: pack.nombre,
+                    tipo: 'pack', // Identifica como pack
+                    precio: pack.precio,
+                    cantidad: pack.cantidad,
+                    precioTotal: pack.precio * pack.cantidad,
+                })),
+            ];
+
+            state.items = items;
+            state.cantidadProductos = items.reduce((total, item) => total + item.cantidad, 0);
+            state.precioTotal = total;
+        },
     },
 });
 
@@ -108,6 +138,7 @@ export const {
     incrementarCantidad,
     decrementarCantidad,
     limpiarCarrito,
+    setCarrito,
     setCostoEnvio,
 } = carritoSlice.actions;
 
