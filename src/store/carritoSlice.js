@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    items: [], // Array de productos y packs en el carrito
-    cantidadProductos: 0, // Cantidad total de productos y packs en el carrito
-    precioTotal: 0, // Precio total del carrito
+    items: [],
+    cantidadProductos: 0,
+    precioTotal: 0,
+    costoEnvio: 0,
 };
 
 const carritoSlice = createSlice({
@@ -94,6 +95,11 @@ const carritoSlice = createSlice({
             state.items = [];
             state.cantidadProductos = 0;
             state.precioTotal = 0;
+            state.costoEnvio = 0;
+        },
+        
+        setCostoEnvio: (state, action) => {
+            state.costoEnvio = action.payload;
         },
 
         setCarrito: (state, action) => {
@@ -133,6 +139,7 @@ export const {
     decrementarCantidad,
     limpiarCarrito,
     setCarrito,
+    setCostoEnvio,
 } = carritoSlice.actions;
 
 export default carritoSlice.reducer;

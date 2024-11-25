@@ -8301,6 +8301,11 @@ react-github-btn@^1.4.0:
   dependencies:
     github-buttons "^2.22.0"
 
+react-icons@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-5.3.0.tgz#ccad07a30aebd40a89f8cfa7d82e466019203f1c"
+  integrity sha512-DnUk8aFbTyQPSkCfF8dbX6kQjXA9DktMeJqfjrg6cK9vwQVMxmcA3BfP4QoiztVmEHtwlTgLFsPuH2NskKT6eg==
+
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
@@ -9650,9 +9655,9 @@ tsutils@^3.21.0:
   dependencies:
     tslib "^1.8.1"
 
-twin.macro@^3.0.0-rc.4:
+twin.macro@^3.4.1:
   version "3.4.1"
-  resolved "https://registry.npmjs.org/twin.macro/-/twin.macro-3.4.1.tgz"
+  resolved "https://registry.yarnpkg.com/twin.macro/-/twin.macro-3.4.1.tgz#1b1919d4c539e4d83481ed29682bcc6adc0cf87e"
   integrity sha512-bxGKTV4u/iGcQqHIugPaW5YSLJ5rIr56ay4Pjcr2Mbb037k341bQ+eWT8z3F7r8ZGTXjTD3uiuxos+qQRy4VjQ==
   dependencies:
     "@babel/template" "^7.22.15"

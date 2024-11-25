@@ -5,6 +5,8 @@ import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import { useDispatch, useSelector } from "react-redux";
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
 import { handleAddToCart } from "utils/carritoUtils";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -46,6 +48,13 @@ const PrimaryButton = styled(PrimaryButtonBase)`
   }
 `;
 
+const BackButton = styled.button`
+  ${tw`flex items-center space-x-2 text-primary-500 font-semibold mb-4`}
+  &:hover {
+    ${tw`text-primary-700`}
+  }
+`;
+
 const Producto = ({ producto }) => {
   const dispatch = useDispatch();
   const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
@@ -80,8 +89,13 @@ const Producto = ({ producto }) => {
     setCantidad(isNaN(value) || value <= 0 ? 1 : value);
   };
 
+  const navigate = useNavigate();
+
   return (
     <Content>
+      <BackButton onClick={() => navigate("/productos")}>
+          <ArrowBackIcon fontSize="small" /> <span>Volver a productos</span>
+       </BackButton>
       <ImageContainer>
         <Image
           src={
