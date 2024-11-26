@@ -10,6 +10,8 @@ import {
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
 import { handleAddToCart, handleQuitarDeCarrito } from "utils/carritoUtils";
 import ZonasMapa from "images/ZONAS.png";
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react'
+initMercadoPago('TEST-75db8543-5df6-4a02-80f8-a98db92fd464');
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full items-center`;
@@ -117,6 +119,33 @@ const CartPage = () => {
     dispatch(quitarItem(item));
   }
 
+  const handleMercadoPago = async () => {
+    const items = cartItems.map((item) => ({
+    title: item.descripcion,
+    quantity: item.cantidad,
+    unitPrice: item.precio,
+    }));
+    
+        try {
+          const response = await fetch("/pagos/crearPreferencia", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`},
+            body: JSON.stringify({ items }),
+          });
+    
+          const data = await response.json();
+          if (data) {
+            console.log(data)
+          } else {
+            alert("Error al generar la preferencia de pago.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Ocurrió un error al procesar el pago.");
+        }
+    
+    };
+
   return (
     <Container>
       <h2 tw="text-xl font-bold mb-6">Tu Carrito</h2>
@@ -205,6 +234,8 @@ const CartPage = () => {
       </div>
       </>
       )}
+    <button onClick={handleMercadoPago}>Pagar con Mercado Pago</button>
+    <Wallet initialization={{ preferenceId: "175019083-317cd3e6-ba22-4ac6-be05-89375c0d0220" }} customization={{ texts:{ valueProp: 'smart_option'}}} />
     </Container>
   );
 };
