@@ -1,7 +1,7 @@
 let request, queryParams, url;
 
 export const crearCliente = async (emailInput, passwordInput) => {
-  request = "/usuarios/create";
+  request = "/api/usuarios/create";
 
   queryParams = new URLSearchParams({
     email: emailInput,

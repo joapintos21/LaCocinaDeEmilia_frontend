@@ -1,7 +1,7 @@
 let request, url, body;
 
 export const quitarPackCarrito = async (clienteId, productoId, cantidad, token) => {
-  request = "/carrito/quitarPackCarrito";
+  request = "/api/carrito/quitarPackCarrito";
   url = `${request}`;
 
   body = {

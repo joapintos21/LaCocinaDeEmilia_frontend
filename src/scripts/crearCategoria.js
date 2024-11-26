@@ -1,7 +1,7 @@
 let request, url, body;
 
 export const crearCategoria = async (titulo, descripcion, token) => {
-  request = "/categorias/create";
+  request = "/api/categorias/create";
   url = `${request}`;
 
   body = {

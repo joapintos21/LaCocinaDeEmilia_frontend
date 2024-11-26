@@ -1,6 +1,6 @@
 export const actualizarCategoria = async (id, titulo, descripcion, token) => {
     // Usar el ID directamente en la URL del endpoint
-    const url = `/categorias/update/${id}`;  // Asumiendo que el servidor espera el ID en la URL
+    const url = `/api/categorias/update/${id}`;  // Asumiendo que el servidor espera el ID en la URL
   
     // Crear el objeto de datos que se enviará en el cuerpo de la solicitud
     const body = {

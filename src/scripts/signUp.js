@@ -1,7 +1,7 @@
 let request, url, body;
 
 export const crearUsuario = async (email, password, nombre, telefono, rol_id) => {
-  request = "/usuarios/create";
+  request = "/api/usuarios/create";
   url = `${request}`;
 
   body = {

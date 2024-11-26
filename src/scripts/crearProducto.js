@@ -1,7 +1,7 @@
 let request, queryParams, url;
 
 export const iniciarSesion = async (emailInput, passwordInput) => {
-  request = "/productos/create";
+  request = "/api/productos/create";
 
   queryParams = new URLSearchParams({
     email: emailInput,

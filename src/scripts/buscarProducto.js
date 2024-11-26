@@ -1,6 +1,6 @@
 // buscarProducto.js
 export const buscarProducto = async (textoBusqueda) => {
-  const request = `/productos/buscar?query=${encodeURIComponent(textoBusqueda)}`;
+  const request = `/api/productos/buscar?query=${encodeURIComponent(textoBusqueda)}`;
 
   try {
     const response = await fetch(request, {

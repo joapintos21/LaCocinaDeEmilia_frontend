@@ -1,4 +1,4 @@
-const request = '/usuarios/show'
+const request = '/api/usuarios/show'
 
 const queryParams = new URLSearchParams({
     id: 1

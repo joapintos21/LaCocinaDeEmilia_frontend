@@ -1,7 +1,7 @@
 import { setPacks } from 'store/packSlice';
 
 export const obtenerPacks = async (dispatch) => {
-  let url = "/packs";
+  let url = "/api/packs";
 
   try {
     const response = await fetch(url, {

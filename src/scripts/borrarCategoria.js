@@ -1,6 +1,6 @@
 export const borrarCategoria = async (id, token) => {
     // Usar el ID directamente en la URL del endpoint
-    const url = `/categorias/delete/${id}`;  // Asumiendo que el servidor espera el ID en la URL
+    const url = `/api/categorias/delete/${id}`;  // Asumiendo que el servidor espera el ID en la URL
   
     try {
       // Hacer la solicitud DELETE

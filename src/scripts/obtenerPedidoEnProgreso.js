@@ -1,7 +1,7 @@
 import { setCarrito } from 'store/carritoSlice';
 
 export const obtenerPedidoEnProgreso = async (userId, token, dispatch) => {
-  const request = `/pedidos/obtenerPedidoEnProgreso?userId=${userId}`;
+  const request = `/api/pedidos/obtenerPedidoEnProgreso?userId=${userId}`;
 
   try {
     const response = await fetch(request, {

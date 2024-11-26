@@ -1,7 +1,7 @@
 import { setCategorias } from '../store/categoriaSlice';
 
 export const obtenerCategorias = async (dispatch) => {
-  let url = "/categorias";
+  let url = "/api/categorias";
 
   try {
     const response = await fetch(url, {

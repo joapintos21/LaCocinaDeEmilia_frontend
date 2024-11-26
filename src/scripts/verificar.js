@@ -1,5 +1,5 @@
 export const verificar = async (token) => {
-    let request = "http://localhost:8080/usuarios/validarToken";
+    let request = "http://localhost:8080/api/usuarios/validarToken";
 
     const queryParams = new URLSearchParams({
         token: token
