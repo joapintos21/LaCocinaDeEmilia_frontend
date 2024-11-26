@@ -7,10 +7,12 @@ import Footer from "components/footers/FiveColumnWithInputForm.js";
 import { Box, Container, Typography, Paper, Grid, Button } from '@mui/material';
 import Dashboard from "components/AdminPanel/Dashboard"; // Asegúrate de que el path sea correcto
 import ProductManagement from "components/AdminPanel/ProductManagement"; // Asegúrate de que el path sea correcto
-import CustomerManagement from "components/AdminPanel/CustomerManagement"; // Asegúrate de que el path sea correcto
+import UserManagement from "components/AdminPanel/UserManagement"; // Asegúrate de que el path sea correcto
 import CategoryManagement from "components/AdminPanel/CategoryManagement";
 import OrderManagement from "components/AdminPanel/OrderManagement";
 import { obtenerCategorias } from 'scripts/obtenerCategorias';
+import DiscountManagement from "components/AdminPanel/DiscountManagement";
+import PermissionsManagement from "components/AdminPanel/PermissionsManagement";
 
 export default () => {
   const dispatch = useDispatch();
@@ -141,7 +143,7 @@ export default () => {
               <ProductManagement />
             </Paper>
 
-            {/* Gestión de Clientes Section */}
+            {/* Gestión de Descuentos Section */}
             <Paper
               sx={{
                 padding: 4,
@@ -155,9 +157,47 @@ export default () => {
                 gutterBottom
                 sx={{ color: "#333", fontWeight: '600' }}
               >
-                Gestión de Clientes
+                Gestión de Descuentos
               </Typography>
-              <CustomerManagement />
+              <DiscountManagement />
+            </Paper>
+
+            {/* Gestión de Usuarios Section */}
+            <Paper
+              sx={{
+                padding: 4,
+                boxShadow: 3,
+                borderRadius: 2,
+                backgroundColor: "#fff",
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ color: "#333", fontWeight: '600' }}
+              >
+                Gestión de Usuarios
+              </Typography>
+              <UserManagement />
+            </Paper>
+
+            {/* Gestión de Permisos Section */}
+            <Paper
+              sx={{
+                padding: 4,
+                boxShadow: 3,
+                borderRadius: 2,
+                backgroundColor: "#fff",
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ color: "#333", fontWeight: '600' }}
+              >
+                Gestión de Permisos de Usuario
+              </Typography>
+              <PermissionsManagement />
             </Paper>
           </Container>
         </Box>
