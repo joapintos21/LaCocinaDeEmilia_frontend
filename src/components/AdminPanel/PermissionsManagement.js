@@ -33,7 +33,9 @@ import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
 const PermissionsManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-  const permisos = useSelector((state) => state.permisos); // Obtenemos los permisos desde el store
+  
+  // Asegúrate de que `permisos` tenga un valor por defecto (un array vacío)
+  const permisos = useSelector((state) => state.permisos || []); // Usamos un array vacío como valor por defecto
 
   const [open, setOpen] = useState(false);
   const [newPermiso, setNewPermiso] = useState({ id: null, nombre: "", descripcion: "" });
@@ -116,12 +118,15 @@ const PermissionsManagement = () => {
     dispatch(deletePermiso(id));
   };
 
-  const filteredPermisos = permisos.filter((permiso) => {
-    return (
-      permiso.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      permiso.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
-    );
-  });
+  // Filtramos permisos solo si permisos es un array (prevención de errores)
+  const filteredPermisos = Array.isArray(permisos)
+    ? permisos.filter((permiso) => {
+        return (
+          permiso.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          permiso.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
+        );
+      })
+    : [];
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -130,21 +135,7 @@ const PermissionsManagement = () => {
         <Grid container spacing={2} alignItems="center">
           {/* Coloca el botón de agregar a la izquierda */}
           <Grid item xs={12} sm={2} md={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOpen()}
-              sx={{
-                width: 40, // Hacemos que el botón sea cuadrado
-                height: 40,
-                borderRadius: 4, // Bordes redondeados si es necesario
-                minWidth: 0, // Evita que el botón tenga un ancho mínimo
-                padding: 0, // Eliminar padding
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+          <Button variant="contained" color="success" onClick={() => handleOpen()}>
               <AddIcon />
             </Button>
           </Grid>
@@ -190,7 +181,7 @@ const PermissionsManagement = () => {
       {/* Tabla de permisos con Scrollbar */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "rgb(153, 205, 182)" }}>
+          <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>

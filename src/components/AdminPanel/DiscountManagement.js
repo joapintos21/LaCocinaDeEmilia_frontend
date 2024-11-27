@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setDescuentos,
   addDescuento,
   updateDescuento,
   deleteDescuento,
-} from "store/descuentoSlice"; // Asegúrate de crear las acciones correspondientes en tu slice
+} from "store/descuentoSlice"; // Asegúrate de que las acciones estén correctamente definidas en el slice
 import { crearDescuento } from "scripts/crearDescuento"; // Función para crear descuento
 import { actualizarDescuento } from "scripts/actualizarDescuento"; // Función para actualizar descuento
 import { borrarDescuento } from "scripts/borrarDescuento"; // Función para eliminar descuento
@@ -28,12 +27,14 @@ import {
   Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
+import AddIcon from "@mui/icons-material/Add";
 
 const DiscountManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-  const descuentos = useSelector((state) => state.descuentos); // Obtenemos los descuentos desde el store
+
+  // Obtén los descuentos del store; si no están disponibles, usa un array vacío
+  const descuentos = useSelector((state) => state.descuentos || []);
 
   const [open, setOpen] = useState(false);
   const [newDescuento, setNewDescuento] = useState({ id: null, nombre: "", descripcion: "", porcentaje: "" });
@@ -41,15 +42,11 @@ const DiscountManagement = () => {
   const [searchDescripcion, setSearchDescripcion] = useState("");
 
   useEffect(() => {
-    setError(""); // Limpiamos el error
+    setError(""); // Limpia los errores en cada renderizado
   }, [dispatch]);
 
   const handleOpen = (descuento = null) => {
-    if (descuento) {
-      setNewDescuento({ ...descuento });
-    } else {
-      setNewDescuento({ id: null, nombre: "", descripcion: "", porcentaje: "" });
-    }
+    setNewDescuento(descuento ? { ...descuento } : { id: null, nombre: "", descripcion: "", porcentaje: "" });
     setOpen(true);
   };
 
@@ -74,9 +71,7 @@ const DiscountManagement = () => {
           newDescuento.porcentaje,
           sessionStorage.getItem("token")
         )
-          .then((data) => {
-            console.log("Descuento agregado:", data);
-          })
+          .then((data) => console.log("Descuento agregado:", data))
           .catch((error) => {
             console.error("Error al crear el descuento:", error.message);
             setError(error.message);
@@ -89,9 +84,7 @@ const DiscountManagement = () => {
           newDescuento.porcentaje,
           sessionStorage.getItem("token")
         )
-          .then((data) => {
-            console.log("Descuento actualizado:", data);
-          })
+          .then((data) => console.log("Descuento actualizado:", data))
           .catch((error) => {
             console.error("Error al actualizar el descuento:", error.message);
             setError(error.message);
@@ -108,9 +101,7 @@ const DiscountManagement = () => {
 
   const handleDelete = (id) => {
     borrarDescuento(id, sessionStorage.getItem("token"))
-      .then((data) => {
-        console.log("Descuento eliminado:", data);
-      })
+      .then((data) => console.log("Descuento eliminado:", data))
       .catch((error) => {
         console.error("Error al eliminar el descuento:", error.message);
         setError(error.message);
@@ -118,40 +109,27 @@ const DiscountManagement = () => {
     dispatch(deleteDescuento(id));
   };
 
-  const filteredDescuentos = descuentos.filter((descuento) => {
-    return (
-      descuento.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      descuento.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
-    );
-  });
+  // Filtra los descuentos asegurándote de que `descuentos` es un array
+  const filteredDescuentos = Array.isArray(descuentos)
+    ? descuentos.filter((descuento) => {
+        return (
+          descuento.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          descuento.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
+        );
+      })
+    : [];
 
   return (
     <div style={{ marginTop: "20px" }}>
       {/* Barra de búsqueda y botón "Agregar" */}
       <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: "2px solid #ccc" }}>
         <Grid container spacing={2} alignItems="center">
-          {/* Coloca el botón de agregar a la izquierda */}
           <Grid item xs={12} sm={2} md={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOpen()}
-              sx={{
-                width: 40, // Hacemos que el botón sea cuadrado
-                height: 40,
-                borderRadius: 4, // Bordes redondeados si es necesario
-                minWidth: 0, // Evita que el botón tenga un ancho mínimo
-                padding: 0, // Eliminar padding
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+          <Button variant="contained" color="success" onClick={() => handleOpen()}>
               <AddIcon />
             </Button>
           </Grid>
 
-          {/* Buscador por nombre */}
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="Buscar por nombre"
@@ -169,7 +147,6 @@ const DiscountManagement = () => {
             />
           </Grid>
 
-          {/* Buscador por descripción */}
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="Buscar por descripción"
@@ -189,10 +166,10 @@ const DiscountManagement = () => {
         </Grid>
       </Box>
 
-      {/* Tabla de descuentos con Scrollbar */}
+      {/* Tabla de descuentos */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "rgb(153, 205, 182)" }}>
+          <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>
@@ -237,7 +214,7 @@ const DiscountManagement = () => {
         </Table>
       </TableContainer>
 
-      {/* Formulario para agregar o editar descuento */}
+      {/* Formulario de descuento */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{newDescuento.id ? "Editar Descuento" : "Agregar Descuento"}</DialogTitle>
         <DialogContent>

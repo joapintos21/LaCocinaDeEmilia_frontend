@@ -23,6 +23,6 @@ export const descuentoSlice = createSlice({
   },
 });
 
-export const { setPermisos, addPermiso, updatePermiso, deletePermiso } = descuentoSlice.actions;
+export const { setDescuentos, addDescuento, updateDescuento, deleteDescuento } = descuentoSlice.actions;
 
 export default descuentoSlice.reducer;

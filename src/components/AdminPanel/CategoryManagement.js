@@ -130,21 +130,7 @@ const CategoryManagement = () => {
         <Grid container spacing={2} alignItems="center">
           {/* Coloca el botón de agregar a la izquierda */}
           <Grid item xs={12} sm={2} md={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOpen()}
-              sx={{
-                width: 40, // Hacemos que el botón sea cuadrado
-                height: 40,
-                borderRadius: 4, // Bordes redondeados si es necesario
-                minWidth: 0, // Evita que el botón tenga un ancho mínimo
-                padding: 0, // Eliminar padding
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+          <Button variant="contained" color="success" onClick={() => handleOpen()}>
               <AddIcon />
             </Button>
           </Grid>
@@ -190,7 +176,7 @@ const CategoryManagement = () => {
       {/* Tabla de categorías con Scrollbar */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "rgb(153, 205, 182)" }}>
+          <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>

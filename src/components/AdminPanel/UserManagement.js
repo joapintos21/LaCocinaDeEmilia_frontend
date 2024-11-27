@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setUsuarios,
   addUsuario,
   updateUsuario,
   deleteUsuario,
-} from "store/usuarioSlice"; // Asegúrate de crear las acciones correspondientes en tu slice
-import { crearUsuario } from "scripts/crearUsuario"; // Función para crear usuario
-import { actualizarUsuario } from "scripts/actualizarUsuario"; // Función para actualizar usuario
-import { borrarUsuario } from "scripts/borrarUsuario"; // Función para eliminar usuario
+} from "store/usuarioSlice"; // Asegúrate de que las acciones estén correctamente definidas en el slice
+import { crearUsuario } from "scripts/crearUsuario";
+import { actualizarUsuario } from "scripts/actualizarUsuario";
+import { borrarUsuario } from "scripts/borrarUsuario";
 import {
   Table,
   TableBody,
@@ -28,12 +27,14 @@ import {
   Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
+import AddIcon from "@mui/icons-material/Add";
 
 const UserManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-  const usuarios = useSelector((state) => state.usuarios); // Obtenemos los usuarios desde el store
+
+  // Obtén los usuarios del store; si no están disponibles, usa un array vacío
+  const usuarios = useSelector((state) => state.usuarios || []);
 
   const [open, setOpen] = useState(false);
   const [newUsuario, setNewUsuario] = useState({ id: null, nombre: "", email: "" });
@@ -41,15 +42,11 @@ const UserManagement = () => {
   const [searchEmail, setSearchEmail] = useState("");
 
   useEffect(() => {
-    setError(""); // Limpiamos el error
+    setError(""); // Limpia los errores en cada renderizado
   }, [dispatch]);
 
   const handleOpen = (usuario = null) => {
-    if (usuario) {
-      setNewUsuario({ ...usuario });
-    } else {
-      setNewUsuario({ id: null, nombre: "", email: "" });
-    }
+    setNewUsuario(usuario ? { ...usuario } : { id: null, nombre: "", email: "" });
     setOpen(true);
   };
 
@@ -68,14 +65,8 @@ const UserManagement = () => {
         const usuarioToAdd = { ...newUsuario };
         dispatch(addUsuario(usuarioToAdd));
 
-        crearUsuario(
-          newUsuario.nombre,
-          newUsuario.email,
-          sessionStorage.getItem("token")
-        )
-          .then((data) => {
-            console.log("Usuario agregado:", data);
-          })
+        crearUsuario(newUsuario.nombre, newUsuario.email, sessionStorage.getItem("token"))
+          .then((data) => console.log("Usuario agregado:", data))
           .catch((error) => {
             console.error("Error al crear el usuario:", error.message);
             setError(error.message);
@@ -87,9 +78,7 @@ const UserManagement = () => {
           newUsuario.email,
           sessionStorage.getItem("token")
         )
-          .then((data) => {
-            console.log("Usuario actualizado:", data);
-          })
+          .then((data) => console.log("Usuario actualizado:", data))
           .catch((error) => {
             console.error("Error al actualizar el usuario:", error.message);
             setError(error.message);
@@ -106,9 +95,7 @@ const UserManagement = () => {
 
   const handleDelete = (id) => {
     borrarUsuario(id, sessionStorage.getItem("token"))
-      .then((data) => {
-        console.log("Usuario eliminado:", data);
-      })
+      .then((data) => console.log("Usuario eliminado:", data))
       .catch((error) => {
         console.error("Error al eliminar el usuario:", error.message);
         setError(error.message);
@@ -116,40 +103,27 @@ const UserManagement = () => {
     dispatch(deleteUsuario(id));
   };
 
-  const filteredUsuarios = usuarios.filter((usuario) => {
-    return (
-      usuario.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      usuario.email.toLowerCase().includes(searchEmail.toLowerCase())
-    );
-  });
+  // Filtra los usuarios asegurándote de que `usuarios` es un array
+  const filteredUsuarios = Array.isArray(usuarios)
+    ? usuarios.filter((usuario) => {
+        return (
+          usuario.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          usuario.email.toLowerCase().includes(searchEmail.toLowerCase())
+        );
+      })
+    : [];
 
   return (
     <div style={{ marginTop: "20px" }}>
       {/* Barra de búsqueda y botón "Agregar" */}
       <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: "2px solid #ccc" }}>
         <Grid container spacing={2} alignItems="center">
-          {/* Coloca el botón de agregar a la izquierda */}
           <Grid item xs={12} sm={2} md={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOpen()}
-              sx={{
-                width: 40, // Hacemos que el botón sea cuadrado
-                height: 40,
-                borderRadius: 4, // Bordes redondeados si es necesario
-                minWidth: 0, // Evita que el botón tenga un ancho mínimo
-                padding: 0, // Eliminar padding
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+          <Button variant="contained" color="success" onClick={() => handleOpen()}>
               <AddIcon />
             </Button>
           </Grid>
 
-          {/* Buscador por nombre */}
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="Buscar por nombre"
@@ -167,7 +141,6 @@ const UserManagement = () => {
             />
           </Grid>
 
-          {/* Buscador por correo */}
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="Buscar por correo"
@@ -187,10 +160,10 @@ const UserManagement = () => {
         </Grid>
       </Box>
 
-      {/* Tabla de usuarios con Scrollbar */}
+      {/* Tabla de usuarios */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "rgb(153, 205, 182)" }}>
+          <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Correo</TableCell>
@@ -233,7 +206,7 @@ const UserManagement = () => {
         </Table>
       </TableContainer>
 
-      {/* Formulario para agregar o editar usuario */}
+      {/* Formulario de usuario */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{newUsuario.id ? "Editar Usuario" : "Agregar Usuario"}</DialogTitle>
         <DialogContent>

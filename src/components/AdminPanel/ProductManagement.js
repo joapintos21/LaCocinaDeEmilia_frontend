@@ -224,7 +224,7 @@ const ProductManagement = () => {
       {/* Tabla de productos */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflowY: 'auto' }}>
         <Table>
-          <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'rgb(153, 205, 182)', zIndex: 1 }}>
+          <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
               <TableCell>Descripción</TableCell>
               <TableCell>Precio</TableCell>
