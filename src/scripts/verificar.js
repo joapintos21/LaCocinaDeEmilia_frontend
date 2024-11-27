@@ -1,5 +1,6 @@
 export const verificar = async (token) => {
-    let request = "http://localhost:8080/api/usuarios/validarToken";
+    const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:8080";
+    const request = `${baseUrl}/api/usuarios/validarToken`;
 
     const queryParams = new URLSearchParams({
         token: token
