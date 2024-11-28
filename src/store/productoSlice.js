@@ -1,29 +1,25 @@
 // productoSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  productos: [],  // Asegúrate de que el estado de productos se inicialice como un array vacío
-};
-
 const productoSlice = createSlice({
   name: 'productos',
-  initialState,
+  initialState: [],
   reducers: {
     setProductos: (state, action) => {
-      state.productos = action.payload;
+      return action.payload;
     },
     addProduct: (state, action) => {
-      state.productos.push(action.payload);
+      state.push(action.payload);
     },
     updateProduct: (state, action) => {
-      const index = state.productos.findIndex(product => product.id === action.payload.id);
+      const index = state.findIndex(product => product.id === action.payload.id);
       if (index !== -1) {
-        state.productos[index] = action.payload;
+        state[index] = action.payload;
       }
     },
     deleteProduct: (state, action) => {
       // Asegúrate de que 'productos' siempre sea un array, incluso si está vacío o es undefined
-      state.productos = state.productos ? state.productos.filter(product => product.id !== action.payload) : [];
+      state = state ? state.filter(product => product.id !== action.payload) : [];
     },
   },
 });

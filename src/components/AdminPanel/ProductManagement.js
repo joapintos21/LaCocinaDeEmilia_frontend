@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  setProductos,
   addProduct,
   updateProduct,
   deleteProduct,
@@ -54,14 +53,10 @@ const ProductManagement = () => {
   const [maxPrice, setMaxPrice] = useState('');
 
   useEffect(() => {
-    obtenerProductos(sessionStorage.getItem("token"))
-      .then((data) => {
-        dispatch(setProductos(data));
-      })
-      .catch((error) => {
-        console.error("Error al obtener productos:", error);
-        setError('No se pudieron cargar los productos.');
-      });
+    const fetchProductos = async () => {
+      await obtenerProductos(dispatch);
+    };
+    fetchProductos();
   }, [dispatch]);
 
   const handleOpen = (product = null) => {
@@ -94,10 +89,7 @@ const ProductManagement = () => {
 
   const handleSaveProduct = () => {
     if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
-      const productToSave = {
-        ...newProduct,
-        precio: parseFloat(newProduct.precio),
-      };
+  
 
       if (newProduct.id === null) {
         crearProducto(newProduct.descripcion, newProduct.precio, newProduct.categoria, newProduct.visible, sessionStorage.getItem("token"))
@@ -114,8 +106,8 @@ const ProductManagement = () => {
             setError(error.message);
           });
       } else {
-        dispatch(updateProduct(productToSave));
-        actualizarProducto(newProduct.id, newProduct.descripcion, newProduct.precio, newProduct.categoria, newProduct.visible, sessionStorage.getItem("token"))
+
+        actualizarProducto(newProduct.id, newProduct.descripcion, parseFloat(newProduct.precio), parseInt(newProduct.categoria), newProduct.visible, sessionStorage.getItem("token"))
           .then((data) => {
             console.log('Producto actualizado:', data);
           })
@@ -147,7 +139,7 @@ const ProductManagement = () => {
     const matchesSearchTerm =
       product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory
-      ? product.categoria.toLowerCase().includes(selectedCategory.toLowerCase())
+      ? product.categoria.titulo.toLowerCase().includes(selectedCategory.toLowerCase())
       : true;
     const matchesMinPrice = minPrice ? product.precio >= minPrice : true;
     const matchesMaxPrice = maxPrice ? product.precio <= maxPrice : true;
@@ -234,12 +226,12 @@ const ProductManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredProducts.length > 0 ? (
+            {filteredProducts.length > 0 ? 
               filteredProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.descripcion}</TableCell>
                   <TableCell>{product.precio}</TableCell>
-                  <TableCell>{product.categoria}</TableCell>
+                  <TableCell>{product.categoria.titulo}</TableCell>
                   <TableCell>{product.visible ? 'Sí' : 'No'}</TableCell>
                   <TableCell>
                     <Button variant="outlined" color="primary" onClick={() => handleOpen(product)}>
@@ -250,8 +242,7 @@ const ProductManagement = () => {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
+              )) : (
               <TableRow>
                 <TableCell colSpan={5} style={{ textAlign: 'center' }}>No hay productos disponibles.</TableCell>
               </TableRow>
@@ -298,7 +289,7 @@ const ProductManagement = () => {
           >
             <option value="">Seleccionar categoría</option>
             {categorias.map((categoria) => (
-              <option key={categoria.id} value={categoria.titulo}>
+              <option key={categoria.id} value={categoria.id}>
                 {categoria.titulo}
               </option>
             ))}

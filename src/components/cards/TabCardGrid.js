@@ -98,7 +98,7 @@ export default () => {
         imageSrc: producto.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80",
         title: producto.descripcion || "Sin nombre",
         price: producto.precio || "$0.00",
-        category: producto.categoria || "Otros",
+        category: producto.categoria.titulo || "Otros",
         url: `/producto/${producto.id}`
       }));
       setProducts(transformedProducts);
@@ -124,7 +124,7 @@ export default () => {
   }, [products, packs]);
 
   const tabs = {
-    Todos: filteredProducts,
+    Todos: filteredProducts.length > 0 ? filteredProducts : products,
     Packs: packs,
     ...categoriasRedux.reduce((acc, categoria) => {
       acc[categoria.titulo] = products.filter((product) => product.category === categoria.titulo);
@@ -147,6 +147,7 @@ export default () => {
           category: producto.categoria || "Otros",
           url: '#'
         }));
+        setActiveTab("");
         setFilteredProducts(transformedResults);
       } catch (error) {
         console.error("Error en la búsqueda:", error);
