@@ -51,7 +51,7 @@ export default ({
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [error, setError] = useState("");
-  const rol_id = 1;
+  const rol_id = 4;
   const navigate = useNavigate();
 
   const handleCreateUser = (event) => {
