@@ -1,7 +1,8 @@
+// obtenerProductosCategoria.js
 import { setProductos } from 'store/productoSlice';
 
 export const obtenerProductos = async (dispatch) => {
-  let url = "/productos";
+  let url = "/productos"; // Aquí debería ir la URL correcta de tu API
 
   try {
     const response = await fetch(url, {
@@ -18,10 +19,10 @@ export const obtenerProductos = async (dispatch) => {
     }
 
     const data = await response.json();
-    dispatch(setProductos(data)); // Almacena las categorías en Redux
+    dispatch(setProductos(data)); // Almacena los productos en Redux
 
   } catch (error) {
-    console.error(error);
+    console.error("Error al obtener productos:", error);
     throw error; // Lanza el error para que sea capturado en el evento
   }
 };

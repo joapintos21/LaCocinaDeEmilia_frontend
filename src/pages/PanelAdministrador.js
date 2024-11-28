@@ -1,166 +1,96 @@
-import React, {useEffect, useState} from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import AnimationRevealPage from "helpers/AnimationRevealPage.js";
-import tw from "twin.macro";
-import Header from "components/headers/light.js";
-import Footer from "components/footers/FiveColumnWithInputForm.js";
-import { Box, Container, Typography, Paper, Grid, Button } from '@mui/material';
-import Dashboard from "components/AdminPanel/Dashboard"; // Asegúrate de que el path sea correcto
-import ProductManagement from "components/AdminPanel/ProductManagement"; // Asegúrate de que el path sea correcto
-import CustomerManagement from "components/AdminPanel/CustomerManagement"; // Asegúrate de que el path sea correcto
+import { Box, Grid, Paper, Typography } from "@mui/material";
+import Dashboard from "components/AdminPanel/Dashboard";
+import ProductManagement from "components/AdminPanel/ProductManagement";
+import UserManagement from "components/AdminPanel/UserManagement";
 import CategoryManagement from "components/AdminPanel/CategoryManagement";
 import OrderManagement from "components/AdminPanel/OrderManagement";
-import { obtenerCategorias } from 'scripts/obtenerCategorias';
+import DiscountManagement from "components/AdminPanel/DiscountManagement";
+import PermissionsManagement from "components/AdminPanel/PermissionsManagement";
+import AdditionalManagement from "components/AdminPanel/AdditionalManagement";
 
 export default () => {
   const dispatch = useDispatch();
   const [categories, setCategories] = useState([]);
-  const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
+  const categoriasRedux = useSelector((state) => state.categorias);
 
   useEffect(() => {
-    if (categoriasRedux && categoriasRedux.length > 0) {
+    if (Array.isArray(categoriasRedux) && categoriasRedux.length > 0) {
       const transformedCategories = categoriasRedux.map((categoria) => ({
-        imageSrc: categoria.imageUrl || "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80", // Usa una URL por defecto si no hay `imageUrl`
+        imageSrc:
+          categoria.imageUrl ||
+          "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80",
         title: categoria.titulo || "Sin nombre",
         description: categoria.descripcion || "Sin descripción",
-        url: '#'
+        url: "#",
       }));
       setCategories(transformedCategories);
+    } else {
+      setCategories([]); // En caso de que no haya datos, inicializa como un array vacío
     }
   }, [categoriasRedux]);
 
+  const modules = [
+    { title: "Dashboard", component: <Dashboard /> },
+    { title: "Gestión de Pedidos", component: <OrderManagement /> },
+    { title: "Gestión de Categorías", component: <CategoryManagement /> },
+    { title: "Gestión de Productos", component: <ProductManagement /> },
+    { title: "Gestión de Adicionales de Productos", component: <AdditionalManagement /> },
+    { title: "Gestión de Descuentos", component: <DiscountManagement /> },
+    { title: "Gestión de Usuarios", component: <UserManagement /> },
+    { title: "Gestión de Permisos", component: <PermissionsManagement /> }
+  ];
+
   return (
     <AnimationRevealPage>
-      <Header />
-      <Box sx={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}>
-
-        {/* Contenido principal sin el Sidebar */}
-        <Box
-          component="main"
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          bgcolor: "#f5f5f5",
+          padding: 3,
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
           sx={{
-            flexGrow: 1,
-            bgcolor: "#f5f5f5",
-            padding: 3,
-            marginTop: 8,  // Esto asegura que el contenido no se superponga con la AppBar
+            textAlign: "center",
+            color: "#333",
+            fontWeight: "bold",
+            marginBottom: 4,
           }}
         >
-          {/* Título del panel de administración */}
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{
-              textAlign: 'center',
-              color: "#333",
-              fontWeight: 'bold',
-              marginBottom: 4,
-            }}
-          >
-            Panel de Administrador
-          </Typography>
+          Panel de Administrador
+        </Typography>
 
-          {/* Contenedor de contenido */}
-          <Container maxWidth="lg">
-            {/* Dashboard Section */}
-            <Paper
-              sx={{
-                padding: 4,
-                marginBottom: 4,
-                boxShadow: 3,
-                borderRadius: 2,
-                backgroundColor: "#fff",
-              }}
-            >
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ color: "#333", fontWeight: '600' }}
+        <Grid container spacing={4}>
+          {modules.map((module, index) => (
+            <Grid item xs={12} key={index}>
+              <Paper
+                sx={{
+                  padding: 3,
+                  boxShadow: 3,
+                  borderRadius: 2,
+                  backgroundColor: "#fff",
+                  height: "100%",
+                }}
               >
-                Dashboard
-              </Typography>
-              <Dashboard />
-            </Paper>
-
-            {/* Gestión de Pedidos Section */}
-            <Paper
-              sx={{
-                padding: 4,
-                marginBottom: 4,
-                boxShadow: 3,
-                borderRadius: 2,
-                backgroundColor: "#fff",
-              }}
-            >
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ color: "#333", fontWeight: '600' }}
-              >
-                Gestión de Pedidos
-              </Typography>
-              <OrderManagement />
-            </Paper>
-
-            {/* Gestión de Categorías Section */}
-            <Paper
-              sx={{
-                padding: 4,
-                marginBottom: 4,
-                boxShadow: 3,
-                borderRadius: 2,
-                backgroundColor: "#fff",
-              }}
-            >
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ color: "#333", fontWeight: '600' }}
-              >
-                Gestión de Categorías
-              </Typography>
-              <CategoryManagement 
-              categories={categories} />
-            </Paper>
-
-            {/* Gestión de Productos Section */}
-            <Paper
-              sx={{
-                padding: 4,
-                marginBottom: 4,
-                boxShadow: 3,
-                borderRadius: 2,
-                backgroundColor: "#fff",
-              }}
-            >
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ color: "#333", fontWeight: '600' }}
-              >
-                Gestión de Productos
-              </Typography>
-              <ProductManagement />
-            </Paper>
-
-            {/* Gestión de Clientes Section */}
-            <Paper
-              sx={{
-                padding: 4,
-                boxShadow: 3,
-                borderRadius: 2,
-                backgroundColor: "#fff",
-              }}
-            >
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ color: "#333", fontWeight: '600' }}
-              >
-                Gestión de Clientes
-              </Typography>
-              <CustomerManagement />
-            </Paper>
-          </Container>
-        </Box>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{ color: "#333", fontWeight: "600" }}
+                >
+                  {module.title}
+                </Typography>
+                {module.component}
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     </AnimationRevealPage>
   );

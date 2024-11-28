@@ -8,6 +8,7 @@ import {
 } from "store/categoriaSlice";
 import { crearCategoria } from "scripts/crearCategoria";
 import { actualizarCategoria } from "scripts/actualizarCategoria";
+import { borrarCategoria } from "scripts/borrarCategoria";
 import {
   Table,
   TableBody,
@@ -22,7 +23,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  InputAdornment,
+  Box,
+  Grid,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";  // Importamos el ícono "+" (Add)
 
 const CategoryManagement = () => {
   const [error, setError] = useState("");
@@ -31,45 +37,48 @@ const CategoryManagement = () => {
 
   const [open, setOpen] = useState(false);
   const [newCategory, setNewCategory] = useState({ id: null, titulo: "", descripcion: "" });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchDescription, setSearchDescription] = useState("");
 
-  // Función para abrir el formulario (para agregar o editar categoría)
+  useEffect(() => {
+    setError(""); // Limpiamos el error
+  }, [dispatch]);
+
   const handleOpen = (category = null) => {
     if (category) {
       setNewCategory({ ...category });
     } else {
-      setNewCategory({ id: null, name: "" });
+      setNewCategory({ id: null, titulo: "", descripcion: "" });
     }
     setOpen(true);
   };
 
-  // Función para cerrar el formulario
   const handleClose = () => {
     setOpen(false);
   };
 
-  // Función para manejar cambios en los campos del formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCategory({ ...newCategory, [name]: value });
   };
 
-  // Función para agregar o editar categoría
   const handleSaveCategory = () => {
-    if (newCategory.titulo) {
+    if (newCategory.titulo && newCategory.descripcion) {
       if (newCategory.id === null) {
-        const categoryToAdd = { ...newCategory, titulo: newCategory.titulo, descripcion: newCategory.descripcion};
+        const categoryToAdd = { ...newCategory };
         dispatch(addCategory(categoryToAdd));
+
         crearCategoria(
           newCategory.titulo,
           newCategory.descripcion,
           sessionStorage.getItem("token")
         )
           .then((data) => {
-            console.log(data);
+            console.log("Categoría agregada:", data);
           })
           .catch((error) => {
             console.error("Error al crear la categoria:", error.message);
-            setError(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+            setError(error.message);
           });
       } else {
         actualizarCategoria(
@@ -79,49 +88,104 @@ const CategoryManagement = () => {
           sessionStorage.getItem("token")
         )
           .then((data) => {
-            console.log(data);
+            console.log("Categoría actualizada:", data);
           })
           .catch((error) => {
             console.error("Error al actualizar la categoria:", error.message);
-            setError(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+            setError(error.message);
           });
         dispatch(updateCategory(newCategory));
       }
-      setNewCategory({ titulo: "", descripcion: "" }); // Limpiar formulario
-      handleClose(); // Cerrar el formulario
+
+      setNewCategory({ titulo: "", descripcion: "" });
+      handleClose();
     } else {
-      alert("Por favor, complete todos los campos.");
+      setError("Por favor, complete todos los campos.");
     }
   };
 
-  // Función para eliminar categoría
   const handleDelete = (id) => {
+    borrarCategoria(id, sessionStorage.getItem("token"))
+      .then((data) => {
+        console.log("Categoría eliminada:", data);
+      })
+      .catch((error) => {
+        console.error("Error al eliminar la categoria:", error.message);
+        setError(error.message);
+      });
     dispatch(deleteCategory(id));
   };
 
-  return (
-    <div>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => handleOpen()}
-        sx={{ marginBottom: 2 }}
-      >
-        Agregar Categoría
-      </Button>
+  const filteredCategories = categories.filter((category) => {
+    return (
+      category.titulo.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      category.descripcion.toLowerCase().includes(searchDescription.toLowerCase())
+    );
+  });
 
-      {/* Tabla de categorías */}
-      <TableContainer component={Paper}>
+  return (
+    <div style={{ marginTop: "20px" }}>
+      {/* Barra de búsqueda y botón "Agregar" */}
+      <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: "2px solid #ccc" }}>
+        <Grid container spacing={2} alignItems="center">
+          {/* Coloca el botón de agregar a la izquierda */}
+          <Grid item xs={12} sm={2} md={1}>
+          <Button variant="contained" color="success" onClick={() => handleOpen()}>
+              <AddIcon />
+            </Button>
+          </Grid>
+
+          {/* Buscador por título */}
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              label="Buscar por nombre"
+              variant="outlined"
+              fullWidth
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+
+          {/* Buscador por descripción */}
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              label="Buscar por descripción"
+              variant="outlined"
+              fullWidth
+              value={searchDescription}
+              onChange={(e) => setSearchDescription(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* Tabla de categorías con Scrollbar */}
+      <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
               <TableCell>Nombre</TableCell>
+              <TableCell>Descripción</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(categories) && categories.length > 0 ? (
-              categories.map((category) => (
+            {filteredCategories.length > 0 ? (
+              filteredCategories.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell>{category.titulo}</TableCell>
                   <TableCell>{category.descripcion}</TableCell>
@@ -129,7 +193,7 @@ const CategoryManagement = () => {
                     <Button
                       variant="outlined"
                       color="primary"
-                      onClick={() => handleOpen(category)} // Abre el formulario en modo edición
+                      onClick={() => handleOpen(category)}
                       sx={{ marginRight: 2 }}
                     >
                       Editar
@@ -146,7 +210,7 @@ const CategoryManagement = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={2}>
+                <TableCell colSpan={3} style={{ textAlign: "center" }}>
                   No hay categorías disponibles.
                 </TableCell>
               </TableRow>
@@ -155,14 +219,12 @@ const CategoryManagement = () => {
         </Table>
       </TableContainer>
 
-      {/* Formulario para agregar o editar una categoría */}
+      {/* Formulario para agregar o editar categoría */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          {newCategory.id ? "Editar Categoría" : "Agregar Categoría"}
-        </DialogTitle>
+        <DialogTitle>{newCategory.id ? "Editar Categoría" : "Agregar Categoría"}</DialogTitle>
         <DialogContent>
           <TextField
-            label="Titulo"
+            label="Título"
             name="titulo"
             value={newCategory.titulo}
             onChange={handleInputChange}
@@ -170,7 +232,7 @@ const CategoryManagement = () => {
             sx={{ marginBottom: 2 }}
           />
           <TextField
-            label="Descripcion"
+            label="Descripción"
             name="descripcion"
             value={newCategory.descripcion}
             onChange={handleInputChange}
@@ -179,7 +241,7 @@ const CategoryManagement = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose} color="secondary">
             Cancelar
           </Button>
           <Button onClick={handleSaveCategory} color="primary">
@@ -187,6 +249,9 @@ const CategoryManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Mostrar errores */}
+      {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
     </div>
   );
 };
