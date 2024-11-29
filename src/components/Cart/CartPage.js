@@ -10,8 +10,7 @@ import {
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
 import { handleAddToCart, handleQuitarDeCarrito } from "utils/carritoUtils";
 import ZonasMapa from "images/ZONAS.png";
-import { initMercadoPago, Wallet } from '@mercadopago/sdk-react'
-initMercadoPago('TEST-75db8543-5df6-4a02-80f8-a98db92fd464');
+import CheckoutProButton from "./CheckoutProMP";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full items-center`;
@@ -32,6 +31,7 @@ const CartPage = () => {
   const dispatch = useDispatch();
   const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
   const user = useSelector((state) => state.usuario); // ID del cliente desde el store
+  const [preferenceId, setPreferenceId] = useState('');
   let userId = null;
   if(user.isLoggedIn){
     userId = user.userInfo.id;
@@ -135,7 +135,7 @@ const CartPage = () => {
     
           const data = await response.json();
           if (data) {
-            console.log(data)
+            setPreferenceId(data.preference_id);
           } else {
             alert("Error al generar la preferencia de pago.");
           }
@@ -235,7 +235,7 @@ const CartPage = () => {
       </>
       )}
     <button onClick={handleMercadoPago}>Pagar con Mercado Pago</button>
-    <Wallet initialization={{ preferenceId: "175019083-317cd3e6-ba22-4ac6-be05-89375c0d0220" }} customization={{ texts:{ valueProp: 'smart_option'}}} />
+    {preferenceId && <CheckoutProButton preferenceId={preferenceId}/>}
     </Container>
   );
 };
