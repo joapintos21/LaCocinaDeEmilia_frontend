@@ -244,13 +244,11 @@ const CartPage = () => {
             </CollapsibleContent>
       </Content>
       <br/>
-      <div tw="mt-6 flex justify-end w-full">
-        <div tw="text-right bg-gray-100 p-4 rounded-lg shadow-md w-1/3">
-          <h3 tw="text-lg font-semibold mb-2">Resumen Total</h3>
-          <p tw="mb-1">Subtotal: ${Math.round(subtotal)}</p>
-          <p tw="mb-1">Envío: ${Math.round(costoEnvio)}</p>
-          <p tw="font-bold">Total: ${Math.round(total)}</p>
-        </div>
+      <div tw="mt-6">
+        <h3 tw="text-lg font-semibold">Resumen Total</h3>
+        <p>Subtotal: ${Math.round(subtotal)}</p>
+        <p>Envío: ${Math.round(costoEnvio)}</p>
+        <p>Total: ${Math.round(total)}</p>
       </div>
       </>
       )}
