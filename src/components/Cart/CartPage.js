@@ -15,7 +15,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full items-center`;
-const Content_total = tw.div`flex flex-col w-full items-end`;
 const Image = tw.img`w-16 h-16 rounded mr-4`;
 const Name = tw.h4`text-lg font-bold`;
 const Price = tw.p`text-gray-600`;
