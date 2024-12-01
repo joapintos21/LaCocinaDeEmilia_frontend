@@ -15,6 +15,8 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full items-center`;
+const AddressSection = tw.div`mt-6 w-full bg-gray-100 p-4 rounded-lg shadow-md`;
+const AddressItem = tw.div`flex justify-between items-center border-b pb-2 mb-2`;
 const Image = tw.img`w-16 h-16 rounded mr-4`;
 const Name = tw.h4`text-lg font-bold`;
 const Price = tw.p`text-gray-600`;
@@ -119,9 +121,39 @@ const CartPage = () => {
     dispatch(quitarItem(item));
   }
 
+  const [direcciones, setDirecciones] = useState([]);
+  const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true);
+  const [isOpenDirecciones, setIsOpenDirecciones] = useState(false);
+
   const [isOpenAgendar, setIsOpenAgendar] = useState(false);
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
   const [fechasOcupadas, setFechasOcupadas] = useState([]);
+
+  const fetchDirecciones = async () => {
+    try {
+      const response = await fetch(`/api/direcciones/cliente/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setDirecciones(data);
+      } else {
+        console.error("Error al obtener las direcciones:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error al obtener las direcciones:", error);
+    } finally {
+      setIsLoadingDirecciones(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      fetchDirecciones();
+    }
+  }, [userId]);
 
   useEffect(() => {
     const fetchFechasOcupadas = async () => {
@@ -242,6 +274,31 @@ const CartPage = () => {
                 </p>
               )}
             </CollapsibleContent>
+      </Content>
+      <Content>
+        <SectionTitle onClick={() => setIsOpenDirecciones(!isOpenDirecciones)}>
+          Direcciones
+          <span>{isOpenDirecciones ? "▲" : "▼"}</span>
+        </SectionTitle>
+        <CollapsibleContent isOpen={isOpenDirecciones}>
+          <AddressSection>
+            {isLoadingDirecciones ? (
+              <p>Cargando direcciones...</p>
+            ) : direcciones.length > 0 ? (
+              direcciones.map((direccion) => (
+                <AddressItem key={direccion.id}>
+                  <div>
+                    <p tw="text-sm font-semibold">{direccion.titulo}</p>
+                    <p>{direccion.barrio}</p>
+                  </div>
+                  {direccion.predeterminado && <p tw="text-green-500">Predeterminada</p>}
+                </AddressItem>
+              ))
+            ) : (
+              <p>No tienes direcciones registradas.</p>
+            )}
+          </AddressSection>
+        </CollapsibleContent>
       </Content>
       <br/>
       <div tw="mt-6">
