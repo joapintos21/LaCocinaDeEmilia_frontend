@@ -22,7 +22,6 @@ export const obtenerPedidoEnProgreso = async (userId, token, dispatch) => {
     dispatch(setCarrito(data)); // Almacena las categorías en Redux
 
   } catch (error) {
-    console.error(error);
     throw error; // Lanza el error para que sea capturado en el evento
   }
 };
