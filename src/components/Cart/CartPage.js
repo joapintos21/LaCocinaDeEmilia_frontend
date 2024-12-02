@@ -55,9 +55,13 @@ const CartPage = () => {
 
   useEffect(() => {
     const payment = searchParams.get('payment_id'); // Captura el parámetro "status" de la URL
-    setPaymentId(payment);
-    if(payment) 
+    if(payment){
+      setPaymentId(payment);
       setIsModalOpen(true);
+    }
+    // Limpiar los parámetros de la URL
+    const newUrl = window.location.origin + window.location.pathname; // Construye la nueva URL sin parámetros
+    window.history.replaceState({}, document.title, newUrl); // Reemplaza la URL actual
   }, [searchParams]);
 
   // Get cart items
@@ -111,7 +115,6 @@ const CartPage = () => {
     } else {
       dispatch(setCostoEnvio(costo));
     }
-  
     setZonaSeleccionada(idZona); // Almacena la zona seleccionada
   };
   

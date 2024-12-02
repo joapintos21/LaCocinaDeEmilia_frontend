@@ -153,6 +153,7 @@ export default function App() {
       if(user && user.rol === "Cliente"){
         const fetchPedido = async () => {
           await obtenerPedidoEnProgreso(user.id, token, dispatch).catch((e) => {
+            console.log("Error en el Obtener Pedido:" + e)
             dispatch(limpiarCarrito())
           }); // Llama al script para cargar las categorías en Redux
         };

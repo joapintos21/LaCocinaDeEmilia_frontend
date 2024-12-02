@@ -26,9 +26,7 @@ const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen }) => {
             backgroundColor: '#fff', // Asegúrate de que el fondo sea opaco
             zIndex: 1002, // Prioridad sobre otros elementos
           },
-          
           overlay: { position: 'fixed',backgroundColor: 'rgba(0, 0, 0, 0.75)',zIndex: 1001 },
-          
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
