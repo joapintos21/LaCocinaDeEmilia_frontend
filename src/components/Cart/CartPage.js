@@ -10,6 +10,8 @@ import {
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
 import { handleAddToCart, handleQuitarDeCarrito } from "utils/carritoUtils";
 import ZonasMapa from "images/ZONAS.png";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full items-center`;
@@ -117,6 +119,32 @@ const CartPage = () => {
     dispatch(quitarItem(item));
   }
 
+  const [isOpenAgendar, setIsOpenAgendar] = useState(false);
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
+  const [fechasOcupadas, setFechasOcupadas] = useState([]);
+
+  useEffect(() => {
+    const fetchFechasOcupadas = async () => {
+      try {
+        const response = await fetch("/api/fechas-ocupadas", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setFechasOcupadas(data.fechas);
+      } catch (error) {
+        console.error("Error al obtener fechas ocupadas:", error);
+      }
+    };
+    fetchFechasOcupadas();
+  }, [token]);
+
+  const isDateDisabled = (date) => {
+    const formattedDate = date.toISOString().split("T")[0];
+    return fechasOcupadas.includes(formattedDate);
+  };
+
   return (
     <Container>
       <h2 tw="text-xl font-bold mb-6">Tu Carrito</h2>
@@ -196,7 +224,26 @@ const CartPage = () => {
           ))}
           </div>
         </CollapsibleContent>
+        <SectionTitle onClick={() => setIsOpenAgendar(!isOpenAgendar)}>
+              Agendar Envío
+              <span>{isOpenAgendar ? "▲" : "▼"}</span>
+            </SectionTitle>
+            <CollapsibleContent isOpen={isOpenAgendar}>
+              <DatePicker
+                selected={fechaSeleccionada}
+                onChange={(date) => setFechaSeleccionada(date)}
+                minDate={new Date().setDate(new Date().getDate() + 1)}
+                filterDate={(date) => !isDateDisabled(date)}
+                inline
+              />
+              {fechaSeleccionada && (
+                <p tw="text-sm text-green-600">
+                  Fecha seleccionada: {fechaSeleccionada.toLocaleDateString()}
+                </p>
+              )}
+            </CollapsibleContent>
       </Content>
+      <br/>
       <div tw="mt-6">
         <h3 tw="text-lg font-semibold">Resumen Total</h3>
         <p>Subtotal: ${Math.round(subtotal)}</p>
