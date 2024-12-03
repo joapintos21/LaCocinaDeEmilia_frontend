@@ -14,7 +14,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
-const Content = tw.div`flex flex-col w-full items-center`;
+const Content = tw.div`flex flex-col w-full`;
+const ContentSection = tw.div`flex flex-col w-full items-center`;
 const AddressSection = tw.div`mt-6 w-full bg-gray-100 p-4 rounded-lg shadow-md`;
 const AddressItem = tw.div`flex justify-between items-center border-b pb-2 mb-2`;
 const Image = tw.img`w-16 h-16 rounded mr-4`;
@@ -122,16 +123,17 @@ const CartPage = () => {
   }
 
   const [direcciones, setDirecciones] = useState([]);
+  const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
   const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true);
   const [isOpenDirecciones, setIsOpenDirecciones] = useState(false);
 
-  const [isOpenAgendar, setIsOpenAgendar] = useState(false);
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
-  const [fechasOcupadas, setFechasOcupadas] = useState([]);
+  const seleccionarDireccion = (id) => {
+    setDireccionSeleccionada(id);
+  };
 
   const fetchDirecciones = async () => {
     try {
-      const response = await fetch(`/api/direcciones/cliente/${userId}`, {
+      const response = await fetch(`/direcciones?cliente_id=${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -139,6 +141,11 @@ const CartPage = () => {
       if (response.ok) {
         const data = await response.json();
         setDirecciones(data);
+
+        const direccionDefault = data.find((direccion) => direccion.predeterminado);
+        if (direccionDefault) {
+          setDireccionSeleccionada(direccionDefault.id);
+        }
       } else {
         console.error("Error al obtener las direcciones:", response.statusText);
       }
@@ -154,6 +161,10 @@ const CartPage = () => {
       fetchDirecciones();
     }
   }, [userId]);
+
+  const [isOpenAgendar, setIsOpenAgendar] = useState(false);
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
+  const [fechasOcupadas, setFechasOcupadas] = useState([]);
 
   useEffect(() => {
     const fetchFechasOcupadas = async () => {
@@ -179,11 +190,10 @@ const CartPage = () => {
 
   return (
     <Container>
-      <h2 tw="text-xl font-bold mb-6">Tu Carrito</h2>
       <Content>
         {cartItems.length > 0 ? (
           cartItems.map((item) => {
-            const descuentos = obtenerDescuentos(item); // Get discounts for the item
+            const descuentos = obtenerDescuentos(item);
             const precioConDescuento = calcularPrecioConDescuento(item.precio, descuentos);
             const descuentoAplicado = item.precio - precioConDescuento;
 
@@ -223,15 +233,14 @@ const CartPage = () => {
       </Content>
       {cartItems.length > 0 && (
       <>
-      <h2 tw="text-xl font-bold mb-6">Envío</h2>
       <Content>
         <SectionTitle onClick={() => setIsOpen(!isOpen)}>
           Opciones de Envío
           <span>{isOpen ? "▲" : "▼"}</span>
         </SectionTitle>
+        <ContentSection>
         <CollapsibleContent isOpen={isOpen}>
           <div tw="mt-6 w-full text-left">
-            <h3 tw="text-lg font-semibold mb-4">Opciones de Envío</h3>
             <img
               src={ZonasMapa}
               alt="Mapa de zonas de envío"
@@ -256,24 +265,27 @@ const CartPage = () => {
           ))}
           </div>
         </CollapsibleContent>
+        </ContentSection>
         <SectionTitle onClick={() => setIsOpenAgendar(!isOpenAgendar)}>
               Agendar Envío
               <span>{isOpenAgendar ? "▲" : "▼"}</span>
             </SectionTitle>
-            <CollapsibleContent isOpen={isOpenAgendar}>
-              <DatePicker
-                selected={fechaSeleccionada}
-                onChange={(date) => setFechaSeleccionada(date)}
-                minDate={new Date().setDate(new Date().getDate() + 1)}
-                filterDate={(date) => !isDateDisabled(date)}
-                inline
-              />
-              {fechaSeleccionada && (
-                <p tw="text-sm text-green-600">
-                  Fecha seleccionada: {fechaSeleccionada.toLocaleDateString()}
-                </p>
-              )}
-            </CollapsibleContent>
+            <ContentSection>
+              <CollapsibleContent isOpen={isOpenAgendar}>
+                <DatePicker
+                  selected={fechaSeleccionada}
+                  onChange={(date) => setFechaSeleccionada(date)}
+                  minDate={new Date().setDate(new Date().getDate() + 1)}
+                  filterDate={(date) => !isDateDisabled(date)}
+                  inline
+                />
+                {fechaSeleccionada && (
+                  <p tw="text-sm text-green-600">
+                    Fecha seleccionada: {fechaSeleccionada.toLocaleDateString()}
+                  </p>
+                )}
+              </CollapsibleContent>
+            </ContentSection>
       </Content>
       <Content>
         <SectionTitle onClick={() => setIsOpenDirecciones(!isOpenDirecciones)}>
@@ -281,25 +293,36 @@ const CartPage = () => {
           <span>{isOpenDirecciones ? "▲" : "▼"}</span>
         </SectionTitle>
         <CollapsibleContent isOpen={isOpenDirecciones}>
-          <AddressSection>
-            {isLoadingDirecciones ? (
-              <p>Cargando direcciones...</p>
-            ) : direcciones.length > 0 ? (
-              direcciones.map((direccion) => (
-                <AddressItem key={direccion.id}>
-                  <div>
-                    <p tw="text-sm font-semibold">{direccion.titulo}</p>
-                    <p>{direccion.barrio}</p>
-                  </div>
-                  {direccion.predeterminado && <p tw="text-green-500">Predeterminada</p>}
-                </AddressItem>
-              ))
-            ) : (
-              <p>No tienes direcciones registradas.</p>
-            )}
-          </AddressSection>
-        </CollapsibleContent>
-      </Content>
+            <AddressSection>
+              {isLoadingDirecciones ? (
+                <p>Cargando direcciones...</p>
+              ) : direcciones.length > 0 ? (
+                direcciones.map((direccion) => (
+                  <AddressItem
+            key={direccion.id}
+            onClick={() => seleccionarDireccion(direccion.id)}
+            style={{
+              backgroundColor:
+                direccionSeleccionada === direccion.id ? "#99cdb6" : "#f7f7f7",
+              cursor: "pointer",
+              padding: "10px",
+              borderRadius: "8px",
+            }}
+          >
+            <div>
+              <p tw="text-sm font-semibold">{direccion.titulo}</p>
+              <p>{direccion.barrio}</p>
+              <p>{direccion.direccion}</p>
+            </div>
+            {direccion.predeterminado && <p tw="text-green-500">Predeterminada</p>}
+          </AddressItem>
+                ))
+              ) : (
+                <p>No tienes direcciones registradas.</p>
+              )}
+            </AddressSection>
+            </CollapsibleContent>
+        </Content>
       <br/>
       <div tw="mt-6">
         <h3 tw="text-lg font-semibold">Resumen Total</h3>
