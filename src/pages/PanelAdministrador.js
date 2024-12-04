@@ -10,6 +10,7 @@ import OrderManagement from "components/AdminPanel/OrderManagement";
 import DiscountManagement from "components/AdminPanel/DiscountManagement";
 import PermissionsManagement from "components/AdminPanel/PermissionsManagement";
 import AdditionalManagement from "components/AdminPanel/AdditionalManagement";
+import Header from "components/headers/light.js";
 
 export default () => {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ export default () => {
 
   return (
     <AnimationRevealPage>
+      <Header />
       <Box
         sx={{
           display: "flex",

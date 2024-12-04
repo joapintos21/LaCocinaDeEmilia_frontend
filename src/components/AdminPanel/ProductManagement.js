@@ -37,7 +37,9 @@ const ProductManagement = () => {
   const dispatch = useDispatch();
   const productos = useSelector((state) => state.productos);
   const categorias = useSelector((state) => state.categorias); // Asumimos que las categorías están en Redux
-
+  const fetchProductos = async () => {
+    await obtenerProductos(dispatch);
+  };
   const [open, setOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
     id: null,
@@ -51,13 +53,6 @@ const ProductManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-
-  useEffect(() => {
-    const fetchProductos = async () => {
-      await obtenerProductos(dispatch);
-    };
-    fetchProductos();
-  }, [dispatch]);
 
   const handleOpen = (product = null) => {
     if (product) {
@@ -95,7 +90,7 @@ const ProductManagement = () => {
         crearProducto(newProduct.descripcion, newProduct.precio, newProduct.categoria, newProduct.visible, sessionStorage.getItem("token"))
           .then((data) => {
             if (data && data.id) {
-              dispatch(addProduct(data)); 
+              //dispatch(addProduct(data)); 
               console.log('Producto creado:', data);
             } else {
               setError('Error al crear el producto en la base de datos.');
@@ -105,6 +100,7 @@ const ProductManagement = () => {
             console.error('Error al crear el producto:', error.message);
             setError(error.message);
           });
+          fetchProductos();
       } else {
 
         actualizarProducto(newProduct.id, newProduct.descripcion, parseFloat(newProduct.precio), parseInt(newProduct.categoria), newProduct.visible, sessionStorage.getItem("token"))
@@ -139,7 +135,7 @@ const ProductManagement = () => {
     const matchesSearchTerm =
       product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory
-      ? product.categoria.titulo.toLowerCase().includes(selectedCategory.toLowerCase())
+      ? product.categoria?.titulo?.toLowerCase().includes(selectedCategory.toLowerCase())
       : true;
     const matchesMinPrice = minPrice ? product.precio >= minPrice : true;
     const matchesMaxPrice = maxPrice ? product.precio <= maxPrice : true;
@@ -216,7 +212,7 @@ const ProductManagement = () => {
       {/* Tabla de productos */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflowY: 'auto' }}>
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0 }}>
+          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#FFFFFF", zIndex: 1 }}>
             <TableRow>
               <TableCell>Descripción</TableCell>
               <TableCell>Precio</TableCell>
@@ -231,7 +227,7 @@ const ProductManagement = () => {
                 <TableRow key={product.id}>
                   <TableCell>{product.descripcion}</TableCell>
                   <TableCell>{product.precio}</TableCell>
-                  <TableCell>{product.categoria.titulo}</TableCell>
+                  <TableCell>{product.categoria?.titulo}</TableCell>
                   <TableCell>{product.visible ? 'Sí' : 'No'}</TableCell>
                   <TableCell>
                     <Button variant="outlined" color="primary" onClick={() => handleOpen(product)}>
