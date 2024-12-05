@@ -1,8 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusScreen } from "@mercadopago/sdk-react";
 import Modal from 'react-modal'; // Usar react-modal (o personalizar si no quieres usar dependencias)
+import { finalizarPedido } from 'scripts/finalizarPedido';
+import { limpiarCarrito } from 'store/carritoSlice';
 
-const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen }) => {
+const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedidoId, dispatch }) => {
+  const [pagoVerificado, setPagoVerificado] = useState(false);
+
+  useEffect(() => {
+    try {
+      if(payment)
+      finalizarPedido(pedidoId, 2, payment, token).then((data) => {
+        setPagoVerificado(true)
+        
+      })
+    } catch (error) {
+      console.error("Error al procesar el pedido:", error);
+    }
+  }, [payment, pedidoId, token]);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    dispatch(limpiarCarrito());
+  }
+
   return (
     <div>
       {/* Modal */}
@@ -21,6 +42,7 @@ const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen }) => {
             transform: 'translate(-50%, -50%)',
             width: '90%',
             maxWidth: '500px',
+            maxHeight: '500px',
             padding: '20px',
             borderRadius: '10px',
             backgroundColor: '#fff', // Asegúrate de que el fondo sea opaco
@@ -31,7 +53,7 @@ const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen }) => {
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {/* StatusScreen de Mercado Pago */}
-          {payment ? (
+          {pagoVerificado ? (
             <StatusScreen initialization={{ paymentId: payment }} />
           ) : (
             <p>Cargando estado del pago...</p>
@@ -39,7 +61,7 @@ const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen }) => {
 
           {/* Botón de Cerrar */}
           <button
-            onClick={() => setIsModalOpen(false)}
+            onClick={() => handleCloseModal()}
             style={{
               marginTop: '20px',
               padding: '10px 20px',

@@ -11,8 +11,7 @@ import { calcularPrecioConDescuento } from "utils/descuentoUtils";
 import { handleAddToCart, handleQuitarDeCarrito } from "utils/carritoUtils";
 import ZonasMapa from "images/ZONAS.png";
 import CheckoutProButton from "./CheckoutProMP";
-import PaymentStatus from "./PaymentStatus";
-import { initMercadoPago, StatusScreen } from "@mercadopago/sdk-react";
+import { initMercadoPago } from "@mercadopago/sdk-react";
 import { useSearchParams } from "react-router-dom";
 import CheckoutStatusModal from "./StatusScreenModal";
 import TransferenciaModal from "./TransferenciaModal";
@@ -66,6 +65,9 @@ const CartPage = () => {
 
   // Get cart items
   const cartItems = useSelector((state) => state.carrito.items);
+
+  // Get cart items
+  const pedidoId = useSelector((state) => state.carrito.pedidoId);
 
   // Get products and packs from their respective slices
   const productosRedux = useSelector((state) => state.productos);
@@ -150,15 +152,15 @@ const CartPage = () => {
     const BASE_URL = process.env.REACT_APP_URL || "http://localhost:3000";
     const items = cartItems.map((item) => ({
       id: item.id,
-      title: item.descripcion,
+      title: item.descripcion || item.nombre,
       quantity: item.cantidad,
       unitPrice: item.precio,
     }));
 
     const backUrls = {
-      success: `${BASE_URL}/carrito?status=pago_aceptado`,
-      pending: `${BASE_URL}/carrito?status=pago_pendiente`,
-      failure: `${BASE_URL}/carrito?status=pago_rechazado`
+      success: `${BASE_URL}/carrito`,
+      pending: `${BASE_URL}/carrito`,
+      failure: `${BASE_URL}/carrito`
     };
     
     try {
@@ -318,10 +320,10 @@ const CartPage = () => {
           </FinalizarCompraButton>
         )}
       </PaymentSection>
-      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia}/>
+      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia} pedidoId={pedidoId} token={token} dispatch={dispatch}/>
       </>
     )}
-    <CheckoutStatusModal payment={paymentId} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
+    <CheckoutStatusModal payment={paymentId} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} token={token} pedidoId={pedidoId} dispatch={dispatch}/>
     </Container>
   );
 };
