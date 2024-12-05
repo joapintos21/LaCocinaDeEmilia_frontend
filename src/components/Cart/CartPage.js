@@ -35,7 +35,7 @@ const Info = tw.div`flex-1`;
 const Actions = tw.div`flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0`;
 const Quantity = tw.div`flex items-center space-x-2`;
 const Button = tw.button`px-2 py-1 bg-gray-200 rounded hover:bg-gray-300`;
-const PaymentSection = tw.div`mt-8 p-6 bg-gray-100 rounded-lg shadow-md`;
+const PaymentSection = tw.div`mb-4 p-6 bg-gray-100 rounded-lg shadow-md`;
 const PaymentOption = tw.div`flex items-center mb-4`;
 const Label = tw.label`ml-2 text-gray-700`;
 const FinalizarCompraButton = tw.button`mt-4 px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-800`;
@@ -378,23 +378,23 @@ const CartPage = () => {
               ) : direcciones.length > 0 ? (
                 direcciones.map((direccion) => (
                   <AddressItem
-            key={direccion.id}
-            onClick={() => seleccionarDireccion(direccion.id)}
-            style={{
-              backgroundColor:
-                direccionSeleccionada === direccion.id ? "#99cdb6" : "#f7f7f7",
-              cursor: "pointer",
-              padding: "10px",
-              borderRadius: "8px",
-            }}
-          >
-            <div>
-              <p tw="text-sm font-semibold">{direccion.titulo}</p>
-              <p>{direccion.barrio}</p>
-              <p>{direccion.direccion}</p>
-            </div>
-            {direccion.predeterminado && <p tw="text-green-500">Predeterminada</p>}
-          </AddressItem>
+                    key={direccion.id}
+                    onClick={() => seleccionarDireccion(direccion.id)}
+                    style={{
+                      backgroundColor:
+                        direccionSeleccionada === direccion.id ? "#99cdb6" : "#f7f7f7",
+                      cursor: "pointer",
+                      padding: "10px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div>
+                      <p tw="text-sm font-semibold">{direccion.titulo}</p>
+                      <p>{direccion.barrio}</p>
+                      <p>{direccion.direccion}</p>
+                    </div>
+                    {direccion.predeterminado && <p tw="text-green-500">Predeterminada</p>}
+                  </AddressItem>
                 ))
               ) : (
                 <p>No tienes direcciones registradas.</p>
@@ -403,12 +403,6 @@ const CartPage = () => {
             </CollapsibleContent>
         </Content>
       <br/>
-      <div tw="mt-6">
-        <h3 tw="text-lg font-semibold">Resumen Total</h3>
-        <p>Subtotal: ${Math.round(subtotal)}</p>
-        <p>Envío: ${Math.round(costoEnvio)}</p>
-        <p>Total: ${Math.round(total)}</p>
-      </div>
       <PaymentSection>
         <SectionTitle>Métodos de Pago</SectionTitle>
         <PaymentOption>
@@ -422,7 +416,7 @@ const CartPage = () => {
               handleMercadoPago(); // Llamada a la función cuando se selecciona Mercado Pago
             }}
           />
-          <Label htmlFor="mercado-pago">Pagar con Mercado Pago</Label>
+          <Label htmlFor="mercado-pago">Pagar con Mercado Pago (+ comision de 5,99% a IVA a cargo del cliente)</Label>
         </PaymentOption>
         <PaymentOption>
           <input
@@ -434,8 +428,15 @@ const CartPage = () => {
           />
           <Label htmlFor="transferencia">Pagar por Transferencia</Label>
         </PaymentOption>
-
-        {metodoPago === "mercado-pago" && preferenceId &&(
+      </PaymentSection>
+      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia} pedidoId={pedidoId} token={token} dispatch={dispatch}/>
+      <div tw="mt-8">
+        <h3 tw="text-lg font-semibold">Resumen Total</h3>
+        <p>Subtotal: ${Math.round(subtotal)}</p>
+        <p>Envío: ${Math.round(costoEnvio)}</p>
+        <p>Total: ${Math.round(total)}</p>
+      </div>
+      {metodoPago === "mercado-pago" && preferenceId &&(
           <div tw="mt-4">
             <CheckoutProButton preferenceId={preferenceId}/>
           </div>
@@ -446,8 +447,6 @@ const CartPage = () => {
             Finalizar Compra
           </FinalizarCompraButton>
         )}
-      </PaymentSection>
-      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia} pedidoId={pedidoId} token={token} dispatch={dispatch}/>
       </>
     )}
     <CheckoutStatusModal payment={paymentId} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} token={token} pedidoId={pedidoId} dispatch={dispatch}/>
