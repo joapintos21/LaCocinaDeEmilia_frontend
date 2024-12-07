@@ -5,6 +5,7 @@ const initialState = {
     cantidadProductos: 0,
     precioTotal: 0,
     costoEnvio: 0,
+    pedidoId: ""
 };
 
 const carritoSlice = createSlice({
@@ -30,7 +31,6 @@ const carritoSlice = createSlice({
                     precioTotal: newItem.precio * (newItem.cantidad || 1),
                 });
             }
-
             state.cantidadProductos += newItem.cantidad || 1;
             state.precioTotal += newItem.precio * (newItem.cantidad || 1);
         },
@@ -104,7 +104,7 @@ const carritoSlice = createSlice({
 
         setCarrito: (state, action) => {
             // Transforma los datos del backend al formato esperado por el estado del carrito
-            const { productos, packs, total } = action.payload;
+            const { productos, packs, total, id } = action.payload;
 
             const items = [
                 ...productos.map((producto) => ({
@@ -128,6 +128,7 @@ const carritoSlice = createSlice({
             state.items = items;
             state.cantidadProductos = items.reduce((total, item) => total + item.cantidad, 0);
             state.precioTotal = total;
+            state.pedidoId = id;
         },
     },
 });
