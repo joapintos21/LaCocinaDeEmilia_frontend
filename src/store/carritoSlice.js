@@ -5,6 +5,7 @@ const initialState = {
     cantidadProductos: 0,
     precioTotal: 0,
     costoEnvio: 0,
+    comisionMP: 0,
     pedidoId: ""
 };
 
@@ -102,6 +103,10 @@ const carritoSlice = createSlice({
             state.costoEnvio = action.payload;
         },
 
+        setComisionMP: (state, action) => {
+            state.comisionMP = action.payload;
+        },
+
         setCarrito: (state, action) => {
             // Transforma los datos del backend al formato esperado por el estado del carrito
             const { productos, packs, total, id } = action.payload;
@@ -141,6 +146,7 @@ export const {
     limpiarCarrito,
     setCarrito,
     setCostoEnvio,
+    setComisionMP,
 } = carritoSlice.actions;
 
 export default carritoSlice.reducer;

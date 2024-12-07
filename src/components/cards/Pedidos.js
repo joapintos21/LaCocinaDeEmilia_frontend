@@ -63,12 +63,10 @@ const PedidosPage = () => {
   }, []);
 
   useEffect(() => {
-	const fetchPedidos = async () => {
-	  await obtenerPedidoCliente(pedidoSeleccionado, token).then((data) => {
-		setProductos(data.productos)
-	  });
-	};
-	fetchPedidos();
+	if(pedidoSeleccionado){
+		const pedido = pedidos.filter((pedido) => pedido.id === pedidoSeleccionado)
+		setProductos(pedido[0].detalles)
+	}
   }, [pedidoSeleccionado]);
 
   return (
@@ -93,7 +91,7 @@ const PedidosPage = () => {
 				  <ProductoCantidad>
 					Cantidad: {producto.cantidad}
 				  </ProductoCantidad>
-				  <ProductoPrecio>${producto.precio}</ProductoPrecio>
+				  <ProductoPrecio>${producto.subtotal}</ProductoPrecio>
 				</ProductoItem>
 			  ))}
 			</ProductosList>
