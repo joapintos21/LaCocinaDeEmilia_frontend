@@ -3,13 +3,13 @@ import Modal from 'react-modal';
 import { finalizarPedido } from 'scripts/finalizarPedido';
 import { limpiarCarrito } from 'store/carritoSlice';
 
-const TransferenciaModal = ({ mostrarModalTransferencia, setMostrarModalTransferencia, pedidoId, token, dispatch}) => {
+const TransferenciaModal = ({ mostrarModalTransferencia, setMostrarModalTransferencia, pedidoId, costoEnvio, token, dispatch}) => {
   const [mostrarEstadoModal, setMostrarEstadoModal] = useState(false); // Control del modal de estado
   const [estadoMensaje, setEstadoMensaje] = useState(""); // Mensaje del estado del pedido
 
   const handleTransferencia = async () => {
     try {
-      finalizarPedido(pedidoId, 1, "", token).then((data) => {
+      finalizarPedido(pedidoId, 1, "", costoEnvio,  token).then((data) => {
         setEstadoMensaje(
           "Pedido ingresado correctamente! Se encuentra pendiente de confirmación de pago. Por favor envíe el comprobante por WhatsApp al número +598 91123456."
         );

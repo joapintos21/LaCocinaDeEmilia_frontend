@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   decrementarCantidad,
   quitarItem,
+  setComisionMP,
   setCostoEnvio,
 } from "store/carritoSlice";
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
@@ -59,7 +60,7 @@ const CartPage = () => {
 
   useEffect(() => {
     const payment = searchParams.get('payment_id'); // Captura el parámetro "status" de la URL
-    if(payment){
+    if(payment && payment !== "null"){
       setPaymentId(payment);
       setIsModalOpen(true);
     }
@@ -99,8 +100,9 @@ const CartPage = () => {
   };
 
   const costoEnvio = useSelector((state) => state.carrito.costoEnvio);
+  const comisionMP = useSelector((state) => state.carrito.comisionMP);
   const subtotal = cartItems.reduce((acc, item) => acc + calcularPrecioConDescuento(item.precioTotal, obtenerDescuentos(item)), 0);
-  const total = subtotal + costoEnvio;
+  const total = comisionMP > 0 ? (subtotal + costoEnvio) * (1 + comisionMP/100) : subtotal + costoEnvio;
   const [zonaSeleccionada, setZonaSeleccionada] = useState(null);
   
   const opcionesEnvio = [
@@ -221,28 +223,29 @@ const CartPage = () => {
 
   const handleMercadoPago = async () => {
     const BASE_URL = process.env.REACT_APP_URL || "http://localhost:3000";
-    const items = cartItems.map((item) => ({
-      id: item.id,
-      title: item.descripcion || item.nombre,
-      quantity: item.cantidad,
-      unitPrice: item.precio,
-    }));
-
     const backUrls = {
       success: `${BASE_URL}/carrito`,
       pending: `${BASE_URL}/carrito`,
       failure: `${BASE_URL}/carrito`
     };
-    
     try {
       const response = await fetch("/pagos/crearPreferencia", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`},
-        body: JSON.stringify({ items, backUrls, userId}),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          pedido_id: pedidoId, // Enviar solo el ID del pedido
+          direccion_id: direccionSeleccionada, // Si corresponde
+          metodo_pago_id: metodoPago === "mercado-pago" ? 2 : 1, // Método de pago
+          costo_envio: costoEnvio,
+          backUrls: backUrls
+        }),
       });
-
+  
       const data = await response.json();
-      if (data) {
+      if (data && data.preference_id) {
         setPreferenceId(data.preference_id);
       } else {
         alert("Error al generar la preferencia de pago.");
@@ -251,12 +254,19 @@ const CartPage = () => {
       console.error("Error:", error);
       alert("Ocurrió un error al procesar el pago.");
     }
-    
   };
 
   const [metodoPago, setMetodoPago] = useState(""); // Almacena el método de pago seleccionado
   const [mostrarModalTransferencia, setMostrarModalTransferencia] =
     useState(false); // Estado para mostrar el modal
+
+  useEffect(() => {
+    if(metodoPago === "mercado-pago"){
+      dispatch(setComisionMP(5.99))
+    }else{
+      dispatch(setComisionMP(0))
+    }
+  }, [metodoPago]);
 
   const handleSeleccionMetodoPago = (metodo) => {
     setMetodoPago(metodo);
@@ -416,7 +426,7 @@ const CartPage = () => {
               handleMercadoPago(); // Llamada a la función cuando se selecciona Mercado Pago
             }}
           />
-          <Label htmlFor="mercado-pago">Pagar con Mercado Pago (+ comision de 5,99% a IVA a cargo del cliente)</Label>
+          <Label htmlFor="mercado-pago">Pagar con Mercado Pago (+ comision de 5,99% a cargo del cliente)</Label>
         </PaymentOption>
         <PaymentOption>
           <input
@@ -429,7 +439,7 @@ const CartPage = () => {
           <Label htmlFor="transferencia">Pagar por Transferencia</Label>
         </PaymentOption>
       </PaymentSection>
-      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia} pedidoId={pedidoId} token={token} dispatch={dispatch}/>
+      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia} pedidoId={pedidoId} costoEnvio={costoEnvio} token={token} dispatch={dispatch}/>
       <div tw="mt-8">
         <h3 tw="text-lg font-semibold">Resumen Total</h3>
         <p>Subtotal: ${Math.round(subtotal)}</p>
@@ -437,19 +447,19 @@ const CartPage = () => {
         <p>Total: ${Math.round(total)}</p>
       </div>
       {metodoPago === "mercado-pago" && preferenceId &&(
-          <div tw="mt-4">
-            <CheckoutProButton preferenceId={preferenceId}/>
-          </div>
-        )}
+        <div tw="mt-4">
+          <CheckoutProButton preferenceId={preferenceId}/>
+        </div>
+      )}
 
-        {metodoPago === "transferencia" && (
-          <FinalizarCompraButton onClick={handleFinalizarCompraTransferencia}>
-            Finalizar Compra
-          </FinalizarCompraButton>
-        )}
+      {metodoPago === "transferencia" && (
+        <FinalizarCompraButton onClick={handleFinalizarCompraTransferencia}>
+          Finalizar Compra
+        </FinalizarCompraButton>
+      )}
       </>
     )}
-    <CheckoutStatusModal payment={paymentId} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} token={token} pedidoId={pedidoId} dispatch={dispatch}/>
+    <CheckoutStatusModal payment={paymentId} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} token={token} pedidoId={pedidoId} costoEnvio={costoEnvio} dispatch={dispatch}/>
     </Container>
   );
 };
