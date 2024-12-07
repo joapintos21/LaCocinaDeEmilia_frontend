@@ -4,16 +4,16 @@ import Modal from 'react-modal'; // Usar react-modal (o personalizar si no quier
 import { finalizarPedido } from 'scripts/finalizarPedido';
 import { limpiarCarrito } from 'store/carritoSlice';
 
-const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedidoId, dispatch }) => {
+const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedidoId, costoEnvio, dispatch }) => {
   const [pagoVerificado, setPagoVerificado] = useState(false);
 
   useEffect(() => {
     try {
-      if(payment)
-      finalizarPedido(pedidoId, 2, payment, token).then((data) => {
-        setPagoVerificado(true)
-        
-      })
+      if(payment != null){
+        finalizarPedido(pedidoId, 2, payment, costoEnvio, token).then((data) => {
+          setPagoVerificado(true)
+        })
+      }
     } catch (error) {
       console.error("Error al procesar el pedido:", error);
     }
@@ -21,7 +21,7 @@ const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedi
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    dispatch(limpiarCarrito());
+    pagoVerificado && dispatch(limpiarCarrito());
   }
 
   return (

@@ -11,9 +11,9 @@ import logo from "../../images/logo.svg";
 import { ReactComponent as MenuIcon } from "feather-icons/dist/icons/menu.svg";
 import { ReactComponent as CloseIcon } from "feather-icons/dist/icons/x.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "store/usuarioSlice";
-import { quitarItem, limpiarCarrito } from "store/carritoSlice";
+import { quitarItem } from "store/carritoSlice";
 import { useNavigate } from "react-router-dom";
+import UserDropdown from "./usuarioLogueado.js";
 
 
 const Header = tw.header`
@@ -75,17 +75,6 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
     dispatch(quitarItem(item));
   };
 
-  const handleCheckout = () => {
-    alert("¡Compra realizada con éxito!");
-    dispatch(limpiarCarrito());
-    handleCartClose();
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
-
   const defaultLogoLink = (
     <LogoLink href="/">
       <img src={logo} alt="logo" />
@@ -97,6 +86,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       {userInfo && userInfo.rol === "Administrador" && (
         <NavLink href="/paneladministrador">Panel</NavLink>
       )}
+      <NavLink href="/panelcocineras">Cocineras</NavLink>
       <NavLink href="/nosotros">Nosotros</NavLink>
       <NavLink href="/pricing">Pricing</NavLink>
       <NavLink href="/contacto">Contactenos</NavLink>
@@ -106,10 +96,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       </IconButton>
       {userInfo ? (
         <>
-          <NavLink href="/#">{userInfo.nombre}</NavLink>
-          <PrimaryLink css={roundedHeaderButton && tw`rounded-full`} onClick={handleLogout}>
-            Cerrar sesión
-          </PrimaryLink>
+          {userInfo && <UserDropdown userName={userInfo.nombre} />}
         </>
       ) : (
         <>

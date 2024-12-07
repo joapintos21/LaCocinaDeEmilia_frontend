@@ -120,6 +120,10 @@ import { obtenerPacks } from "scripts/obtenerPacks";
 import { obtenerPedidoEnProgreso } from "scripts/obtenerPedidoEnProgreso";
 import ScrollToTop from "helpers/ScrollToTop";
 import { limpiarCarrito } from "store/carritoSlice";
+import PanelCocineras from "pages/PanelCocineras";
+import PaginaPedidos from "pages/PaginaPedidos";
+import PanelCocineras from "pages/PanelCocineras";
+import PanelCocineras from "pages/PanelCocineras";
 
 const theme = createTheme({
   palette: {
@@ -186,6 +190,9 @@ export default function App() {
           <Route path="/pack/:id" element={<PaginaPack />} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/paneladministrador" element={<PanelAdministrador />} />
+          <Route path="/mis_pedidos" element={<PaginaPedidos />} />
+          <Route path="/panelcocineras" element={<PanelCocineras />} />
+          <Route path="/panelcocineras" element={<PanelCocineras />} />
           <Route path="/" element={<RestaurantLandingPage />} />
         </Routes>
       </Router>
