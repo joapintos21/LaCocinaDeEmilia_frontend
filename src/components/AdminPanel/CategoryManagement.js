@@ -29,20 +29,20 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";  // Importamos el ícono "+" (Add)
+import obtenerCategorias from "scripts/obtenerCategorias";
 
 const CategoryManagement = () => {
   const [error, setError] = useState("");
-  const dispatch = useDispatch();
+  const dispatch = useDispatch();  
   const categories = useSelector((state) => state.categorias); // Obtenemos las categorías desde el store
-
+  const fetchCategorias = async () => {
+    await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
+  };
+  
   const [open, setOpen] = useState(false);
   const [newCategory, setNewCategory] = useState({ id: null, titulo: "", descripcion: "" });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDescription, setSearchDescription] = useState("");
-
-  useEffect(() => {
-    setError(""); // Limpiamos el error
-  }, [dispatch]);
 
   const handleOpen = (category = null) => {
     if (category) {
@@ -66,7 +66,7 @@ const CategoryManagement = () => {
     if (newCategory.titulo && newCategory.descripcion) {
       if (newCategory.id === null) {
         const categoryToAdd = { ...newCategory };
-        dispatch(addCategory(categoryToAdd));
+        //dispatch(addCategory(categoryToAdd));
 
         crearCategoria(
           newCategory.titulo,
@@ -80,6 +80,7 @@ const CategoryManagement = () => {
             console.error("Error al crear la categoria:", error.message);
             setError(error.message);
           });
+          fetchCategorias();
       } else {
         actualizarCategoria(
           newCategory.id,
@@ -94,8 +95,9 @@ const CategoryManagement = () => {
             console.error("Error al actualizar la categoria:", error.message);
             setError(error.message);
           });
-        dispatch(updateCategory(newCategory));
+        //dispatch(updateCategory(newCategory));
       }
+      fetchCategorias();
 
       setNewCategory({ titulo: "", descripcion: "" });
       handleClose();
@@ -113,7 +115,7 @@ const CategoryManagement = () => {
         console.error("Error al eliminar la categoria:", error.message);
         setError(error.message);
       });
-    dispatch(deleteCategory(id));
+      fetchCategorias();
   };
 
   const filteredCategories = categories.filter((category) => {
@@ -176,7 +178,7 @@ const CategoryManagement = () => {
       {/* Tabla de categorías con Scrollbar */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0 }}>
+          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#FFFFFF", zIndex: 1 }}>
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>
