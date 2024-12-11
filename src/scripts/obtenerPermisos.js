@@ -1,4 +1,4 @@
-import { setPermisos } from '../store/descuentoSlice';
+import { setPermisos } from '../store/permisoSlice';
 
 export const obtenerPermisos = async (dispatch) => {
   let url = "/permisos/obtenerPermisos?tipo_usuario=4";

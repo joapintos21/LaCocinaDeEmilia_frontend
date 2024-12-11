@@ -7,6 +7,9 @@ const usuarioSlice = createSlice({
     userInfo: null,
   },
   reducers: {
+    setUsuarios: (state, action) => {
+      return action.payload;
+    },
     login: (state, action) => {
       state.isLoggedIn = true;
       state.userInfo = action.payload;
@@ -32,5 +35,5 @@ const usuarioSlice = createSlice({
   },
 });
 
-export const { login, logout, addUsuario, updateUsuario, deleteUsuario } = usuarioSlice.actions;
+export const { setUsuarios, login, logout, addUsuario, updateUsuario, deleteUsuario } = usuarioSlice.actions;
 export default usuarioSlice.reducer;

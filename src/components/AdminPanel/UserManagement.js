@@ -28,6 +28,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
+import { obtenerUsuarios } from "scripts/obtenerUsuarios";
 
 const UserManagement = () => {
   const [error, setError] = useState("");
@@ -42,7 +43,17 @@ const UserManagement = () => {
   const [searchEmail, setSearchEmail] = useState("");
 
   useEffect(() => {
-    setError(""); // Limpia los errores en cada renderizado
+
+    try {
+      const fetchUsuarios = async () => {
+        await obtenerUsuarios(dispatch); // Llama al script para cargar las categorías en Redux
+      };
+      fetchUsuarios();
+
+    } catch (e) {
+      console.log(e)
+    }
+    setError(""); // Limpiamos el error
   }, [dispatch]);
 
   const handleOpen = (usuario = null) => {

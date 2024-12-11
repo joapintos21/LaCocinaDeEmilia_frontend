@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setAdicionales,
@@ -29,10 +29,24 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
+import { obtenerAdicionales } from "scripts/obtenerAdicionales";
 
 const AdditionalManagement = () => {
+  
   const [error, setError] = useState("");
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    try {
+      const fetchAdicionales = async () => {
+        await obtenerAdicionales(dispatch); // Llama al script para cargar las categorías en Redux
+      };
+      fetchAdicionales();
+
+    } catch (e) {
+      console.log(e)
+    }
+  }, [dispatch]);
 
   // Asegúrate de que `adicionales` tenga un valor por defecto (un array vacío)
   const adicionales = useSelector((state) => state.adicionales || []); // Usamos un array vacío como valor por defecto

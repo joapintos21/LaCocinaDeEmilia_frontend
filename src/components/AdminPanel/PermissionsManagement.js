@@ -29,6 +29,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
+import { obtenerPermisos } from "scripts/obtenerPermisos";
 
 const PermissionsManagement = () => {
   const [error, setError] = useState("");
@@ -43,7 +44,16 @@ const PermissionsManagement = () => {
   const [searchDescripcion, setSearchDescripcion] = useState("");
 
   useEffect(() => {
-    setError(""); // Limpiamos el error
+    try {
+      const fetchPermisos = async () => {
+        await obtenerPermisos(dispatch); 
+      };
+      fetchPermisos();
+
+    } catch (e) {
+      console.log(e)
+    }
+    setError(""); 
   }, [dispatch]);
 
   const handleOpen = (permiso = null) => {

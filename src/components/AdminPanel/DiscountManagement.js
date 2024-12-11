@@ -28,6 +28,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
+import { obtenerDescuentos } from "scripts/obtenerDescuentos";
 
 const DiscountManagement = () => {
   const [error, setError] = useState("");
@@ -37,13 +38,24 @@ const DiscountManagement = () => {
   const descuentos = useSelector((state) => state.descuentos || []);
 
   const [open, setOpen] = useState(false);
-  const [newDescuento, setNewDescuento] = useState({ id: null, nombre: "", descripcion: "", porcentaje: "" });
+  const [newDescuento, setNewDescuento] = useState({ id: null, tipo: "", valor: "", fechaInicio: "", fechaFin: "" , descripcion: "" });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDescripcion, setSearchDescripcion] = useState("");
-
+  
   useEffect(() => {
-    setError(""); // Limpia los errores en cada renderizado
+
+    try {
+      const fetchDescuentos = async () => {
+        await obtenerDescuentos(dispatch); // Llama al script para cargar los descuentos en Redux
+      };
+      fetchDescuentos();
+
+    } catch (e) {
+      console.log(e)
+    }
   }, [dispatch]);
+
+  setError(""); // Limpia los errores en cada renderizado
 
   const handleOpen = (descuento = null) => {
     setNewDescuento(descuento ? { ...descuento } : { id: null, nombre: "", descripcion: "", porcentaje: "" });
@@ -60,13 +72,12 @@ const DiscountManagement = () => {
   };
 
   const handleSaveDescuento = () => {
-    if (newDescuento.nombre && newDescuento.descripcion && newDescuento.porcentaje) {
+    if (newDescuento.descripcion && newDescuento.porcentaje) {
       if (newDescuento.id === null) {
         const descuentoToAdd = { ...newDescuento };
         dispatch(addDescuento(descuentoToAdd));
 
         crearDescuento(
-          newDescuento.nombre,
           newDescuento.descripcion,
           newDescuento.porcentaje,
           sessionStorage.getItem("token")
@@ -79,7 +90,6 @@ const DiscountManagement = () => {
       } else {
         actualizarDescuento(
           newDescuento.id,
-          newDescuento.nombre,
           newDescuento.descripcion,
           newDescuento.porcentaje,
           sessionStorage.getItem("token")
@@ -171,19 +181,22 @@ const DiscountManagement = () => {
         <Table>
           <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
-              <TableCell>Nombre</TableCell>
+              <TableCell>Tipo</TableCell>
+              <TableCell>Valor (%)</TableCell>
+              <TableCell>Fecha de Inicio</TableCell>
+              <TableCell>Fecha de Fin</TableCell>
               <TableCell>Descripción</TableCell>
-              <TableCell>Descuento (%)</TableCell>
-              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredDescuentos.length > 0 ? (
               filteredDescuentos.map((descuento) => (
                 <TableRow key={descuento.id}>
-                  <TableCell>{descuento.nombre}</TableCell>
+                  <TableCell>{descuento.tipo}%</TableCell>
+                  <TableCell>{descuento.valor}%</TableCell>
+                  <TableCell>{descuento.fechaInicio}</TableCell>
+                  <TableCell>{descuento.fechaFin}</TableCell>
                   <TableCell>{descuento.descripcion}</TableCell>
-                  <TableCell>{descuento.porcentaje}%</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -218,10 +231,38 @@ const DiscountManagement = () => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{newDescuento.id ? "Editar Descuento" : "Agregar Descuento"}</DialogTitle>
         <DialogContent>
+        <TextField
+            label="Tipo"
+            name="tipo"
+            type="number"
+            value={newDescuento.tipo}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
           <TextField
-            label="Nombre"
-            name="nombre"
-            value={newDescuento.nombre}
+            label="Valor de Descuento"
+            name="valor"
+            type="number"
+            value={newDescuento.valor}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Fecha de Inicio"
+            name="fechaInicio"
+            type="date"
+            value={newDescuento.fechaInicio}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Fecha de Fin"
+            name="fechaFin"
+            type="date"
+            value={newDescuento.fechaFin}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
@@ -230,15 +271,6 @@ const DiscountManagement = () => {
             label="Descripción"
             name="descripcion"
             value={newDescuento.descripcion}
-            onChange={handleInputChange}
-            fullWidth
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Porcentaje de Descuento"
-            name="porcentaje"
-            type="number"
-            value={newDescuento.porcentaje}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
