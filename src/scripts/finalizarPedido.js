@@ -1,6 +1,6 @@
 let request, url, body;
 
-export const finalizarPedido = async (pedidoId, metodoPagoId, paymentId, constoEnvio, token) => {
+export const finalizarPedido = async (pedidoId, metodoPagoId, paymentId, direccionId, token) => {
   request = "/pedidos/finalizarPedido";
   url = `${request}`;
 
@@ -8,7 +8,7 @@ export const finalizarPedido = async (pedidoId, metodoPagoId, paymentId, constoE
     pedido_id: pedidoId,
     metodo_pago_id: metodoPagoId,
     payment_id: paymentId,
-    costo_envio: constoEnvio
+    direccion_id: direccionId
   };
 
   try {

@@ -8,12 +8,20 @@ import { agregarItem } from "store/carritoSlice";
  * Agregar un producto al carrito
  */
 export const handleAddToCart = async (producto, cantidad, token, clienteId, tipo, dispatch) => {
-    if(tipo === "producto"){
-        await agregarProductoACarrito(clienteId, producto.id, cantidad, token);
-    }else{
-        await agregarPackACarrito(clienteId, producto.id, cantidad, token);
+    let response;
+
+    if (tipo === "producto") {
+        response = await agregarProductoACarrito(clienteId, producto.id, cantidad, token);
+    } else {
+        response = await agregarPackACarrito(clienteId, producto.id, cantidad, token);
     }
-    const productoConCantidad = { ...producto, cantidad, tipo: tipo };
+
+    // Verificar que la respuesta contiene el pedido_id
+    const pedidoId = response?.pedido_id;
+
+    // Crear el objeto con la información del producto y el pedido_id
+    const productoConCantidad = { ...producto, cantidad, tipo, pedido_id: pedidoId };
+
     dispatch(agregarItem(productoConCantidad));
 };
 

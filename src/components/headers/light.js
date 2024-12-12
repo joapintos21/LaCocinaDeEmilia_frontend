@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { quitarItem } from "store/carritoSlice";
 import { useNavigate } from "react-router-dom";
 import UserDropdown from "./usuarioLogueado.js";
+import { handleQuitarDeCarrito } from "utils/carritoUtils.js";
 
 
 const Header = tw.header`
@@ -66,14 +67,16 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
   const userInfo = useSelector((state) => state.usuario.userInfo);
   const cartItems = useSelector((state) => state.carrito.items);
   const totalPrice = cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
+  const token = sessionStorage.getItem("token");
 
   // Manejo de carrito
   const handleCartOpen = (event) => setCartAnchorEl(event.currentTarget);
   const handleCartClose = () => setCartAnchorEl(null);
 
-  const handleRemoveItem = (item) => {
+  const handleQuitarCarrito = (item) => {
+    handleQuitarDeCarrito(userInfo.id, item.id, item.cantidad, item.tipo, token);
     dispatch(quitarItem(item));
-  };
+  }
 
   const defaultLogoLink = (
     <LogoLink href="/">
@@ -137,7 +140,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
         anchorEl={cartAnchorEl}
         close={handleCartClose}
         dataCart={cartItems}
-        removeItem={handleRemoveItem}
+        removeItem={handleQuitarCarrito}
         totalPrice={totalPrice}
         checkout={() => navigate('/carrito')}
       />

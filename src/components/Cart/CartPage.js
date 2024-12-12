@@ -7,10 +7,10 @@ import {
   quitarItem,
   setComisionMP,
   setCostoEnvio,
+  setDireccion
 } from "store/carritoSlice";
 import { calcularPrecioConDescuento } from "utils/descuentoUtils";
 import { handleAddToCart, handleQuitarDeCarrito } from "utils/carritoUtils";
-import ZonasMapa from "images/ZONAS.png";
 import CheckoutProButton from "./CheckoutProMP";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import { useSearchParams } from "react-router-dom";
@@ -18,6 +18,8 @@ import CheckoutStatusModal from "./StatusScreenModal";
 import TransferenciaModal from "./TransferenciaModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DireccionesModal from "./DireccionesModal";
+import { crearDireccion } from "scripts/crearDireccion";
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full`;
@@ -101,45 +103,9 @@ const CartPage = () => {
 
   const costoEnvio = useSelector((state) => state.carrito.costoEnvio);
   const comisionMP = useSelector((state) => state.carrito.comisionMP);
+  const direccionId = useSelector((state) => state.carrito.direccionId);
   const subtotal = cartItems.reduce((acc, item) => acc + calcularPrecioConDescuento(item.precioTotal, obtenerDescuentos(item)), 0);
-  const total = comisionMP > 0 ? (subtotal + costoEnvio) * (1 + comisionMP/100) : subtotal + costoEnvio;
-  const [zonaSeleccionada, setZonaSeleccionada] = useState(null);
-  
-  const opcionesEnvio = [
-    { id: 1, zona: "Verde", costo: 180, descripcion: "Zona Verde (gratis a partir de $1500 en compras)" },
-    { id: 2, zona: "Roja", costo: 200, descripcion: "Zona Roja" },
-    { id: 3, zona: "Amarilla", costo: 250, descripcion: "Zona Amarilla" },
-    { id: 4, zona: "Otros", costo: 0, descripcion: "Otros" },
-  ];
-
-  const handleSeleccionEnvio = (costo, idZona) => {
-    const subtotal = cartItems.reduce((acc, item) => acc + calcularPrecioConDescuento(item.precioTotal, obtenerDescuentos(item)), 0);
-  
-    if (idZona === 1) { // Zona Verde
-      if (subtotal >= 1500) {
-        dispatch(setCostoEnvio(0)); // Envío gratuito
-      } else {
-        dispatch(setCostoEnvio(costo));
-      }
-    } else {
-      dispatch(setCostoEnvio(costo));
-    }
-    setZonaSeleccionada(idZona); // Almacena la zona seleccionada
-  };
-  
-  useEffect(() => {
-    if (cartItems.length === 0) {
-      setZonaSeleccionada(null);
-      dispatch(setCostoEnvio(0));
-    } else if (zonaSeleccionada === 1) {
-      if (subtotal >= 1500) {
-        dispatch(setCostoEnvio(0));
-      } else {
-        dispatch(setCostoEnvio(180));
-      }
-    }
-    setPreferenceId('');
-  }, [cartItems.length, subtotal, zonaSeleccionada, dispatch]);
+  const total = (subtotal + (costoEnvio > 0 ? costoEnvio : 0)) * (1 + (comisionMP > 0 ? comisionMP / 100 : 0));
 
   const handleIncrement = (item) => {
     handleAddToCart(item, 1, token, userId, item.tipo, dispatch);
@@ -156,12 +122,32 @@ const CartPage = () => {
   }
 
   const [direcciones, setDirecciones] = useState([]);
-  const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
+  const [mostrarModalDirecciones, setMostrarModalDirecciones] = useState(false);
   const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true);
   const [isOpenDirecciones, setIsOpenDirecciones] = useState(false);
 
-  const seleccionarDireccion = (id) => {
-    setDireccionSeleccionada(id);
+  const seleccionarDireccion = async(id) => {
+    dispatch(setDireccion(id));
+    try {
+      const response = await fetch("/direcciones/calcularCostoEnvio?direccion_id="+id+"&pedido_id="+pedidoId, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      });
+  
+      const data = await response.json();
+      if (data && data.costoEnvio) {
+        dispatch(setCostoEnvio(data.costoEnvio));
+      } else {
+        alert("Error al obtener el costo de envio.");
+        console.log(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Ocurrió un error al obtener el costo de envio.");
+    }
   };
 
   const fetchDirecciones = async () => {
@@ -176,8 +162,8 @@ const CartPage = () => {
         setDirecciones(data);
 
         const direccionDefault = data.find((direccion) => direccion.predeterminado);
-        if (direccionDefault) {
-          setDireccionSeleccionada(direccionDefault.id);
+        if (direccionDefault && direccionId === null) {
+          seleccionarDireccion(direccionDefault.id);
         }
       } else {
         console.error("Error al obtener las direcciones:", response.statusText);
@@ -187,6 +173,20 @@ const CartPage = () => {
     } finally {
       setIsLoadingDirecciones(false);
     }
+  };
+
+  const guardarDireccion = (direccion) => {
+    // Aquí envías la dirección al backend
+    const fetchCrearPedido = async () => {
+      await crearDireccion(direccion, token).then((data)=>{
+        fetchDirecciones().then(() => {
+          seleccionarDireccion(data.id);
+        });
+      }).catch((e) => {
+        console.log("Error creando la direccion:" + e)
+      }); // Llama al script para cargar las categorías en Redux
+    };
+    fetchCrearPedido();
   };
 
   useEffect(() => {
@@ -237,9 +237,7 @@ const CartPage = () => {
         },
         body: JSON.stringify({
           pedido_id: pedidoId, // Enviar solo el ID del pedido
-          direccion_id: direccionSeleccionada, // Si corresponde
-          metodo_pago_id: metodoPago === "mercado-pago" ? 2 : 1, // Método de pago
-          costo_envio: costoEnvio,
+          direccion_id: direccionId, // Si corresponde
           backUrls: backUrls
         }),
       });
@@ -323,38 +321,6 @@ const CartPage = () => {
       {cartItems.length > 0 && (
       <>
       <Content>
-        <SectionTitle onClick={() => setIsOpen(!isOpen)}>
-          Opciones de Envío
-          <span>{isOpen ? "▲" : "▼"}</span>
-        </SectionTitle>
-        <ContentSection>
-        <CollapsibleContent isOpen={isOpen}>
-          <div tw="mt-6 w-full text-left">
-            <img
-              src={ZonasMapa}
-              alt="Mapa de zonas de envío"
-              tw="w-full h-auto rounded-lg shadow mb-4"
-            />
-            {opcionesEnvio.map((opcion) => (
-            <div key={opcion.id}>
-              <input
-                type="radio"
-                name="envio"
-                value={opcion.costo}
-                onChange={() => handleSeleccionEnvio(opcion.costo, opcion.id)}
-                checked={zonaSeleccionada === opcion.id}
-              />
-              <label
-                htmlFor={`envio-${opcion.id}`}
-                tw="ml-2 cursor-pointer"
-              >
-                {' ' + opcion.descripcion + ' '} - {opcion.costo === 0 ? "Consultar" : '$' + opcion.costo}
-              </label>
-            </div>
-          ))}
-          </div>
-        </CollapsibleContent>
-        </ContentSection>
         <SectionTitle onClick={() => setIsOpenAgendar(!isOpenAgendar)}>
               Agendar Envío
               <span>{isOpenAgendar ? "▲" : "▼"}</span>
@@ -392,7 +358,7 @@ const CartPage = () => {
                     onClick={() => seleccionarDireccion(direccion.id)}
                     style={{
                       backgroundColor:
-                        direccionSeleccionada === direccion.id ? "#99cdb6" : "#f7f7f7",
+                        direccionId === direccion.id ? "#99cdb6" : "#f7f7f7",
                       cursor: "pointer",
                       padding: "10px",
                       borderRadius: "8px",
@@ -409,6 +375,23 @@ const CartPage = () => {
               ) : (
                 <p>No tienes direcciones registradas.</p>
               )}
+              {/* Botón para abrir el modal */}
+              <div tw="mt-4">
+                <button
+                  onClick={() => setMostrarModalDirecciones(true)}
+                  tw="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-800"
+                >
+                  + Agregar Dirección
+                </button>
+              </div>
+
+              {/* Modal para agregar direcciones */}
+              <DireccionesModal
+                userId={userId}
+                mostrarModalDirecciones={mostrarModalDirecciones}
+                setMostrarModalDirecciones={setMostrarModalDirecciones}
+                onGuardarDireccion={guardarDireccion}
+              />
             </AddressSection>
             </CollapsibleContent>
         </Content>
@@ -439,12 +422,16 @@ const CartPage = () => {
           <Label htmlFor="transferencia">Pagar por Transferencia</Label>
         </PaymentOption>
       </PaymentSection>
-      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia} pedidoId={pedidoId} costoEnvio={costoEnvio} token={token} dispatch={dispatch}/>
+      <TransferenciaModal mostrarModalTransferencia={mostrarModalTransferencia} setMostrarModalTransferencia={setMostrarModalTransferencia} pedidoId={pedidoId} direccionId={direccionId} token={token} dispatch={dispatch}/>
       <div tw="mt-8">
         <h3 tw="text-lg font-semibold">Resumen Total</h3>
-        <p>Subtotal: ${Math.round(subtotal)}</p>
-        <p>Envío: ${Math.round(costoEnvio)}</p>
-        <p>Total: ${Math.round(total)}</p>
+        <p>Subtotal: ${subtotal.toFixed(2)}</p>
+        {costoEnvio === -1 ? (
+          <p tw="text-sm text-red-600">Envío: Coordina el costo de envío por WhatsApp.</p>
+        ) : (
+          <p>Envío: ${Math.round(costoEnvio)}</p>
+        )}
+        <p>Total: ${total.toFixed(2)}</p>
       </div>
       {metodoPago === "mercado-pago" && preferenceId &&(
         <div tw="mt-4">
@@ -459,7 +446,7 @@ const CartPage = () => {
       )}
       </>
     )}
-    <CheckoutStatusModal payment={paymentId} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} token={token} pedidoId={pedidoId} costoEnvio={costoEnvio} dispatch={dispatch}/>
+    <CheckoutStatusModal payment={paymentId} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} token={token} pedidoId={pedidoId} direccionId={direccionId} dispatch={dispatch}/>
     </Container>
   );
 };

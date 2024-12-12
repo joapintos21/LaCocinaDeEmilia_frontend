@@ -4,14 +4,17 @@ import Modal from 'react-modal'; // Usar react-modal (o personalizar si no quier
 import { finalizarPedido } from 'scripts/finalizarPedido';
 import { limpiarCarrito } from 'store/carritoSlice';
 
-const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedidoId, costoEnvio, dispatch }) => {
+const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedidoId, direccionId, dispatch }) => {
   const [pagoVerificado, setPagoVerificado] = useState(false);
 
   useEffect(() => {
     try {
       if(payment != null){
-        finalizarPedido(pedidoId, 2, payment, costoEnvio, token).then((data) => {
+        finalizarPedido(pedidoId, 2, payment, direccionId, token).then((data) => {
           setPagoVerificado(true)
+        }).catch((e) => {
+          setPagoVerificado(true)
+          console.log("No hay pedidos EN_PROGRESO")
         })
       }
     } catch (error) {

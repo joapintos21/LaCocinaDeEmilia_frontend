@@ -166,7 +166,7 @@ export default function App() {
     } catch (e) {
       console.log(e)
     }
-  }, [dispatch, user, token]);
+  }, []);
 
 
   return (

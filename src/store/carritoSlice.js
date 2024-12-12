@@ -6,6 +6,7 @@ const initialState = {
     precioTotal: 0,
     costoEnvio: 0,
     comisionMP: 0,
+    direccionId: "",
     pedidoId: ""
 };
 
@@ -34,6 +35,7 @@ const carritoSlice = createSlice({
             }
             state.cantidadProductos += newItem.cantidad || 1;
             state.precioTotal += newItem.precio * (newItem.cantidad || 1);
+            state.pedidoId = newItem.pedido_id
         },
 
         quitarItem: (state, action) => {
@@ -50,6 +52,10 @@ const carritoSlice = createSlice({
                 state.precioTotal -= existingItem.precioTotal;
 
                 state.items.splice(existingItemIndex, 1);
+            }
+            if(state.cantidadProductos < 1){
+                state.pedidoId = "";
+                state.direccionId = ""
             }
         },
 
@@ -90,6 +96,10 @@ const carritoSlice = createSlice({
                     state.precioTotal -= existingItem.precio;
                 }
             }
+            if(state.cantidadProductos < 1){
+                state.pedidoId = "";
+                state.direccionId = ""
+            }
         },
 
         limpiarCarrito: (state) => {
@@ -97,6 +107,8 @@ const carritoSlice = createSlice({
             state.cantidadProductos = 0;
             state.precioTotal = 0;
             state.costoEnvio = 0;
+            state.pedidoId = "";
+            state.direccionId = ""
         },
         
         setCostoEnvio: (state, action) => {
@@ -135,6 +147,10 @@ const carritoSlice = createSlice({
             state.precioTotal = total;
             state.pedidoId = id;
         },
+
+        setDireccion: (state, action) => {
+            state.direccionId = action.payload;
+        }
     },
 });
 
@@ -147,6 +163,7 @@ export const {
     setCarrito,
     setCostoEnvio,
     setComisionMP,
+    setDireccion,
 } = carritoSlice.actions;
 
 export default carritoSlice.reducer;
