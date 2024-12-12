@@ -1,13 +1,14 @@
 import { setPermisos } from '../store/permisoSlice';
 
-export const obtenerPermisos = async (dispatch) => {
+export const obtenerPermisos = async (dispatch, token) => {
   let url = "/permisos/obtenerPermisos?tipo_usuario=4";
 
   try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // Incluir el token en el header de autorización
       },
     });
 

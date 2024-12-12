@@ -1,13 +1,14 @@
 import { setUsuarios } from '../store/usuarioSlice';
 
-export const obtenerUsuarios  = async (dispatch) => {
+export const obtenerUsuarios  = async (dispatch, token) => {
   let url = "/usuarios";
 
   try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
     });
 

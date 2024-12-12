@@ -34,31 +34,29 @@ const DiscountManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
-  // Obtén los descuentos del store; si no están disponibles, usa un array vacío
-  const descuentos = useSelector((state) => state.descuentos || []);
-
   const [open, setOpen] = useState(false);
   const [newDescuento, setNewDescuento] = useState({ id: null, tipo: "", valor: "", fechaInicio: "", fechaFin: "" , descripcion: "" });
-  const [searchTerm, setSearchTerm] = useState("");
   const [searchDescripcion, setSearchDescripcion] = useState("");
   
   useEffect(() => {
 
     try {
       const fetchDescuentos = async () => {
-        await obtenerDescuentos(dispatch); // Llama al script para cargar los descuentos en Redux
+        await obtenerDescuentos(dispatch, sessionStorage.getItem("token")); // Llama al script para cargar los descuentos en Redux
       };
       fetchDescuentos();
 
     } catch (e) {
       console.log(e)
     }
+    setError("");
   }, [dispatch]);
 
-  setError(""); // Limpia los errores en cada renderizado
+  // Obtén los descuentos del store; si no están disponibles, usa un array vacío
+  const descuentos = useSelector((state) => state.descuentos || []);
 
   const handleOpen = (descuento = null) => {
-    setNewDescuento(descuento ? { ...descuento } : { id: null, nombre: "", descripcion: "", porcentaje: "" });
+    setNewDescuento(descuento ? { ...descuento } : { id: null, tipo: "", valor: "", fechaInicio: "", fechaFin: "" , descripcion: "" });
     setOpen(true);
   };
 
@@ -72,14 +70,16 @@ const DiscountManagement = () => {
   };
 
   const handleSaveDescuento = () => {
-    if (newDescuento.descripcion && newDescuento.porcentaje) {
+    if (newDescuento.tipo && newDescuento.valor && newDescuento.fechaInicio && newDescuento.fechaFin && newDescuento.descripcion) {
       if (newDescuento.id === null) {
         const descuentoToAdd = { ...newDescuento };
         dispatch(addDescuento(descuentoToAdd));
 
         crearDescuento(
+          newDescuento.tipo,
+          newDescuento.fechaInicio,
+          newDescuento.fechaFin,
           newDescuento.descripcion,
-          newDescuento.porcentaje,
           sessionStorage.getItem("token")
         )
           .then((data) => console.log("Descuento agregado:", data))
@@ -90,8 +90,9 @@ const DiscountManagement = () => {
       } else {
         actualizarDescuento(
           newDescuento.id,
+          newDescuento.fechaInicio,
+          newDescuento.fechaFin,
           newDescuento.descripcion,
-          newDescuento.porcentaje,
           sessionStorage.getItem("token")
         )
           .then((data) => console.log("Descuento actualizado:", data))
@@ -123,7 +124,6 @@ const DiscountManagement = () => {
   const filteredDescuentos = Array.isArray(descuentos)
     ? descuentos.filter((descuento) => {
         return (
-          descuento.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
           descuento.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
         );
       })
@@ -138,23 +138,6 @@ const DiscountManagement = () => {
           <Button variant="contained" color="success" onClick={() => handleOpen()}>
               <AddIcon />
             </Button>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              label="Buscar por nombre"
-              variant="outlined"
-              fullWidth
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>

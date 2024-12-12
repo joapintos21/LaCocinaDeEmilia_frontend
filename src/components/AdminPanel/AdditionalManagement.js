@@ -32,7 +32,6 @@ import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
 import { obtenerAdicionales } from "scripts/obtenerAdicionales";
 
 const AdditionalManagement = () => {
-  
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
@@ -42,9 +41,8 @@ const AdditionalManagement = () => {
         await obtenerAdicionales(dispatch); // Llama al script para cargar las categorías en Redux
       };
       fetchAdicionales();
-
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   }, [dispatch]);
 
@@ -52,7 +50,12 @@ const AdditionalManagement = () => {
   const adicionales = useSelector((state) => state.adicionales || []); // Usamos un array vacío como valor por defecto
 
   const [open, setOpen] = useState(false);
-  const [newAdicional, setNewAdicional] = useState({ id: null, nombre: "", descripcion: "" });
+  const [newAdicional, setNewAdicional] = useState({
+    id: null,
+    descripcion: "",
+    costoAdicional: "",
+    visible: "",
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDescripcion, setSearchDescripcion] = useState("");
 
@@ -60,7 +63,12 @@ const AdditionalManagement = () => {
     if (adicional) {
       setNewAdicional({ ...adicional });
     } else {
-      setNewAdicional({ id: null, nombre: "", descripcion: "" });
+      setNewAdicional({
+        id: null,
+        descripcion: "",
+        costoAdicional: "",
+        visible: "",
+      });
     }
     setOpen(true);
   };
@@ -75,14 +83,19 @@ const AdditionalManagement = () => {
   };
 
   const handleSaveAdicional = () => {
-    if (newAdicional.nombre && newAdicional.descripcion) {
+    if (
+      newAdicional.descripcion &&
+      newAdicional.costoAdicional &&
+      newAdicional.visible
+    ) {
       if (newAdicional.id === null) {
         const adicionalToAdd = { ...newAdicional };
         dispatch(addAdicional(adicionalToAdd));
 
         crearAdicional(
-          newAdicional.nombre,
           newAdicional.descripcion,
+          newAdicional.costoAdicional,
+          newAdicional.visible,
           sessionStorage.getItem("token")
         )
           .then((data) => {
@@ -95,8 +108,9 @@ const AdditionalManagement = () => {
       } else {
         actualizarAdicional(
           newAdicional.id,
-          newAdicional.nombre,
           newAdicional.descripcion,
+          newAdicional.costoAdicional,
+          newAdicional.visible,
           sessionStorage.getItem("token")
         )
           .then((data) => {
@@ -109,7 +123,7 @@ const AdditionalManagement = () => {
         dispatch(updateAdicional(newAdicional));
       }
 
-      setNewAdicional({ nombre: "", descripcion: "" });
+      setNewAdicional({ descripcion: "", costoAdicional: "", visible: "" });
       handleClose();
     } else {
       setError("Por favor, complete todos los campos.");
@@ -133,7 +147,9 @@ const AdditionalManagement = () => {
     ? adicionales.filter((adicional) => {
         return (
           adicional.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          adicional.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
+          adicional.descripcion
+            .toLowerCase()
+            .includes(searchDescripcion.toLowerCase())
         );
       })
     : [];
@@ -141,31 +157,23 @@ const AdditionalManagement = () => {
   return (
     <div style={{ marginTop: "20px" }}>
       {/* Barra de búsqueda y botón "Agregar" */}
-      <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: "2px solid #ccc" }}>
+      <Box
+        sx={{
+          marginBottom: 2,
+          paddingBottom: 2,
+          borderBottom: "2px solid #ccc",
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
           {/* Coloca el botón de agregar a la izquierda */}
           <Grid item xs={12} sm={2} md={1}>
-            <Button variant="contained" color="success" onClick={() => handleOpen()}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => handleOpen()}
+            >
               <AddIcon />
             </Button>
-          </Grid>
-
-          {/* Buscador por nombre */}
-          <Grid item xs={12} sm={6} md={3}>
-            <TextField
-              label="Buscar por nombre"
-              variant="outlined"
-              fullWidth
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
           </Grid>
 
           {/* Buscador por descripción */}
@@ -189,21 +197,25 @@ const AdditionalManagement = () => {
       </Box>
 
       {/* Tabla de adicionales con Scrollbar */}
-      <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
+      <TableContainer
+        component={Paper}
+        sx={{ maxHeight: 400, overflow: "auto" }}
+      >
         <Table>
           <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
-              <TableCell>Nombre</TableCell>
               <TableCell>Descripción</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell>Costo adicional</TableCell>
+              <TableCell>Visible</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredAdicionales.length > 0 ? (
               filteredAdicionales.map((adicional) => (
                 <TableRow key={adicional.id}>
-                  <TableCell>{adicional.nombre}</TableCell>
                   <TableCell>{adicional.descripcion}</TableCell>
+                  <TableCell>{adicional.costoAdicional}</TableCell>
+                  <TableCell>{adicional.visible}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -236,20 +248,30 @@ const AdditionalManagement = () => {
 
       {/* Formulario para agregar o editar adicional */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newAdicional.id ? "Editar Adicional" : "Agregar Adicional"}</DialogTitle>
+        <DialogTitle>
+          {newAdicional.id ? "Editar Adicional" : "Agregar Adicional"}
+        </DialogTitle>
         <DialogContent>
           <TextField
-            label="Nombre"
-            name="nombre"
-            value={newAdicional.nombre}
+            label="Descripción"
+            name="descripcion"
+            value={newAdicional.descripcion}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
           <TextField
-            label="Descripción"
-            name="descripcion"
-            value={newAdicional.descripcion}
+            label="Costo adicional"
+            name="costoAdicional"
+            value={newAdicional.costoAdicional}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Visible"
+            name="visible"
+            value={newAdicional.visible}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}

@@ -1,13 +1,14 @@
 import { setAdicionales } from '../store/adicionalSlice';
 
-export const obtenerAdicionales = async (dispatch) => {
+export const obtenerAdicionales = async (dispatch, token) => {
   let url = "/listarAdicionales/listarAdicionales?producto_id=1";
 
   try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
     });
 
