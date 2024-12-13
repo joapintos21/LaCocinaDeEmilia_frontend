@@ -10,25 +10,25 @@ import carritoReducer from './carritoSlice'; // Importa el cartSlice
 
 // Configuración de persistencia para el estado de la aplicación
 const persistConfig = {
-    key: 'root',
-    storage,
-    whitelist: ['usuario', 'productos', 'categorias', 'carrito', 'packs'], // Incluye el cart en la persistencia
+	key: 'root',
+	storage,
+	whitelist: ['usuario', 'productos', 'categorias', 'carrito', 'packs'], // Incluye el cart en la persistencia
 };
 
 // Combina los reducers
 const rootReducer = combineReducers({
-    usuario: usuarioReducer,
-    productos: productoReducer,
-    categorias: categoriaReducer,
-    carrito: carritoReducer,
-    packs: packReducer
+	usuario: usuarioReducer,
+	productos: productoReducer,
+	categorias: categoriaReducer,
+	carrito: carritoReducer,
+	packs: packReducer,
 });
 
 // Aplica persistencia al rootReducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-    reducer: persistedReducer,
+	reducer: persistedReducer,
 });
 
 export const persistor = persistStore(store);
