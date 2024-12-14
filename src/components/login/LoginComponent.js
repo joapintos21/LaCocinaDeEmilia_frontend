@@ -6,6 +6,7 @@ import { iniciarSesion } from 'scripts/loginScript.js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from 'store/usuarioSlice'; // Importa la acción login desde el slice
+import broadcastService from 'utils/broadcastService';
 
 const Form = tw.form`mx-auto max-w-xs`;
 const Input = tw.input`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`;
@@ -39,6 +40,14 @@ const LoginComponente = () => {
 				// Despacha la acción `login` y almacena el usuario en Redux
 				dispatch(login(data.usuario));
 
+				if (broadcastService.channel) {
+					broadcastService.sendMessage({
+						type: 'TOKEN_ACTUALIZADO',
+						token: data.token,
+					});
+				} else {
+					console.warn('El canal ya está cerrado.');
+				}
 				// Navega a la página principal después del inicio de sesión
 				navigate('/');
 			})

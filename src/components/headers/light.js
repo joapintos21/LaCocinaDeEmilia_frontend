@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import tw from 'twin.macro';
 import styled from 'styled-components';
@@ -15,6 +15,7 @@ import { quitarItem } from 'store/carritoSlice';
 import { useNavigate } from 'react-router-dom';
 import UserDropdown from './usuarioLogueado.js';
 import { handleQuitarDeCarrito } from 'utils/carritoUtils.js';
+import broadcastService from 'utils/broadcastService.js';
 
 const Header = tw.header`
   flex justify-between items-center
@@ -77,6 +78,23 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 		dispatch(quitarItem(item));
 	};
 
+	useEffect(() => {
+		if (broadcastService.channel) {
+			// Escucha los mensajes del canal
+			broadcastService.onMessage((data) => {
+				if (data.type === 'TOKEN_ACTUALIZADO') {
+					sessionStorage.setItem('token', data.token);
+					console.log('Token sincronizado:', data.token);
+				}
+			});
+		}
+
+		// Limpieza al desmontar el componente
+		return () => {
+			broadcastService.closeChannel();
+		};
+	}, []);
+
 	const defaultLogoLink = (
 		<LogoLink href="/">
 			<img src={logo} alt="logo" />
@@ -94,15 +112,16 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 			<IconButton onClick={handleCartOpen}>
 				<ShoppingCartIcon />
 			</IconButton>
-			{userInfo ?
+			{userInfo ? (
 				<>{userInfo && <UserDropdown userName={userInfo.nombre} />}</>
-			:	<>
+			) : (
+				<>
 					<NavLink href="/login">Iniciar sesión</NavLink>
 					<PrimaryLink css={roundedHeaderButton && tw`rounded-full`} href="/signup">
 						Registrarse
 					</PrimaryLink>
 				</>
-			}
+			)}
 		</NavLinks>,
 	];
 
@@ -126,9 +145,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 					{links}
 				</MobileNavLinks>
 				<NavToggle onClick={toggleNavbar} className={showNavLinks ? 'open' : 'closed'}>
-					{showNavLinks ?
-						<CloseIcon tw="w-6 h-6" />
-					:	<MenuIcon tw="w-6 h-6" />}
+					{showNavLinks ? <CloseIcon tw="w-6 h-6" /> : <MenuIcon tw="w-6 h-6" />}
 				</NavToggle>
 			</MobileNavLinksContainer>
 
