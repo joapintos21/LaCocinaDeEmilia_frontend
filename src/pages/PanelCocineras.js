@@ -29,9 +29,9 @@ const PanelCocineras = () => {
 	
 			if (response.ok) {
 				const data = await response.json();
-				console.log("Respuesta de pedidos:", data); // <--- Inspecciona la respuesta
-				setPedidosHoy(data.pedidosHoy); // Pedidos del día
-				setPedidosPosteriores(data.pedidosPosteriores); // Pedidos de fechas posteriores
+				console.log("Respuesta de pedidos:", data);
+				setPedidosHoy(data.pedidosHoy);
+				setPedidosPosteriores(data.pedidosPosteriores);
 			} else {
 				console.error('Error al obtener pedidos:', response.statusText);
 				alert('Hubo un problema al obtener los pedidos.');
@@ -55,7 +55,6 @@ const PanelCocineras = () => {
 			body: JSON.stringify({ pedido_id: pedidoId }),
 		  });
 		  if (response.ok) {
-			// Filtrar el pedido terminado de la lista actual
 			setPedidosHoy((prevPedidos) => prevPedidos.filter((pedido) => pedido.id !== pedidoId));
 		  } else {
 			console.error('Error al marcar pedido como terminado:', response.statusText);
@@ -78,7 +77,7 @@ const PanelCocineras = () => {
 				body: JSON.stringify({ pedido_id: pedidoId, nueva_cocinera_id: userId }),
 			});
 			if (response.ok) {
-				fetchPedidos(); // Recargar pedidos después de reasignar
+				fetchPedidos();
 			} else {
 				console.error('Error al reasignar pedido:', response.statusText);
 				alert('No se pudo reasignar el pedido.');
@@ -101,7 +100,6 @@ const PanelCocineras = () => {
 					<p>Cargando pedidos...</p>
 				) : (
 					<>
-						{/* Pedidos de hoy */}
 						<SectionTitle>Pedidos para entregar hoy</SectionTitle>
 						{pedidosHoy.length > 0 ? (
 							pedidosHoy.map((pedido) => {
@@ -181,8 +179,7 @@ const PanelCocineras = () => {
 						) : (
 							<p>No hay pedidos para entregar hoy.</p>
 						)}
-		
-						{/* Pedidos posteriores */}
+
 						<SectionTitle>Pedidos posteriores</SectionTitle>
 						{pedidosPosteriores.length > 0 ? (
 							pedidosPosteriores.map((pedido) => (
