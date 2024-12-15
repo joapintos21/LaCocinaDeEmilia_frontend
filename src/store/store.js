@@ -6,7 +6,9 @@ import usuarioReducer from './usuarioSlice';
 import productoReducer from './productoSlice';
 import packReducer from './packSlice';
 import categoriaReducer from './categoriaSlice';
-import carritoReducer from './carritoSlice'; // Importa el cartSlice
+import carritoReducer from './carritoSlice'; 
+import descuentoReducer from './descuentoSlice'; 
+import permisoReducer from './permisoSlice'; 
 
 // Configuración de persistencia para el estado de la aplicación
 const persistConfig = {
@@ -21,7 +23,10 @@ const rootReducer = combineReducers({
     productos: productoReducer,
     categorias: categoriaReducer,
     carrito: carritoReducer,
-    packs: packReducer
+    packs: packReducer,
+    descuentos : descuentoReducer,
+    permisos : permisoReducer,
+    usuarios : usuarioReducer
 });
 
 // Aplica persistencia al rootReducer

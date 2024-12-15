@@ -33,7 +33,9 @@ import { obtenerDescuentos } from "scripts/obtenerDescuentos";
 const DiscountManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-
+  const fetchDescuentos = async () => {
+    await obtenerDescuentos(dispatch, sessionStorage.getItem("token")); // Llama al script para cargar los descuentos en Redux
+  };
   const [open, setOpen] = useState(false);
   const [newDescuento, setNewDescuento] = useState({ id: null, tipo: "", valor: "", fechaInicio: "", fechaFin: "" , descripcion: "" });
   const [searchDescripcion, setSearchDescripcion] = useState("");
@@ -41,16 +43,12 @@ const DiscountManagement = () => {
   useEffect(() => {
 
     try {
-      const fetchDescuentos = async () => {
-        await obtenerDescuentos(dispatch, sessionStorage.getItem("token")); // Llama al script para cargar los descuentos en Redux
-      };
-      fetchDescuentos();
-
+      fetchDescuentos(); 
     } catch (e) {
       console.log(e)
     }
     setError("");
-  }, [dispatch]);
+  }, []);
 
   // Obtén los descuentos del store; si no están disponibles, usa un array vacío
   const descuentos = useSelector((state) => state.descuentos || []);
@@ -76,7 +74,6 @@ const DiscountManagement = () => {
         dispatch(addDescuento(descuentoToAdd));
 
         crearDescuento(
-          newDescuento.tipo,
           newDescuento.fechaInicio,
           newDescuento.fechaFin,
           newDescuento.descripcion,
@@ -164,7 +161,6 @@ const DiscountManagement = () => {
         <Table>
           <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
-              <TableCell>Tipo</TableCell>
               <TableCell>Valor (%)</TableCell>
               <TableCell>Fecha de Inicio</TableCell>
               <TableCell>Fecha de Fin</TableCell>
@@ -175,7 +171,6 @@ const DiscountManagement = () => {
             {filteredDescuentos.length > 0 ? (
               filteredDescuentos.map((descuento) => (
                 <TableRow key={descuento.id}>
-                  <TableCell>{descuento.tipo}%</TableCell>
                   <TableCell>{descuento.valor}%</TableCell>
                   <TableCell>{descuento.fechaInicio}</TableCell>
                   <TableCell>{descuento.fechaFin}</TableCell>
@@ -214,15 +209,6 @@ const DiscountManagement = () => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{newDescuento.id ? "Editar Descuento" : "Agregar Descuento"}</DialogTitle>
         <DialogContent>
-        <TextField
-            label="Tipo"
-            name="tipo"
-            type="number"
-            value={newDescuento.tipo}
-            onChange={handleInputChange}
-            fullWidth
-            sx={{ marginBottom: 2 }}
-          />
           <TextField
             label="Valor de Descuento"
             name="valor"

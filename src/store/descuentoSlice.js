@@ -1,9 +1,8 @@
-// src/redux/categorySlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 export const descuentoSlice = createSlice({
   name: 'discount',
-  initialState: [],  // Asegúrate de que el estado inicial sea un arreglo vacío
+  initialState: [],  
   reducers: {
     setDescuentos: (state, action) => {
       return action.payload;

@@ -43,7 +43,15 @@ const CategoryManagement = () => {
   const [newCategory, setNewCategory] = useState({ id: null, titulo: "", descripcion: "" });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDescription, setSearchDescription] = useState("");
+  useEffect(() => {
 
+    try {
+      fetchCategorias(); 
+    } catch (e) {
+      console.log(e)
+    }
+    setError("");
+  }, []);
   const handleOpen = (category = null) => {
     if (category) {
       setNewCategory({ ...category });
@@ -110,12 +118,12 @@ const CategoryManagement = () => {
     borrarCategoria(id, sessionStorage.getItem("token"))
       .then((data) => {
         console.log("Categoría eliminada:", data);
+        fetchCategorias();
       })
       .catch((error) => {
         console.error("Error al eliminar la categoria:", error.message);
         setError(error.message);
       });
-      fetchCategorias();
   };
 
   const filteredCategories = categories.filter((category) => {

@@ -1,14 +1,15 @@
-let request, queryParams, url;
+let url, body;
 
-export const crearUsuario = async (emailInput, passwordInput) => {
-  request = "/usuarios/create";
+export const crearUsuario = async (emailInput, passwordInput, nombreInput, telefonoInput, rolIdInput) => {
+  url = "/usuarios/create";
 
-  queryParams = new URLSearchParams({
+  body = {
     email: emailInput,
     password: passwordInput,
-  }).toString();
-
-  url = `${request}?${queryParams}`;
+    nombre: nombreInput,
+    telefono: telefonoInput, 
+    rol_id: rolIdInput
+  };
 
   try {
     const response = await fetch(url, {
@@ -16,19 +17,19 @@ export const crearUsuario = async (emailInput, passwordInput) => {
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(body)
     });
 
-    // Maneja errores fuera del rango 200-299
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Se produjo un error desconocido.");
     }
 
     const data = await response.json();
-    return data; // Devuelve los datos de la respuesta
+    return data; 
 
   } catch (error) {
     console.error(error);
-    throw error; // Lanza el error para que sea capturado en el evento
+    throw error; 
   }
 };

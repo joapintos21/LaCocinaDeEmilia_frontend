@@ -54,6 +54,16 @@ const ProductManagement = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
+ useEffect(() => {
+
+    try {
+      fetchProductos(); 
+    } catch (e) {
+      console.log(e)
+    }
+    setError("");
+  }, []);
+
   const handleOpen = (product = null) => {
     if (product) {
       setNewProduct({ ...product });
@@ -230,7 +240,7 @@ const ProductManagement = () => {
                   <TableCell>{product.categoria?.titulo}</TableCell>
                   <TableCell>{product.visible ? 'Sí' : 'No'}</TableCell>
                   <TableCell>
-                    <Button variant="outlined" color="primary" onClick={() => handleOpen(product)}>
+                    <Button variant="outlined" sx={{ marginRight: 2 }} color="primary" onClick={() => handleOpen(product) }>
                       Editar
                     </Button>
                     <Button variant="outlined" color="secondary" onClick={() => handleDelete(product.id)}>

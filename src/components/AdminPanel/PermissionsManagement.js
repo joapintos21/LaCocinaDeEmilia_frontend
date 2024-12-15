@@ -40,13 +40,13 @@ const PermissionsManagement = () => {
 
   const [open, setOpen] = useState(false);
   const [newPermiso, setNewPermiso] = useState({ id: null, nombre: "", descripcion: "" });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchDescripcion, setSearchDescripcion] = useState("");
+  const [searchEndpoint, setSearchEndpoint] = useState("");
+  const [searchTipo, setSearchTipo] = useState("");
 
   useEffect(() => {
     try {
       const fetchPermisos = async () => {
-        await obtenerPermisos(dispatch); 
+        await obtenerPermisos(dispatch, sessionStorage.getItem("token")); 
       };
       fetchPermisos();
 
@@ -60,7 +60,7 @@ const PermissionsManagement = () => {
     if (permiso) {
       setNewPermiso({ ...permiso });
     } else {
-      setNewPermiso({ id: null, nombre: "", descripcion: "" });
+      setNewPermiso({ id: null, endpoint: null, tipo : null, rol_id: "" });
     }
     setOpen(true);
   };
@@ -81,8 +81,10 @@ const PermissionsManagement = () => {
         dispatch(addPermiso(permisoToAdd));
 
         crearPermiso(
-          newPermiso.nombre,
-          newPermiso.descripcion,
+          newPermiso.id,
+          newPermiso.endpoint,
+          newPermiso.tipo,
+          newPermiso.rol_id,
           sessionStorage.getItem("token")
         )
           .then((data) => {
@@ -95,8 +97,9 @@ const PermissionsManagement = () => {
       } else {
         actualizarPermiso(
           newPermiso.id,
-          newPermiso.nombre,
-          newPermiso.descripcion,
+          newPermiso.endpoint,
+          newPermiso.tipo,
+          newPermiso.rol_id,
           sessionStorage.getItem("token")
         )
           .then((data) => {
@@ -109,7 +112,7 @@ const PermissionsManagement = () => {
         dispatch(updatePermiso(newPermiso));
       }
 
-      setNewPermiso({ nombre: "", descripcion: "" });
+      setNewPermiso({ endpoint : "", tipo: "", rol_id : "" });
       handleClose();
     } else {
       setError("Por favor, complete todos los campos.");
@@ -132,8 +135,8 @@ const PermissionsManagement = () => {
   const filteredPermisos = Array.isArray(permisos)
     ? permisos.filter((permiso) => {
         return (
-          permiso.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          permiso.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
+          permiso.endpoint.toLowerCase().includes(searchEndpoint.toLowerCase()) &&
+          permiso.tipo.toLowerCase().includes(searchTipo.toLowerCase())
         );
       })
     : [];
@@ -153,11 +156,11 @@ const PermissionsManagement = () => {
           {/* Buscador por nombre */}
           <Grid item xs={12} sm={6} md={3}>
             <TextField
-              label="Buscar por nombre"
+              label="Buscar por funcion"
               variant="outlined"
               fullWidth
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchEndpoint}
+              onChange={(e) => setSearchEndpoint(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -168,14 +171,13 @@ const PermissionsManagement = () => {
             />
           </Grid>
 
-          {/* Buscador por descripción */}
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="Buscar por descripción"
               variant="outlined"
               fullWidth
-              value={searchDescripcion}
-              onChange={(e) => setSearchDescripcion(e.target.value)}
+              value={searchTipo}
+              onChange={(e) => setSearchTipo(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -193,17 +195,18 @@ const PermissionsManagement = () => {
         <Table>
           <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Descripción</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell>Endpoint</TableCell>
+              <TableCell>Tipo</TableCell>
+              <TableCell>Rol</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredPermisos.length > 0 ? (
               filteredPermisos.map((permiso) => (
                 <TableRow key={permiso.id}>
-                  <TableCell>{permiso.nombre}</TableCell>
-                  <TableCell>{permiso.descripcion}</TableCell>
+                  <TableCell>{permiso.endpoint}</TableCell>
+                  <TableCell>{permiso.tipo}</TableCell>
+                  <TableCell>{permiso.rol_id}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -239,16 +242,24 @@ const PermissionsManagement = () => {
         <DialogTitle>{newPermiso.id ? "Editar Permiso" : "Agregar Permiso"}</DialogTitle>
         <DialogContent>
           <TextField
-            label="Nombre"
-            name="nombre"
+            label="Endpoint"
+            name="endpoint"
             value={newPermiso.nombre}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
           <TextField
-            label="Descripción"
-            name="descripcion"
+            label="Tipo"
+            name="tipo"
+            value={newPermiso.descripcion}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+           <TextField
+            label="Rol"
+            name="rol_id"
             value={newPermiso.descripcion}
             onChange={handleInputChange}
             fullWidth

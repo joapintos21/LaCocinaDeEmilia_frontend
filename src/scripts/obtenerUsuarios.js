@@ -19,7 +19,7 @@ export const obtenerUsuarios  = async (dispatch, token) => {
 
     const data = await response.json();
     dispatch(setUsuarios(data)); 
-
+    console.log(data);
   } catch (error) {
     console.error(error);
     throw error; 

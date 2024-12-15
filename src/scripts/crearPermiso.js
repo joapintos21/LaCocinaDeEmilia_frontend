@@ -17,7 +17,7 @@ export const crearPermiso = async (endpoint, tipo, rolId, token) => {
         "Content-Type": "application/json",
         'Authorization': `Bearer ${token}` // Pasa el token en el header
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     });
 
     // Maneja errores fuera del rango 200-299

@@ -34,14 +34,14 @@ export default () => {
   //}, [categoriasRedux]);
 
   const modules = [
-    //{ title: "Dashboard", component: <Dashboard /> },
+    { title: "Dashboard", component: <Dashboard /> },
     //{ title: "Gestión de Pedidos", component: <OrderManagement /> },
     { title: "Gestión de Categorías", component: <CategoryManagement /> },
     { title: "Gestión de Productos", component: <ProductManagement /> },
     //{ title: "Gestión de Adicionales de Productos", component: <AdditionalManagement /> },
     { title: "Gestión de Descuentos", component: <DiscountManagement /> },
-    //{ title: "Gestión de Usuarios", component: <UserManagement /> },
-    //{ title: "Gestión de Permisos", component: <PermissionsManagement /> }
+    { title: "Gestión de Usuarios", component: <UserManagement /> },
+    { title: "Gestión de Permisos", component: <PermissionsManagement /> }
   ];
 
   return (

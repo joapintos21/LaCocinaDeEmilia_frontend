@@ -18,6 +18,7 @@ export const obtenerDescuentos = async (dispatch, token) => {
     }
 
     const data = await response.json();
+    console.log(data);
     dispatch(setDescuentos(data));
 
   } catch (error) {

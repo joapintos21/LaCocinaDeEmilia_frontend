@@ -18,7 +18,6 @@ const productoSlice = createSlice({
       }
     },
     deleteProduct: (state, action) => {
-      // Asegúrate de que 'productos' siempre sea un array, incluso si está vacío o es undefined
       state = state ? state.filter(product => product.id !== action.payload) : [];
     },
   },

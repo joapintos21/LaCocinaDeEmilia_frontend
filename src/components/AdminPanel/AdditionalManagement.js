@@ -28,26 +28,25 @@ import {
   Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
+import AddIcon from "@mui/icons-material/Add"; 
 import { obtenerAdicionales } from "scripts/obtenerAdicionales";
 
 const AdditionalManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-
+  const fetchAdicionales = async () => {
+    await obtenerAdicionales(dispatch, sessionStorage.getItem("token")); 
+  };
   useEffect(() => {
     try {
-      const fetchAdicionales = async () => {
-        await obtenerAdicionales(dispatch); // Llama al script para cargar las categorías en Redux
-      };
+      
       fetchAdicionales();
     } catch (e) {
       console.log(e);
     }
   }, [dispatch]);
 
-  // Asegúrate de que `adicionales` tenga un valor por defecto (un array vacío)
-  const adicionales = useSelector((state) => state.adicionales || []); // Usamos un array vacío como valor por defecto
+  const adicionales = useSelector((state) => state.adicionales || []); 
 
   const [open, setOpen] = useState(false);
   const [newAdicional, setNewAdicional] = useState({

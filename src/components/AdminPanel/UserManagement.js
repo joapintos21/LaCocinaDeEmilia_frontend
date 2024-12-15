@@ -34,7 +34,6 @@ const UserManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
-  // Obtén los usuarios del store; si no están disponibles, usa un array vacío
   const usuarios = useSelector((state) => state.usuarios || []);
 
   const [open, setOpen] = useState(false);
@@ -46,7 +45,7 @@ const UserManagement = () => {
 
     try {
       const fetchUsuarios = async () => {
-        await obtenerUsuarios(dispatch); // Llama al script para cargar las categorías en Redux
+        await obtenerUsuarios(dispatch, sessionStorage.getItem("token")); 
       };
       fetchUsuarios();
 
@@ -57,7 +56,7 @@ const UserManagement = () => {
   }, [dispatch]);
 
   const handleOpen = (usuario = null) => {
-    setNewUsuario(usuario ? { ...usuario } : { id: null, nombre: "", email: "" });
+    setNewUsuario(usuario ? { ...usuario } : { id: null, nombre: "", email: "", telefono: "", rol : "" });
     setOpen(true);
   };
 
@@ -71,7 +70,7 @@ const UserManagement = () => {
   };
 
   const handleSaveUsuario = () => {
-    if (newUsuario.nombre && newUsuario.email) {
+    if (newUsuario.nombre && newUsuario.email && newUsuario.telefono && newUsuario.rol) {
       if (newUsuario.id === null) {
         const usuarioToAdd = { ...newUsuario };
         dispatch(addUsuario(usuarioToAdd));
@@ -87,6 +86,8 @@ const UserManagement = () => {
           newUsuario.id,
           newUsuario.nombre,
           newUsuario.email,
+          newUsuario.telefono,
+          newUsuario.rol,
           sessionStorage.getItem("token")
         )
           .then((data) => console.log("Usuario actualizado:", data))
@@ -97,7 +98,7 @@ const UserManagement = () => {
         dispatch(updateUsuario(newUsuario));
       }
 
-      setNewUsuario({ nombre: "", email: "" });
+      setNewUsuario({ nombre: "", email: "" , telefono : "", rol : ""});
       handleClose();
     } else {
       setError("Por favor, complete todos los campos.");
@@ -178,6 +179,8 @@ const UserManagement = () => {
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Correo</TableCell>
+              <TableCell>Telefono</TableCell>
+              <TableCell>Rol</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
@@ -187,6 +190,8 @@ const UserManagement = () => {
                 <TableRow key={usuario.id}>
                   <TableCell>{usuario.nombre}</TableCell>
                   <TableCell>{usuario.email}</TableCell>
+                  <TableCell>{usuario.telefono}</TableCell>
+                  <TableCell>{usuario.rol}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -233,6 +238,22 @@ const UserManagement = () => {
             label="Correo"
             name="email"
             value={newUsuario.email}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Telefono"
+            name="telefono"
+            value={newUsuario.telefono}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Rol"
+            name="rol"
+            value={newUsuario.telefono}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
