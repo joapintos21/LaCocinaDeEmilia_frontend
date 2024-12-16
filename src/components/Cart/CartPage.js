@@ -15,6 +15,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import DireccionesModal from './DireccionesModal';
 import { crearDireccion } from 'scripts/crearDireccion';
 import Spinner from 'components/Spinner';
+import { format } from 'date-fns';
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full`;
@@ -200,6 +201,11 @@ const CartPage = () => {
 	const [isOpenAgendar, setIsOpenAgendar] = useState(false);
 	const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
 	const [fechasOcupadas, setFechasOcupadas] = useState([]);
+	const [fechaFormateada, setFechaFormateada] = useState(null);
+
+	useEffect(() => {
+		setFechaFormateada(format(fechaSeleccionada, 'yyyy-MM-dd'));
+	}, [fechaSeleccionada]);
 
 	useEffect(() => {
 		const fetchFechasOcupadas = async () => {
@@ -239,8 +245,9 @@ const CartPage = () => {
 					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({
-					pedido_id: pedidoId, // Enviar solo el ID del pedido
-					direccion_id: direccionId, // Si corresponde
+					pedido_id: pedidoId,
+					direccion_id: direccionId,
+					fecha_envio: fechaFormateada,
 					backUrls: backUrls,
 				}),
 			});
@@ -337,7 +344,7 @@ const CartPage = () => {
 								<DatePicker
 									selected={fechaSeleccionada}
 									onChange={(date) => setFechaSeleccionada(date)}
-									minDate={new Date().setDate(new Date().getDate() + 1)}
+									minDate={new Date().setDate(new Date().getDate())}
 									filterDate={(date) => !isDateDisabled(date)}
 									inline
 								/>
@@ -435,6 +442,7 @@ const CartPage = () => {
 						setMostrarModalTransferencia={setMostrarModalTransferencia}
 						pedidoId={pedidoId}
 						direccionId={direccionId}
+						fechaEnvio={fechaFormateada}
 						token={token}
 						dispatch={dispatch}
 					/>
@@ -469,6 +477,7 @@ const CartPage = () => {
 				token={token}
 				pedidoId={pedidoId}
 				direccionId={direccionId}
+				fechaEnvio={fechaFormateada}
 				dispatch={dispatch}
 			/>
 		</Container>

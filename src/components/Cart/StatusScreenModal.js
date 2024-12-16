@@ -4,13 +4,22 @@ import Modal from 'react-modal'; // Usar react-modal (o personalizar si no quier
 import { finalizarPedido } from 'scripts/finalizarPedido';
 import { limpiarCarrito } from 'store/carritoSlice';
 
-const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedidoId, direccionId, dispatch }) => {
+const CheckoutStatusModal = ({
+	payment,
+	isModalOpen,
+	setIsModalOpen,
+	token,
+	pedidoId,
+	direccionId,
+	fechaEnvio,
+	dispatch,
+}) => {
 	const [pagoVerificado, setPagoVerificado] = useState(false);
 
 	useEffect(() => {
 		try {
 			if (payment != null) {
-				finalizarPedido(pedidoId, 2, payment, direccionId, token)
+				finalizarPedido(pedidoId, 2, payment, direccionId, fechaEnvio, token)
 					.then((data) => {
 						setPagoVerificado(true);
 					})
@@ -58,9 +67,11 @@ const CheckoutStatusModal = ({ payment, isModalOpen, setIsModalOpen, token, pedi
 			>
 				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 					{/* StatusScreen de Mercado Pago */}
-					{pagoVerificado ?
+					{pagoVerificado ? (
 						<StatusScreen initialization={{ paymentId: payment }} />
-					:	<p>Cargando estado del pago...</p>}
+					) : (
+						<p>Cargando estado del pago...</p>
+					)}
 
 					{/* Botón de Cerrar */}
 					<button
