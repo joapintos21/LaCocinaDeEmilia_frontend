@@ -14,6 +14,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import DireccionesModal from './DireccionesModal';
 import { crearDireccion } from 'scripts/crearDireccion';
+import Spinner from 'components/Spinner';
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full`;
@@ -41,7 +42,8 @@ const CartPage = () => {
 	const dispatch = useDispatch();
 	const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
 	const user = useSelector((state) => state.usuario); // ID del cliente desde el store
-	const [preferenceId, setPreferenceId] = useState('');
+	const [isLoading, setIsLoading] = useState(true); // Estado para el loader
+	const [preferenceId, setPreferenceId] = useState(null);
 	let userId = null;
 	if (user.isLoggedIn) {
 		userId = user.userInfo.id;
@@ -222,6 +224,7 @@ const CartPage = () => {
 	};
 
 	const handleMercadoPago = async () => {
+		setIsLoading(true); // Mostrar loader mientras se genera la preferencia
 		const BASE_URL = process.env.REACT_APP_URL || 'http://localhost:3000';
 		const backUrls = {
 			success: `${BASE_URL}/carrito`,
@@ -251,6 +254,8 @@ const CartPage = () => {
 		} catch (error) {
 			console.error('Error:', error);
 			alert('Ocurrió un error al procesar el pago.');
+		} finally {
+			setIsLoading(false); // Ocultar loader una vez que se complete la solicitud
 		}
 	};
 
@@ -277,7 +282,7 @@ const CartPage = () => {
 	return (
 		<Container>
 			<Content>
-				{cartItems.length > 0 ?
+				{cartItems.length > 0 ? (
 					cartItems.map((item) => {
 						const descuentos = obtenerDescuentos(item);
 						const precioConDescuento = calcularPrecioConDescuento(item.precio, descuentos);
@@ -316,7 +321,9 @@ const CartPage = () => {
 							</CartItem>
 						);
 					})
-				:	<p tw="text-gray-600">Tu carrito está vacío</p>}
+				) : (
+					<p tw="text-gray-600">Tu carrito está vacío</p>
+				)}
 			</Content>
 			{cartItems.length > 0 && (
 				<>
@@ -349,9 +356,9 @@ const CartPage = () => {
 						</SectionTitle>
 						<CollapsibleContent isOpen={isOpenDirecciones}>
 							<AddressSection>
-								{isLoadingDirecciones ?
+								{isLoadingDirecciones ? (
 									<p>Cargando direcciones...</p>
-								: direcciones.length > 0 ?
+								) : direcciones.length > 0 ? (
 									direcciones.map((direccion) => (
 										<AddressItem
 											key={direccion.id}
@@ -371,7 +378,9 @@ const CartPage = () => {
 											{direccion.predeterminado && <p tw="text-green-500">Predeterminada</p>}
 										</AddressItem>
 									))
-								:	<p>No tienes direcciones registradas.</p>}
+								) : (
+									<p>No tienes direcciones registradas.</p>
+								)}
 								{/* Botón para abrir el modal */}
 								<div tw="mt-4">
 									<button
@@ -432,16 +441,19 @@ const CartPage = () => {
 					<div tw="mt-8">
 						<h3 tw="text-lg font-semibold">Resumen Total</h3>
 						<p>Subtotal: ${subtotal.toFixed(2)}</p>
-						{costoEnvio === -1 ?
+						{costoEnvio === -1 ? (
 							<p tw="text-sm text-red-600">Envío: Coordina el costo de envío por WhatsApp.</p>
-						:	<p>Envío: ${Math.round(costoEnvio)}</p>}
+						) : (
+							<p>Envío: ${Math.round(costoEnvio)}</p>
+						)}
 						<p>Total: ${total.toFixed(2)}</p>
 					</div>
-					{metodoPago === 'mercado-pago' && preferenceId && (
-						<div tw="mt-4">
+					{metodoPago === 'mercado-pago' &&
+						(isLoading || !preferenceId ? (
+							<Spinner text="Creando link de pago..." />
+						) : (
 							<CheckoutProButton preferenceId={preferenceId} />
-						</div>
-					)}
+						))}
 
 					{metodoPago === 'transferencia' && (
 						<FinalizarCompraButton onClick={handleFinalizarCompraTransferencia}>
