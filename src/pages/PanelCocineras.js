@@ -3,7 +3,7 @@ import tw from 'twin.macro';
 import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
 import Header from 'components/headers/light.js';
 import { useSelector } from 'react-redux';
-import { format } from "date-fns";
+import { format, parse } from 'date-fns';
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const PedidoItem = tw.div`flex justify-between items-center border-b pb-2 mb-2 p-4 rounded-lg shadow-md bg-gray-100`;
 const Button = tw.button`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700`;
@@ -26,10 +26,9 @@ const PanelCocineras = () => {
 					Authorization: `Bearer ${token}`,
 				},
 			});
-	
+
 			if (response.ok) {
 				const data = await response.json();
-				console.log("Respuesta de pedidos:", data);
 				setPedidosHoy(data.pedidosHoy);
 				setPedidosPosteriores(data.pedidosPosteriores);
 			} else {
@@ -43,30 +42,30 @@ const PanelCocineras = () => {
 			setIsLoading(false);
 		}
 	};
-	  
+
 	const marcarComoTerminado = async (pedidoId) => {
 		try {
-		  const response = await fetch('/pedidos/marcarComoTerminado', {
-			method: 'PUT',
-			headers: {
-			  Authorization: `Bearer ${token}`,
-			  'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ pedido_id: pedidoId }),
-		  });
-		  if (response.ok) {
-			setPedidosHoy((prevPedidos) => prevPedidos.filter((pedido) => pedido.id !== pedidoId));
-		  } else {
-			console.error('Error al marcar pedido como terminado:', response.statusText);
-			alert('No se pudo marcar el pedido como terminado.');
-		  }
+			const response = await fetch('/pedidos/marcarComoTerminado', {
+				method: 'PUT',
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ pedido_id: pedidoId }),
+			});
+			if (response.ok) {
+				setPedidosHoy((prevPedidos) => prevPedidos.filter((pedido) => pedido.id !== pedidoId));
+			} else {
+				console.error('Error al marcar pedido como terminado:', response.statusText);
+				alert('No se pudo marcar el pedido como terminado.');
+			}
 		} catch (error) {
-		  console.error('Error al marcar pedido como terminado:', error);
-		  alert('Error al conectar con el servidor.');
+			console.error('Error al marcar pedido como terminado:', error);
+			alert('Error al conectar con el servidor.');
 		}
-	  };
+	};
 
-	  const reasignarPedido = async (pedidoId) => {
+	const reasignarPedido = async (pedidoId) => {
 		try {
 			const response = await fetch('/pedidos/reasignarPedido', {
 				method: 'PUT',
@@ -74,7 +73,7 @@ const PanelCocineras = () => {
 					Authorization: `Bearer ${token}`,
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ pedido_id: pedidoId, nueva_cocinera_id: userId }),
+				body: JSON.stringify({ pedido_id: pedidoId, userId: userId }),
 			});
 			if (response.ok) {
 				fetchPedidos();
@@ -111,7 +110,7 @@ const PanelCocineras = () => {
 												<Divider />
 												<div>
 													{pedido.detalles
-														?.filter((detalle) => detalle.descripcion !== "Envío")
+														?.filter((detalle) => detalle.descripcion !== 'Envío')
 														.map((detalle, index) => (
 															<div key={index}>
 																<p>Producto: {detalle.descripcion}</p>
@@ -134,7 +133,7 @@ const PanelCocineras = () => {
 												<Divider />
 												<div>
 													{pedido.detalles
-														?.filter((detalle) => detalle.descripcion !== "Envío")
+														?.filter((detalle) => detalle.descripcion !== 'Envío')
 														.map((detalle, index) => (
 															<div key={index}>
 																<p>Producto: {detalle.descripcion}</p>
@@ -145,9 +144,7 @@ const PanelCocineras = () => {
 												</div>
 												<p>No tiene cocinera asignada</p>
 											</div>
-											<Button onClick={() => reasignarPedido(pedido.id)}>
-												Asignar
-											</Button>
+											<Button onClick={() => reasignarPedido(pedido.id)}>Asignar</Button>
 										</PedidoItem>
 									);
 								} else {
@@ -158,7 +155,7 @@ const PanelCocineras = () => {
 												<Divider />
 												<div>
 													{pedido.detalles
-														?.filter((detalle) => detalle.descripcion !== "Envío")
+														?.filter((detalle) => detalle.descripcion !== 'Envío')
 														.map((detalle, index) => (
 															<div key={index}>
 																<p>Producto: {detalle.descripcion}</p>
@@ -169,9 +166,7 @@ const PanelCocineras = () => {
 												</div>
 												<p>Cocinera Asignada: {pedido.cocinera_asignada}</p>
 											</div>
-											<Button onClick={() => reasignarPedido(pedido.id)}>
-												Reasignar
-											</Button>
+											<Button onClick={() => reasignarPedido(pedido.id)}>Reasignar</Button>
 										</BluePedidoItem>
 									);
 								}
@@ -189,7 +184,7 @@ const PanelCocineras = () => {
 										<Divider />
 										<div>
 											{pedido.detalles
-												?.filter((detalle) => detalle.descripcion !== "Envío")
+												?.filter((detalle) => detalle.descripcion !== 'Envío')
 												.map((detalle, index) => (
 													<div key={index}>
 														<p>Producto: {detalle.descripcion}</p>
@@ -198,7 +193,15 @@ const PanelCocineras = () => {
 													</div>
 												))}
 										</div>
-										<p>Fecha de entrega: {pedido.fecha_entrega ? format(new Date(pedido.fecha_entrega), "dd/MM/yyyy") : "Sin fecha definida"}</p>
+										<p>
+											Fecha de entrega:{' '}
+											{pedido.fecha_entrega
+												? format(
+														parse(pedido.fecha_entrega, 'yyyy-MM-dd', new Date()),
+														'dd/MM/yyyy',
+												  )
+												: 'Sin fecha definida'}
+										</p>
 									</div>
 								</PedidoItem>
 							))

@@ -8,6 +8,7 @@ const TransferenciaModal = ({
 	setMostrarModalTransferencia,
 	pedidoId,
 	direccionId,
+	fechaEnvio,
 	token,
 	dispatch,
 }) => {
@@ -16,7 +17,7 @@ const TransferenciaModal = ({
 
 	const handleTransferencia = async () => {
 		try {
-			finalizarPedido(pedidoId, 1, '', direccionId, token).then((data) => {
+			finalizarPedido(pedidoId, 1, '', direccionId, fechaEnvio, token).then((data) => {
 				setEstadoMensaje(
 					'Pedido ingresado correctamente! Se encuentra pendiente de confirmación de pago. Por favor envíe el comprobante por WhatsApp al número +598 91123456.',
 				);
