@@ -7,7 +7,7 @@ export const crearPermiso = async (endpoint, tipo, rolId, token) => {
   body = {
     endpoint: endpoint,
     tipo: tipo,
-    rolId : rolId
+    rol_id : rolId
   };
 
   try {

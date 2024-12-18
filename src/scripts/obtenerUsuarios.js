@@ -1,4 +1,4 @@
-import { setUsuarios } from '../store/usuarioSlice';
+import { setUsuarios } from '../store/usuariosSlice';
 
 export const obtenerUsuarios  = async (dispatch, token) => {
   let url = "/usuarios";

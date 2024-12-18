@@ -75,13 +75,12 @@ const PermissionsManagement = () => {
   };
 
   const handleSavePermiso = () => {
-    if (newPermiso.nombre && newPermiso.descripcion) {
+    if (newPermiso.endpoint && newPermiso.tipo && newPermiso.rol_id) {
       if (newPermiso.id === null) {
         const permisoToAdd = { ...newPermiso };
         dispatch(addPermiso(permisoToAdd));
 
         crearPermiso(
-          newPermiso.id,
           newPermiso.endpoint,
           newPermiso.tipo,
           newPermiso.rol_id,

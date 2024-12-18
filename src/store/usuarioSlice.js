@@ -7,9 +7,6 @@ const usuarioSlice = createSlice({
     userInfo: null,
   },
   reducers: {
-    setUsuarios: (state, action) => {
-      return action.payload;
-    },
     login: (state, action) => {
       state.isLoggedIn = true;
       state.userInfo = action.payload;
@@ -17,23 +14,9 @@ const usuarioSlice = createSlice({
     logout: (state) => {
       state.isLoggedIn = false;
       state.userInfo = null;
-    },
-    addUsuario: (state, action) => {
-      state.push(action.payload);
-    },
-    updateUsuario: (state, action) => {
-      const index = state.findIndex(
-        (usuario) => usuario.id === action.payload.id
-      );
-      if (index !== -1) {
-        state[index] = action.payload;
-      }
-    },
-    deleteUsuario: (state, action) => {
-      return state.filter((usuario) => usuario.id !== action.payload);
-    },
+    }
   },
 });
 
-export const { setUsuarios, login, logout, addUsuario, updateUsuario, deleteUsuario } = usuarioSlice.actions;
+export const { login, logout } = usuarioSlice.actions;
 export default usuarioSlice.reducer;

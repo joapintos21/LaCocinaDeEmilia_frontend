@@ -65,7 +65,7 @@ export default () => {
             marginBottom: 4,
           }}
         >
-          Panel de Administrador
+          Panel de Administradorr
         </Typography>
 
         <Grid container spacing={4}>

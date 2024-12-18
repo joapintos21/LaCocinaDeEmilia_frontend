@@ -8,7 +8,7 @@ export const crearUsuario = async (emailInput, passwordInput, nombreInput, telef
     password: passwordInput,
     nombre: nombreInput,
     telefono: telefonoInput, 
-    rol_id: rolIdInput
+    rol_id: parseInt(rolIdInput)
   };
 
   try {

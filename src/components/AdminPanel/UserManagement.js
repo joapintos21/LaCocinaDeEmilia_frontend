@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addUsuario,
-  updateUsuario,
-  deleteUsuario,
-} from "store/usuarioSlice"; // Asegúrate de que las acciones estén correctamente definidas en el slice
+import { addUsuario, updateUsuario, deleteUsuario } from "store/usuariosSlice"; // Asegúrate de que las acciones estén correctamente definidas en el slice
 import { crearUsuario } from "scripts/crearUsuario";
 import { actualizarUsuario } from "scripts/actualizarUsuario";
 import { borrarUsuario } from "scripts/borrarUsuario";
@@ -33,30 +29,43 @@ import { obtenerUsuarios } from "scripts/obtenerUsuarios";
 const UserManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-
+  const fetchUsuarios = async () => {
+    await obtenerUsuarios(dispatch, sessionStorage.getItem("token"));
+  };
   const usuarios = useSelector((state) => state.usuarios || []);
 
   const [open, setOpen] = useState(false);
-  const [newUsuario, setNewUsuario] = useState({ id: null, nombre: "", email: "" });
+  const [newUsuario, setNewUsuario] = useState({
+    id: null,
+    nombre: "",
+    email: "",
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchEmail, setSearchEmail] = useState("");
 
   useEffect(() => {
-
     try {
-      const fetchUsuarios = async () => {
-        await obtenerUsuarios(dispatch, sessionStorage.getItem("token")); 
-      };
       fetchUsuarios();
-
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
     setError(""); // Limpiamos el error
   }, [dispatch]);
 
   const handleOpen = (usuario = null) => {
-    setNewUsuario(usuario ? { ...usuario } : { id: null, nombre: "", email: "", telefono: "", rol : "" });
+    setNewUsuario(
+      usuario
+        ? { ...usuario }
+        : {
+            id: null,
+            nombre: "",
+            password: "",
+            email: "",
+            telefono: "",
+            rol: "",
+            status: "",
+          }
+    );
     setOpen(true);
   };
 
@@ -70,35 +79,61 @@ const UserManagement = () => {
   };
 
   const handleSaveUsuario = () => {
-    if (newUsuario.nombre && newUsuario.email && newUsuario.telefono && newUsuario.rol) {
+    if (
+      newUsuario.nombre &&
+      newUsuario.email &&
+      newUsuario.telefono &&
+      newUsuario.rol
+    ) {
       if (newUsuario.id === null) {
         const usuarioToAdd = { ...newUsuario };
         dispatch(addUsuario(usuarioToAdd));
 
-        crearUsuario(newUsuario.nombre, newUsuario.email, sessionStorage.getItem("token"))
+        crearUsuario(
+          newUsuario.email,
+          newUsuario.password,
+          newUsuario.nombre,
+          newUsuario.telefono,
+          newUsuario.rol,
+          sessionStorage.getItem("token")
+        )
           .then((data) => console.log("Usuario agregado:", data))
           .catch((error) => {
             console.error("Error al crear el usuario:", error.message);
             setError(error.message);
           });
+        fetchUsuarios();
       } else {
-        actualizarUsuario(
-          newUsuario.id,
-          newUsuario.nombre,
-          newUsuario.email,
-          newUsuario.telefono,
-          newUsuario.rol,
-          sessionStorage.getItem("token")
-        )
-          .then((data) => console.log("Usuario actualizado:", data))
-          .catch((error) => {
-            console.error("Error al actualizar el usuario:", error.message);
-            setError(error.message);
-          });
-        dispatch(updateUsuario(newUsuario));
+        if (newUsuario.status) {
+          actualizarUsuario(
+            newUsuario.id,
+            newUsuario.telefono,
+            newUsuario.nombre,
+            newUsuario.email,
+            newUsuario.rol,
+            newUsuario.status,
+            sessionStorage.getItem("token")
+          )
+            .then((data) => console.log("Usuario actualizado:", data))
+            .catch((error) => {
+              console.error("Error al actualizar el usuario:", error.message);
+              setError(error.message);
+            });
+          dispatch(updateUsuario(newUsuario));
+          fetchUsuarios();
+        } else {
+          setError("Por favor, complete todos los campos.");
+        }
       }
 
-      setNewUsuario({ nombre: "", email: "" , telefono : "", rol : ""});
+      setNewUsuario({
+        nombre: "",
+        password: "",
+        email: "",
+        telefono: "",
+        rol: "",
+        status: "",
+      });
       handleClose();
     } else {
       setError("Por favor, complete todos los campos.");
@@ -113,9 +148,9 @@ const UserManagement = () => {
         setError(error.message);
       });
     dispatch(deleteUsuario(id));
+    fetchUsuarios();
   };
 
-  // Filtra los usuarios asegurándote de que `usuarios` es un array
   const filteredUsuarios = Array.isArray(usuarios)
     ? usuarios.filter((usuario) => {
         return (
@@ -127,11 +162,20 @@ const UserManagement = () => {
 
   return (
     <div style={{ marginTop: "20px" }}>
-      {/* Barra de búsqueda y botón "Agregar" */}
-      <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: "2px solid #ccc" }}>
+      <Box
+        sx={{
+          marginBottom: 2,
+          paddingBottom: 2,
+          borderBottom: "2px solid #ccc",
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={2} md={1}>
-          <Button variant="contained" color="success" onClick={() => handleOpen()}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => handleOpen()}
+            >
               <AddIcon />
             </Button>
           </Grid>
@@ -173,7 +217,10 @@ const UserManagement = () => {
       </Box>
 
       {/* Tabla de usuarios */}
-      <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
+      <TableContainer
+        component={Paper}
+        sx={{ maxHeight: 400, overflow: "auto" }}
+      >
         <Table>
           <TableHead sx={{ position: "sticky", top: 0 }}>
             <TableRow>
@@ -224,7 +271,9 @@ const UserManagement = () => {
 
       {/* Formulario de usuario */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newUsuario.id ? "Editar Usuario" : "Agregar Usuario"}</DialogTitle>
+        <DialogTitle>
+          {newUsuario.id ? "Editar Usuario" : "Agregar Usuario"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             label="Nombre"
@@ -243,6 +292,14 @@ const UserManagement = () => {
             sx={{ marginBottom: 2 }}
           />
           <TextField
+            label="Contraseña"
+            name="password"
+            value={newUsuario.contrasena}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
             label="Telefono"
             name="telefono"
             value={newUsuario.telefono}
@@ -253,7 +310,15 @@ const UserManagement = () => {
           <TextField
             label="Rol"
             name="rol"
-            value={newUsuario.telefono}
+            value={newUsuario.rol}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Status"
+            name="status"
+            value={newUsuario.status}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}

@@ -68,12 +68,13 @@ const DiscountManagement = () => {
   };
 
   const handleSaveDescuento = () => {
-    if (newDescuento.tipo && newDescuento.valor && newDescuento.fechaInicio && newDescuento.fechaFin && newDescuento.descripcion) {
+    if (newDescuento.valor && newDescuento.fechaInicio && newDescuento.fechaFin && newDescuento.descripcion) {
       if (newDescuento.id === null) {
         const descuentoToAdd = { ...newDescuento };
         dispatch(addDescuento(descuentoToAdd));
 
         crearDescuento(
+          newDescuento.valor,
           newDescuento.fechaInicio,
           newDescuento.fechaFin,
           newDescuento.descripcion,
@@ -84,9 +85,11 @@ const DiscountManagement = () => {
             console.error("Error al crear el descuento:", error.message);
             setError(error.message);
           });
+          fetchDescuentos();
       } else {
         actualizarDescuento(
           newDescuento.id,
+          newDescuento.valor,
           newDescuento.fechaInicio,
           newDescuento.fechaFin,
           newDescuento.descripcion,
@@ -98,9 +101,10 @@ const DiscountManagement = () => {
             setError(error.message);
           });
         dispatch(updateDescuento(newDescuento));
+        fetchDescuentos();
       }
 
-      setNewDescuento({ nombre: "", descripcion: "", porcentaje: "" });
+      setNewDescuento({ valor: "", fechaInicio: "", fechaFin: "", descripcion : "" });
       handleClose();
     } else {
       setError("Por favor, complete todos los campos.");
@@ -115,6 +119,7 @@ const DiscountManagement = () => {
         setError(error.message);
       });
     dispatch(deleteDescuento(id));
+    fetchDescuentos();
   };
 
   // Filtra los descuentos asegurándote de que `descuentos` es un array
@@ -221,7 +226,6 @@ const DiscountManagement = () => {
           <TextField
             label="Fecha de Inicio"
             name="fechaInicio"
-            type="date"
             value={newDescuento.fechaInicio}
             onChange={handleInputChange}
             fullWidth
@@ -230,7 +234,6 @@ const DiscountManagement = () => {
           <TextField
             label="Fecha de Fin"
             name="fechaFin"
-            type="date"
             value={newDescuento.fechaFin}
             onChange={handleInputChange}
             fullWidth
