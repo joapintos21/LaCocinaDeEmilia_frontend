@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  addProduct,
-  updateProduct,
-  deleteProduct,
-} from 'store/productoSlice';
-import { crearProducto } from 'scripts/crearProducto';
-import { actualizarProducto } from 'scripts/actualizarProducto';
-import { borrarProducto } from 'scripts/borrarProducto';
-import { obtenerProductos } from 'scripts/obtenerProductosCategoria'; 
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct, updateProduct, deleteProduct } from "store/productoSlice";
+import { crearProducto } from "scripts/crearProducto";
+import { actualizarProducto } from "scripts/actualizarProducto";
+import { borrarProducto } from "scripts/borrarProducto";
+import { obtenerProductos } from "scripts/obtenerProductosCategoria";
 import {
   Table,
   TableBody,
@@ -28,38 +24,37 @@ import {
   InputAdornment,
   FormControlLabel,
   Checkbox,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add'; 
-import SearchIcon from '@mui/icons-material/Search';
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
 
 const ProductManagement = () => {
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const productos = useSelector((state) => state.productos);
-  const categorias = useSelector((state) => state.categorias); // Asumimos que las categorías están en Redux
+  const categorias = useSelector((state) => state.categorias);
   const fetchProductos = async () => {
     await obtenerProductos(dispatch);
   };
   const [open, setOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
     id: null,
-    descripcion: '',
-    precio: '',
-    categoria: '',
+    descripcion: "",
+    precio: "",
+    categoria: "",
     visible: true,
   });
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
- useEffect(() => {
-
+  useEffect(() => {
     try {
-      fetchProductos(); 
+      fetchProductos();
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
     setError("");
   }, []);
@@ -70,9 +65,9 @@ const ProductManagement = () => {
     } else {
       setNewProduct({
         id: null,
-        descripcion: '',
-        precio: '',
-        categoria: '',
+        descripcion: "",
+        precio: "",
+        categoria: "",
         visible: true,
       });
     }
@@ -94,50 +89,63 @@ const ProductManagement = () => {
 
   const handleSaveProduct = () => {
     if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
-  
-
       if (newProduct.id === null) {
-        crearProducto(newProduct.descripcion, newProduct.precio, newProduct.categoria, newProduct.visible, sessionStorage.getItem("token"))
+        crearProducto(
+          newProduct.descripcion,
+          newProduct.precio,
+          newProduct.categoria,
+          newProduct.visible,
+          sessionStorage.getItem("token")
+        )
           .then((data) => {
             if (data && data.id) {
               fetchProductos();
-              console.log('Producto creado:', data);
+              console.log("Producto creado:", data);
             } else {
-              setError('Error al crear el producto en la base de datos.');
+              setError("Error al crear el producto en la base de datos.");
             }
-            
           })
           .catch((error) => {
-            console.error('Error al crear el producto:', error.message);
+            console.error("Error al crear el producto:", error.message);
             setError(error.message);
           });
-          
       } else {
-
-        actualizarProducto(newProduct.id, newProduct.descripcion, parseFloat(newProduct.precio), parseInt(newProduct.categoria), newProduct.visible, sessionStorage.getItem("token"))
+        actualizarProducto(
+          newProduct.id,
+          newProduct.descripcion,
+          parseFloat(newProduct.precio),
+          parseInt(newProduct.categoria),
+          newProduct.visible,
+          sessionStorage.getItem("token")
+        )
           .then((data) => {
-            console.log('Producto actualizado:', data);
+            console.log("Producto actualizado:", data);
           })
           .catch((error) => {
-            console.error('Error al actualizar el producto:', error.message);
+            console.error("Error al actualizar el producto:", error.message);
             setError(error.message);
           });
-          fetchProductos();
+        fetchProductos();
       }
-      setNewProduct({ descripcion: '', precio: '', categoria: '', visible: true });
+      setNewProduct({
+        descripcion: "",
+        precio: "",
+        categoria: "",
+        visible: true,
+      });
       handleClose();
     } else {
-      setError('Por favor, complete todos los campos.');
+      setError("Por favor, complete todos los campos.");
     }
   };
 
   const handleDelete = (id) => {
     borrarProducto(id, sessionStorage.getItem("token"))
       .then((data) => {
-        console.log('Producto eliminado:', data);
+        console.log("Producto eliminado:", data);
       })
       .catch((error) => {
-        console.error('Error al eliminar el producto:', error.message);
+        console.error("Error al eliminar el producto:", error.message);
         setError(error.message);
       });
     dispatch(deleteProduct(id));
@@ -145,29 +153,46 @@ const ProductManagement = () => {
   };
 
   const filteredProducts = productos.filter((product) => {
-    const matchesSearchTerm =
-      product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearchTerm = product.descripcion
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory
-      ? product.categoria?.titulo?.toLowerCase().includes(selectedCategory.toLowerCase())
+      ? product.categoria?.titulo
+          ?.toLowerCase()
+          .includes(selectedCategory.toLowerCase())
       : true;
     const matchesMinPrice = minPrice ? product.precio >= minPrice : true;
     const matchesMaxPrice = maxPrice ? product.precio <= maxPrice : true;
 
     return (
-      matchesSearchTerm &&
-      matchesCategory &&
-      matchesMinPrice &&
-      matchesMaxPrice
+      matchesSearchTerm && matchesCategory && matchesMinPrice && matchesMaxPrice
     );
   });
 
   return (
-    <div style={{ marginTop: '20px' }}>
+    <div style={{ marginTop: "20px" }}>
       {/* Filtros y búsqueda */}
-      <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: '2px solid #ccc', position: 'relative' }}>
+      <Box
+        sx={{
+          marginBottom: 2,
+          paddingBottom: 2,
+          borderBottom: "2px solid #ccc",
+          position: "relative",
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={2} md={1} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <Button variant="contained" color="success" onClick={() => handleOpen()}>
+          <Grid
+            item
+            xs={12}
+            sm={2}
+            md={1}
+            sx={{ display: "flex", justifyContent: "flex-start" }}
+          >
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => handleOpen()}
+            >
               <AddIcon />
             </Button>
           </Grid>
@@ -223,9 +248,19 @@ const ProductManagement = () => {
       </Box>
 
       {/* Tabla de productos */}
-      <TableContainer component={Paper} sx={{ maxHeight: 400, overflowY: 'auto' }}>
+      <TableContainer
+        component={Paper}
+        sx={{ maxHeight: 400, overflowY: "auto" }}
+      >
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#FFFFFF", zIndex: 1 }}>
+          <TableHead
+            sx={{
+              position: "sticky",
+              top: 0,
+              backgroundColor: "#FFFFFF",
+              zIndex: 1,
+            }}
+          >
             <TableRow>
               <TableCell>Descripción</TableCell>
               <TableCell>Precio</TableCell>
@@ -235,25 +270,37 @@ const ProductManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredProducts.length > 0 ? 
+            {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.descripcion}</TableCell>
                   <TableCell>{product.precio}</TableCell>
                   <TableCell>{product.categoria?.titulo}</TableCell>
-                  <TableCell>{product.visible ? 'Sí' : 'No'}</TableCell>
+                  <TableCell>{product.visible ? "Sí" : "No"}</TableCell>
                   <TableCell>
-                    <Button variant="outlined" sx={{ marginRight: 2 }} color="primary" onClick={() => handleOpen(product) }>
+                    <Button
+                      variant="outlined"
+                      sx={{ marginRight: 2 }}
+                      color="primary"
+                      onClick={() => handleOpen(product)}
+                    >
                       Editar
                     </Button>
-                    <Button variant="outlined" color="secondary" onClick={() => handleDelete(product.id)}>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDelete(product.id)}
+                    >
                       Eliminar
                     </Button>
                   </TableCell>
                 </TableRow>
-              )) : (
+              ))
+            ) : (
               <TableRow>
-                <TableCell colSpan={5} style={{ textAlign: 'center' }}>No hay productos disponibles.</TableCell>
+                <TableCell colSpan={5} style={{ textAlign: "center" }}>
+                  No hay productos disponibles.
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -262,29 +309,31 @@ const ProductManagement = () => {
 
       {/* Diálogo para agregar/editar producto */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</DialogTitle>
+        <DialogTitle>
+          {newProduct.id ? "Editar Producto" : "Nuevo Producto"}
+        </DialogTitle>
         <DialogContent>
+          Descripción
           <TextField
-            label="Descripción"
             name="descripcion"
             variant="outlined"
             value={newProduct.descripcion}
             onChange={handleInputChange}
             fullWidth
-            style={{ marginBottom: '10px' }}
+            style={{ marginBottom: "10px" }}
           />
+          Precio
           <TextField
-            label="Precio"
             name="precio"
             variant="outlined"
             value={newProduct.precio}
             onChange={handleInputChange}
             fullWidth
             type="number"
-            style={{ marginBottom: '10px' }}
+            style={{ marginBottom: "10px" }}
           />
+          Categoría
           <TextField
-            label="Categoría"
             name="categoria"
             variant="outlined"
             value={newProduct.categoria}
@@ -294,7 +343,7 @@ const ProductManagement = () => {
             SelectProps={{
               native: true,
             }}
-            style={{ marginBottom: '10px' }}
+            style={{ marginBottom: "10px" }}
           >
             <option value="">Seleccionar categoría</option>
             {categorias.map((categoria) => (
@@ -321,7 +370,7 @@ const ProductManagement = () => {
             Cancelar
           </Button>
           <Button onClick={handleSaveProduct} color="primary">
-            {newProduct.id ? 'Guardar cambios' : 'Agregar producto'}
+            {newProduct.id ? "Guardar cambios" : "Agregar producto"}
           </Button>
         </DialogActions>
       </Dialog>

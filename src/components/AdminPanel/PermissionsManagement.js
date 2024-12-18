@@ -5,10 +5,10 @@ import {
   addPermiso,
   updatePermiso,
   deletePermiso,
-} from "store/permisoSlice"; // Asegúrate de crear las acciones correspondientes en tu slice
-import { crearPermiso } from "scripts/crearPermiso"; // Función para crear permiso
-import { actualizarPermiso } from "scripts/actualizarPermiso"; // Función para actualizar permiso
-import { borrarPermiso } from "scripts/borrarPermiso"; // Función para eliminar permiso
+} from "store/gestionPermisosSlice"; 
+import { crearPermiso } from "scripts/crearPermiso"; 
+import { actualizarPermiso } from "scripts/actualizarPermiso"; 
+import { borrarPermiso } from "scripts/borrarPermiso"; 
 import {
   Table,
   TableBody,
@@ -28,39 +28,48 @@ import {
   Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import AddIcon from "@mui/icons-material/Add"; // Importamos el ícono "+" (Add)
+import AddIcon from "@mui/icons-material/Add";
 import { obtenerPermisos } from "scripts/obtenerPermisos";
+import { obtenerRolesUsuario } from "scripts/obtenerRolesUsuario";
 
 const PermissionsManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-  
-  // Asegúrate de que `permisos` tenga un valor por defecto (un array vacío)
-  const permisos = useSelector((state) => state.permisos || []); // Usamos un array vacío como valor por defecto
+  const fetchPermisos = async () => {
+    await obtenerPermisos(dispatch, sessionStorage.getItem("token"));
+  };
+  const fetchRolesUsuario = async () => {
+    await obtenerRolesUsuario(dispatch, sessionStorage.getItem("token"));
+  };
 
   const [open, setOpen] = useState(false);
-  const [newPermiso, setNewPermiso] = useState({ id: null, nombre: "", descripcion: "" });
+  const [newPermiso, setNewPermiso] = useState({
+    id: null,
+    endpoint: null,
+    tipo: null,
+    rol_id: null,
+  });
   const [searchEndpoint, setSearchEndpoint] = useState("");
   const [searchTipo, setSearchTipo] = useState("");
 
   useEffect(() => {
     try {
-      const fetchPermisos = async () => {
-        await obtenerPermisos(dispatch, sessionStorage.getItem("token")); 
-      };
       fetchPermisos();
-
+      fetchRolesUsuario();
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-    setError(""); 
+    setError("");
   }, [dispatch]);
+
+  const permisos = useSelector((state) => state.gestionPermisos || []);
+  const roles = useSelector((state) => state.rolesUsuario || []);
 
   const handleOpen = (permiso = null) => {
     if (permiso) {
       setNewPermiso({ ...permiso });
     } else {
-      setNewPermiso({ id: null, endpoint: null, tipo : null, rol_id: "" });
+      setNewPermiso({ id: null, endpoint: null, tipo: null, rol_id: "" });
     }
     setOpen(true);
   };
@@ -78,8 +87,8 @@ const PermissionsManagement = () => {
     if (newPermiso.endpoint && newPermiso.tipo && newPermiso.rol_id) {
       if (newPermiso.id === null) {
         const permisoToAdd = { ...newPermiso };
-        dispatch(addPermiso(permisoToAdd));
-
+        //dispatch(addPermiso(permisoToAdd));
+      
         crearPermiso(
           newPermiso.endpoint,
           newPermiso.tipo,
@@ -88,6 +97,8 @@ const PermissionsManagement = () => {
         )
           .then((data) => {
             console.log("Permiso agregado:", data);
+            fetchPermisos();
+          fetchRolesUsuario();
           })
           .catch((error) => {
             console.error("Error al crear el permiso:", error.message);
@@ -103,15 +114,18 @@ const PermissionsManagement = () => {
         )
           .then((data) => {
             console.log("Permiso actualizado:", data);
+            fetchPermisos();
+            fetchRolesUsuario();
           })
           .catch((error) => {
             console.error("Error al actualizar el permiso:", error.message);
             setError(error.message);
           });
-        dispatch(updatePermiso(newPermiso));
+          //dispatch(updatePermiso(newPermiso));
+          
       }
 
-      setNewPermiso({ endpoint : "", tipo: "", rol_id : "" });
+      setNewPermiso({ endpoint: "", tipo: "", rol_id: "" });
       handleClose();
     } else {
       setError("Por favor, complete todos los campos.");
@@ -122,6 +136,8 @@ const PermissionsManagement = () => {
     borrarPermiso(id, sessionStorage.getItem("token"))
       .then((data) => {
         console.log("Permiso eliminado:", data);
+        fetchPermisos();
+        fetchRolesUsuario();
       })
       .catch((error) => {
         console.error("Error al eliminar el permiso:", error.message);
@@ -130,11 +146,12 @@ const PermissionsManagement = () => {
     dispatch(deletePermiso(id));
   };
 
-  // Filtramos permisos solo si permisos es un array (prevención de errores)
   const filteredPermisos = Array.isArray(permisos)
     ? permisos.filter((permiso) => {
         return (
-          permiso.endpoint.toLowerCase().includes(searchEndpoint.toLowerCase()) &&
+          permiso.endpoint
+            .toLowerCase()
+            .includes(searchEndpoint.toLowerCase()) &&
           permiso.tipo.toLowerCase().includes(searchTipo.toLowerCase())
         );
       })
@@ -142,17 +159,24 @@ const PermissionsManagement = () => {
 
   return (
     <div style={{ marginTop: "20px" }}>
-      {/* Barra de búsqueda y botón "Agregar" */}
-      <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: "2px solid #ccc" }}>
+      <Box
+        sx={{
+          marginBottom: 2,
+          paddingBottom: 2,
+          borderBottom: "2px solid #ccc",
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
-          {/* Coloca el botón de agregar a la izquierda */}
           <Grid item xs={12} sm={2} md={1}>
-          <Button variant="contained" color="success" onClick={() => handleOpen()}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => handleOpen()}
+            >
               <AddIcon />
             </Button>
           </Grid>
 
-          {/* Buscador por nombre */}
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="Buscar por funcion"
@@ -189,14 +213,17 @@ const PermissionsManagement = () => {
         </Grid>
       </Box>
 
-      {/* Tabla de permisos con Scrollbar */}
-      <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
+      <TableContainer
+        component={Paper}
+        sx={{ maxHeight: 400, overflow: "auto" }}
+      >
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0 }}>
+          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#FFFFFF", zIndex: 1  }}>
             <TableRow>
-              <TableCell>Endpoint</TableCell>
+              <TableCell>Permiso</TableCell>
               <TableCell>Tipo</TableCell>
               <TableCell>Rol</TableCell>
+              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -205,7 +232,7 @@ const PermissionsManagement = () => {
                 <TableRow key={permiso.id}>
                   <TableCell>{permiso.endpoint}</TableCell>
                   <TableCell>{permiso.tipo}</TableCell>
-                  <TableCell>{permiso.rol_id}</TableCell>
+                  <TableCell>{permiso.rol}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -236,34 +263,74 @@ const PermissionsManagement = () => {
         </Table>
       </TableContainer>
 
-      {/* Formulario para agregar o editar permiso */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newPermiso.id ? "Editar Permiso" : "Agregar Permiso"}</DialogTitle>
+        <DialogTitle>
+          {newPermiso.id ? "Editar Permiso" : "Agregar Permiso"}
+        </DialogTitle>
         <DialogContent>
+          Permiso
           <TextField
-            label="Endpoint"
             name="endpoint"
-            value={newPermiso.nombre}
+            variant="outlined"
+            value={newPermiso.endpoint}
             onChange={handleInputChange}
             fullWidth
-            sx={{ marginBottom: 2 }}
-          />
+            select
+            SelectProps={{
+              native: true,
+            }}
+            style={{ marginBottom: "10px" }}
+          >
+            <option value="">Seleccionar permiso</option>
+            <option value={"carrito"}>Carrito</option>
+            <option value={"usuarios"}>Usuarios</option>
+            <option value={"packs"}>Packs</option>
+            <option value={"descuentos"}>Descuentos</option>
+            <option value={"direcciones"}>Direcciones</option>
+            <option value={"categorias"}>Categorias</option>
+            <option value={"pedidos"}>Pedidos</option>
+            <option value={"permisos"}>Permisos</option>
+            <option value={"adicionales"}>Adicionales</option>
+            <option value={"pagos"}>Pagos</option>
+            <option value={"productos"}>Productos</option>
+          </TextField>
+          Tipo de permiso
           <TextField
-            label="Tipo"
             name="tipo"
-            value={newPermiso.descripcion}
+            variant="outlined"
+            value={newPermiso.tipo}
             onChange={handleInputChange}
             fullWidth
-            sx={{ marginBottom: 2 }}
-          />
-           <TextField
-            label="Rol"
+            select
+            SelectProps={{
+              native: true,
+            }}
+            style={{ marginBottom: "10px" }}
+          >
+            <option value="">Seleccionar tipo de permiso</option>
+            <option value={"ESCRITURA"}>Escritura</option>
+            <option value={"LECTURA"}>Lectura</option>
+          </TextField>
+          Rol
+          <TextField
             name="rol_id"
-            value={newPermiso.descripcion}
+            variant="outlined"
+            value={newPermiso.rol_id}
             onChange={handleInputChange}
             fullWidth
-            sx={{ marginBottom: 2 }}
-          />
+            select
+            SelectProps={{
+              native: true,
+            }}
+            style={{ marginBottom: "10px" }}
+          >
+            <option value="">Seleccionar rol</option>
+            {roles.map((rol) => (
+              <option key={rol.id} value={rol.id}>
+                {rol.nombre}
+              </option>
+            ))}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">

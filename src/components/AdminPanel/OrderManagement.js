@@ -118,7 +118,7 @@ const OrderManagement = () => {
       {/* Tabla de pedidos */}
       <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0 }}>
+          <TableHead sx={{ position: "sticky", top: 0 , backgroundColor: "#FFFFFF" }}>
             <TableRow>
               <TableCell>Cliente</TableCell>
               <TableCell>Artículos</TableCell>
@@ -169,24 +169,24 @@ const OrderManagement = () => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{isEditing ? "Editar Pedido" : "Agregar Pedido"}</DialogTitle>
         <DialogContent>
+        Nombre del Cliente
           <TextField
-            label="Nombre del Cliente"
             name="customerName"
             value={currentOrder.customerName}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Artículos
           <TextField
-            label="Artículos"
             name="items"
             value={currentOrder.items}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Total
           <TextField
-            label="Total"
             name="total"
             type="number"
             value={currentOrder.total}

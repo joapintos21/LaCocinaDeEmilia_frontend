@@ -1,11 +1,11 @@
-export const actualizarDescuento = async (id, valor, fechaInicio, fechaFin, descripcion, token) => {
+export const actualizarDescuento = async (id, tipoId, valor, fechaInicio, fechaFin, descripcion, token) => {
     const url = `/descuentos/update/${id}`;  
   
     const body = {
-      tipo_id: 1, //Ajustar para manejar varios tipos de descuentos
+      tipo_id: parseInt(tipoId), 
       valor: parseFloat(valor),
-      fechaInicio: fechaInicio,
-      fechaFin: fechaFin,
+      fechainicio: fechaInicio,
+      fechafin: fechaFin,
       descripcion: descripcion
     };
   

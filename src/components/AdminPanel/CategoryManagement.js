@@ -233,16 +233,16 @@ const CategoryManagement = () => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{newCategory.id ? "Editar Categoría" : "Agregar Categoría"}</DialogTitle>
         <DialogContent>
+          Titulo
           <TextField
-            label="Título"
             name="titulo"
             value={newCategory.titulo}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Descripción
           <TextField
-            label="Descripción"
             name="descripcion"
             value={newCategory.descripcion}
             onChange={handleInputChange}

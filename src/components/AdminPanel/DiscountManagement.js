@@ -4,10 +4,11 @@ import {
   addDescuento,
   updateDescuento,
   deleteDescuento,
-} from "store/descuentoSlice"; // Asegúrate de que las acciones estén correctamente definidas en el slice
-import { crearDescuento } from "scripts/crearDescuento"; // Función para crear descuento
-import { actualizarDescuento } from "scripts/actualizarDescuento"; // Función para actualizar descuento
-import { borrarDescuento } from "scripts/borrarDescuento"; // Función para eliminar descuento
+} from "store/descuentoSlice";
+import { obtenerTiposDescuento } from "scripts/obtenerTiposDescuento";
+import { crearDescuento } from "scripts/crearDescuento";
+import { actualizarDescuento } from "scripts/actualizarDescuento";
+import { borrarDescuento } from "scripts/borrarDescuento";
 import {
   Table,
   TableBody,
@@ -34,27 +35,48 @@ const DiscountManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const fetchDescuentos = async () => {
-    await obtenerDescuentos(dispatch, sessionStorage.getItem("token")); // Llama al script para cargar los descuentos en Redux
+    await obtenerDescuentos(dispatch, sessionStorage.getItem("token"));
+  };
+  const fetchTiposDescuento = async () => {
+    await obtenerTiposDescuento(dispatch, sessionStorage.getItem("token"));
   };
   const [open, setOpen] = useState(false);
-  const [newDescuento, setNewDescuento] = useState({ id: null, tipo: "", valor: "", fechaInicio: "", fechaFin: "" , descripcion: "" });
+  const [newDescuento, setNewDescuento] = useState({
+    id: null,
+    tipo: "",
+    valor: "",
+    fechaInicio: "",
+    fechaFin: "",
+    descripcion: "",
+  });
   const [searchDescripcion, setSearchDescripcion] = useState("");
-  
-  useEffect(() => {
 
+  useEffect(() => {
     try {
-      fetchDescuentos(); 
+      fetchDescuentos();
+      fetchTiposDescuento();
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
     setError("");
   }, []);
 
-  // Obtén los descuentos del store; si no están disponibles, usa un array vacío
   const descuentos = useSelector((state) => state.descuentos || []);
+  const tiposDescuento = useSelector((state) => state.tiposDescuento || []);
 
   const handleOpen = (descuento = null) => {
-    setNewDescuento(descuento ? { ...descuento } : { id: null, tipo: "", valor: "", fechaInicio: "", fechaFin: "" , descripcion: "" });
+    setNewDescuento(
+      descuento
+        ? { ...descuento }
+        : {
+            id: null,
+            tipo: "",
+            valor: "",
+            fechaInicio: "",
+            fechaFin: "",
+            descripcion: "",
+          }
+    );
     setOpen(true);
   };
 
@@ -68,43 +90,61 @@ const DiscountManagement = () => {
   };
 
   const handleSaveDescuento = () => {
-    if (newDescuento.valor && newDescuento.fechaInicio && newDescuento.fechaFin && newDescuento.descripcion) {
+    if (
+      newDescuento.tipo &&
+      newDescuento.valor &&
+      newDescuento.fechaInicio &&
+      newDescuento.fechaFin &&
+      newDescuento.descripcion
+    ) {
       if (newDescuento.id === null) {
         const descuentoToAdd = { ...newDescuento };
         dispatch(addDescuento(descuentoToAdd));
 
         crearDescuento(
+          newDescuento.tipo,
           newDescuento.valor,
           newDescuento.fechaInicio,
           newDescuento.fechaFin,
           newDescuento.descripcion,
           sessionStorage.getItem("token")
         )
-          .then((data) => console.log("Descuento agregado:", data))
+          .then((data) => {
+            console.log("Descuento agregado:", data);
+            fetchDescuentos();
+          })
           .catch((error) => {
             console.error("Error al crear el descuento:", error.message);
             setError(error.message);
           });
-          fetchDescuentos();
       } else {
         actualizarDescuento(
           newDescuento.id,
+          newDescuento.tipo,
           newDescuento.valor,
           newDescuento.fechaInicio,
           newDescuento.fechaFin,
           newDescuento.descripcion,
           sessionStorage.getItem("token")
         )
-          .then((data) => console.log("Descuento actualizado:", data))
+          .then((data) => {
+            fetchDescuentos();
+            console.log("Descuento actualizado:", data);
+          })
           .catch((error) => {
             console.error("Error al actualizar el descuento:", error.message);
             setError(error.message);
           });
         dispatch(updateDescuento(newDescuento));
-        fetchDescuentos();
       }
 
-      setNewDescuento({ valor: "", fechaInicio: "", fechaFin: "", descripcion : "" });
+      setNewDescuento({
+        valor: "",
+        fechaInicio: "",
+        fechaFin: "",
+        descripcion: "",
+        tipo: ""
+      });
       handleClose();
     } else {
       setError("Por favor, complete todos los campos.");
@@ -125,19 +165,29 @@ const DiscountManagement = () => {
   // Filtra los descuentos asegurándote de que `descuentos` es un array
   const filteredDescuentos = Array.isArray(descuentos)
     ? descuentos.filter((descuento) => {
-        return (
-          descuento.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
-        );
+        return descuento.descripcion
+          .toLowerCase()
+          .includes(searchDescripcion.toLowerCase());
       })
     : [];
 
   return (
     <div style={{ marginTop: "20px" }}>
       {/* Barra de búsqueda y botón "Agregar" */}
-      <Box sx={{ marginBottom: 2, paddingBottom: 2, borderBottom: "2px solid #ccc" }}>
+      <Box
+        sx={{
+          marginBottom: 2,
+          paddingBottom: 2,
+          borderBottom: "2px solid #ccc",
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={2} md={1}>
-          <Button variant="contained" color="success" onClick={() => handleOpen()}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => handleOpen()}
+            >
               <AddIcon />
             </Button>
           </Grid>
@@ -162,23 +212,29 @@ const DiscountManagement = () => {
       </Box>
 
       {/* Tabla de descuentos */}
-      <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
+      <TableContainer
+        component={Paper}
+        sx={{ maxHeight: 400, overflow: "auto" }}
+      >
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0 }}>
+          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#FFFFFF" }}>
             <TableRow>
-              <TableCell>Valor (%)</TableCell>
+              <TableCell>Tipo</TableCell>
+              <TableCell>Valor</TableCell>
               <TableCell>Fecha de Inicio</TableCell>
               <TableCell>Fecha de Fin</TableCell>
               <TableCell>Descripción</TableCell>
+              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredDescuentos.length > 0 ? (
               filteredDescuentos.map((descuento) => (
                 <TableRow key={descuento.id}>
-                  <TableCell>{descuento.valor}%</TableCell>
-                  <TableCell>{descuento.fechaInicio}</TableCell>
-                  <TableCell>{descuento.fechaFin}</TableCell>
+                  <TableCell>{descuento.tipo}</TableCell>
+                  <TableCell>{descuento.valor}</TableCell>
+                  <TableCell>{descuento.fechainicio}</TableCell>
+                  <TableCell>{descuento.fechafin}</TableCell>
                   <TableCell>{descuento.descripcion}</TableCell>
                   <TableCell>
                     <Button
@@ -212,10 +268,32 @@ const DiscountManagement = () => {
 
       {/* Formulario de descuento */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{newDescuento.id ? "Editar Descuento" : "Agregar Descuento"}</DialogTitle>
+        <DialogTitle>
+          {newDescuento.id ? "Editar Descuento" : "Agregar Descuento"}
+        </DialogTitle>
         <DialogContent>
+          Tipo de descuento
           <TextField
-            label="Valor de Descuento"
+            name="tipo"
+            variant="outlined"
+            value={newDescuento.tipo}
+            onChange={handleInputChange}
+            fullWidth
+            select
+            SelectProps={{
+              native: true,
+            }}
+            style={{ marginBottom: "10px" }}
+          >
+            <option value="">Seleccionar tipo de descuento</option>
+            {tiposDescuento.map((tipoDescuento) => (
+              <option key={tipoDescuento.id} value={tipoDescuento.id}>
+                {tipoDescuento.nombre}
+              </option>
+            ))}
+          </TextField>
+          Valor de Descuento
+          <TextField
             name="valor"
             type="number"
             value={newDescuento.valor}
@@ -223,24 +301,26 @@ const DiscountManagement = () => {
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Fecha de Inicio
           <TextField
-            label="Fecha de Inicio"
             name="fechaInicio"
+            type="date"
             value={newDescuento.fechaInicio}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Fecha de Fin
           <TextField
-            label="Fecha de Fin"
             name="fechaFin"
+            type="date"
             value={newDescuento.fechaFin}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Descripción
           <TextField
-            label="Descripción"
             name="descripcion"
             value={newDescuento.descripcion}
             onChange={handleInputChange}

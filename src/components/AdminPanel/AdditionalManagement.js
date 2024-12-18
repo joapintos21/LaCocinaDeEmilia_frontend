@@ -28,25 +28,24 @@ import {
   Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import AddIcon from "@mui/icons-material/Add"; 
+import AddIcon from "@mui/icons-material/Add";
 import { obtenerAdicionales } from "scripts/obtenerAdicionales";
 
 const AdditionalManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const fetchAdicionales = async () => {
-    await obtenerAdicionales(dispatch, sessionStorage.getItem("token")); 
+    await obtenerAdicionales(dispatch, sessionStorage.getItem("token"));
   };
   useEffect(() => {
     try {
-      
       fetchAdicionales();
     } catch (e) {
       console.log(e);
     }
   }, [dispatch]);
 
-  const adicionales = useSelector((state) => state.adicionales || []); 
+  const adicionales = useSelector((state) => state.adicionales || []);
 
   const [open, setOpen] = useState(false);
   const [newAdicional, setNewAdicional] = useState({
@@ -201,11 +200,12 @@ const AdditionalManagement = () => {
         sx={{ maxHeight: 400, overflow: "auto" }}
       >
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0 }}>
+          <TableHead sx={{ position: "sticky", top: 0 , backgroundColor: "#FFFFFF", zIndex: 1 }}>
             <TableRow>
               <TableCell>Descripción</TableCell>
               <TableCell>Costo adicional</TableCell>
               <TableCell>Visible</TableCell>
+              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -251,24 +251,24 @@ const AdditionalManagement = () => {
           {newAdicional.id ? "Editar Adicional" : "Agregar Adicional"}
         </DialogTitle>
         <DialogContent>
+          Descripción
           <TextField
-            label="Descripción"
             name="descripcion"
             value={newAdicional.descripcion}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Costo adicional
           <TextField
-            label="Costo adicional"
             name="costoAdicional"
             value={newAdicional.costoAdicional}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Visible
           <TextField
-            label="Visible"
             name="visible"
             value={newAdicional.visible}
             onChange={handleInputChange}

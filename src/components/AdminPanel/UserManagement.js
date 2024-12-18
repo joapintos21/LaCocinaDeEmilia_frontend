@@ -25,6 +25,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { obtenerUsuarios } from "scripts/obtenerUsuarios";
+import { obtenerRolesUsuario } from "scripts/obtenerRolesUsuario";
 
 const UserManagement = () => {
   const [error, setError] = useState("");
@@ -32,13 +33,21 @@ const UserManagement = () => {
   const fetchUsuarios = async () => {
     await obtenerUsuarios(dispatch, sessionStorage.getItem("token"));
   };
+  const fetchRolesUsuario = async () => {
+    await obtenerRolesUsuario(dispatch, sessionStorage.getItem("token"));
+  };
   const usuarios = useSelector((state) => state.usuarios || []);
+  const roles = useSelector((state) => state.rolesUsuario || []);
 
   const [open, setOpen] = useState(false);
   const [newUsuario, setNewUsuario] = useState({
     id: null,
     nombre: "",
+    password: "",
     email: "",
+    telefono: "",
+    rol: "",
+    status: "",
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchEmail, setSearchEmail] = useState("");
@@ -46,10 +55,11 @@ const UserManagement = () => {
   useEffect(() => {
     try {
       fetchUsuarios();
+      fetchRolesUsuario();
     } catch (e) {
       console.log(e);
     }
-    setError(""); // Limpiamos el error
+    setError("");
   }, [dispatch]);
 
   const handleOpen = (usuario = null) => {
@@ -97,12 +107,15 @@ const UserManagement = () => {
           newUsuario.rol,
           sessionStorage.getItem("token")
         )
-          .then((data) => console.log("Usuario agregado:", data))
+          .then((data) => {
+            console.log("Usuario agregado:", data);
+            fetchUsuarios();
+            fetchRolesUsuario();
+          })
           .catch((error) => {
             console.error("Error al crear el usuario:", error.message);
             setError(error.message);
           });
-        fetchUsuarios();
       } else {
         if (newUsuario.status) {
           actualizarUsuario(
@@ -114,13 +127,16 @@ const UserManagement = () => {
             newUsuario.status,
             sessionStorage.getItem("token")
           )
-            .then((data) => console.log("Usuario actualizado:", data))
+            .then((data) => {
+              fetchUsuarios();
+              fetchRolesUsuario();
+              console.log("Usuario actualizado:", data);
+            })
             .catch((error) => {
               console.error("Error al actualizar el usuario:", error.message);
               setError(error.message);
             });
           dispatch(updateUsuario(newUsuario));
-          fetchUsuarios();
         } else {
           setError("Por favor, complete todos los campos.");
         }
@@ -142,13 +158,16 @@ const UserManagement = () => {
 
   const handleDelete = (id) => {
     borrarUsuario(id, sessionStorage.getItem("token"))
-      .then((data) => console.log("Usuario eliminado:", data))
+      .then((data) => {
+        fetchUsuarios();
+        fetchRolesUsuario();
+        console.log("Usuario eliminado:", data);
+      })
       .catch((error) => {
         console.error("Error al eliminar el usuario:", error.message);
         setError(error.message);
       });
     dispatch(deleteUsuario(id));
-    fetchUsuarios();
   };
 
   const filteredUsuarios = Array.isArray(usuarios)
@@ -222,7 +241,7 @@ const UserManagement = () => {
         sx={{ maxHeight: 400, overflow: "auto" }}
       >
         <Table>
-          <TableHead sx={{ position: "sticky", top: 0 }}>
+          <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#FFFFFF" }}>
             <TableRow>
               <TableCell>Nombre</TableCell>
               <TableCell>Correo</TableCell>
@@ -275,54 +294,77 @@ const UserManagement = () => {
           {newUsuario.id ? "Editar Usuario" : "Agregar Usuario"}
         </DialogTitle>
         <DialogContent>
+          Nombre y apellido
           <TextField
-            label="Nombre"
             name="nombre"
             value={newUsuario.nombre}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Correo
           <TextField
-            label="Correo"
             name="email"
             value={newUsuario.email}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Contraseña
           <TextField
-            label="Contraseña"
             name="password"
+            type="password"
             value={newUsuario.contrasena}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Telefono
           <TextField
-            label="Telefono"
             name="telefono"
+            type="number"
             value={newUsuario.telefono}
             onChange={handleInputChange}
             fullWidth
             sx={{ marginBottom: 2 }}
           />
+          Rol
           <TextField
-            label="Rol"
             name="rol"
+            variant="outlined"
             value={newUsuario.rol}
             onChange={handleInputChange}
             fullWidth
-            sx={{ marginBottom: 2 }}
-          />
+            select
+            SelectProps={{
+              native: true,
+            }}
+            style={{ marginBottom: "10px" }}
+          >
+            <option value="">Seleccionar rol</option>
+            {roles.map((rol) => (
+              <option key={rol.id} value={rol.id}>
+                {rol.nombre}
+              </option>
+            ))}
+          </TextField>
+          Estado
           <TextField
-            label="Status"
             name="status"
+            variant="outlined"
             value={newUsuario.status}
             onChange={handleInputChange}
             fullWidth
-            sx={{ marginBottom: 2 }}
-          />
+            select
+            SelectProps={{
+              native: true,
+            }}
+            style={{ marginBottom: "10px" }}
+          >
+            <option value="">Seleccionar estado</option>
+            <option value={"activo"}>Activo</option>
+            <option value={"pendiente"}>Pendiente</option>
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">

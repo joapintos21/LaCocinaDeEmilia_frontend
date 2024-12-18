@@ -1,11 +1,11 @@
 let request, url, body;
 
-export const crearDescuento = async (valor, fechaInicio, fechaFin, descripcion, token) => {
+export const crearDescuento = async (tipoId, valor, fechaInicio, fechaFin, descripcion, token) => {
   request = "/descuentos/create";
   url = `${request}`;
 
   body = {
-    tipo_id : 1, //Ajustar para manejar varios tipos de descuentos
+    tipo_id : parseInt(tipoId), 
     valor : parseFloat(valor),
     fechainicio : fechaInicio,
     fechafin : fechaFin,

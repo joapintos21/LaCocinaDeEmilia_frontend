@@ -6,7 +6,7 @@ export const actualizarPermiso = async (id, endpoint, tipo, rolId, token) => {
     const body = {
       endpoint: endpoint,
       tipo: tipo,
-      rolId: rolId
+      rol_id: parseInt(rolId)
     };
   
     try {

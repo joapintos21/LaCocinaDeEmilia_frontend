@@ -1,10 +1,10 @@
-import { setPermisos } from '../store/permisoSlice';
+import { setPermisos } from '../store/gestionPermisosSlice';
 
 export const obtenerPermisos = async (dispatch, token) => {
-  let url = "/permisos/obtenerPermisos?tipo_usuario=4";
+  let url = "/permisos";
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(url, { 
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -18,7 +18,7 @@ export const obtenerPermisos = async (dispatch, token) => {
     }
 
     const data = await response.json();
-    dispatch(setPermisos(data.permisos)); 
+    dispatch(setPermisos(data)); 
 
   } catch (error) {
     console.error(error);
