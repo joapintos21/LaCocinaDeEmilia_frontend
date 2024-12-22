@@ -1,8 +1,8 @@
 let request, url, body;
 
 export const crearDescuento = async (tipoId, valor, fechaInicio, fechaFin, descripcion, token) => {
-  request = "/descuentos/create";
-  url = `${request}`;
+	request = '/descuentos/create';
+	url = `${request}`;
 
   body = {
     tipo_id : parseInt(tipoId), 

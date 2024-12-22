@@ -8,13 +8,13 @@
  * @returns {number} - Precio final con los descuentos aplicados.
  */
 export const calcularPrecioConDescuento = (precio, descuentos) => {
-    return descuentos.reduce((precioFinal, item) => {
-      const { tipo, valor } = item.descuento;
-      if (tipo === "PORCENTAJE") {
-        return precioFinal * (1 - valor);
-      } else if (tipo === "IMPORTE") {
-        return precioFinal - valor;
-      }
-      return precioFinal;
-    }, precio);
-  };
+	return descuentos.reduce((precioFinal, item) => {
+		const { tipo, valor } = item.descuento;
+		if (tipo === 'PORCENTAJE') {
+			return precioFinal * (1 - valor);
+		} else if (tipo === 'IMPORTE') {
+			return precioFinal - valor;
+		}
+		return precioFinal;
+	}, precio);
+};

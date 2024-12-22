@@ -1,35 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCategorias, addCategory, updateCategory, deleteCategory } from 'store/categoriaSlice';
+import { crearCategoria } from 'scripts/crearCategoria';
+import { actualizarCategoria } from 'scripts/actualizarCategoria';
+import { borrarCategoria } from 'scripts/borrarCategoria';
 import {
-  setCategorias,
-  addCategory,
-  updateCategory,
-  deleteCategory,
-} from "store/categoriaSlice";
-import { crearCategoria } from "scripts/crearCategoria";
-import { actualizarCategoria } from "scripts/actualizarCategoria";
-import { borrarCategoria } from "scripts/borrarCategoria";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-  Paper,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  InputAdornment,
-  Box,
-  Grid,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import AddIcon from "@mui/icons-material/Add";  // Importamos el ícono "+" (Add)
-import obtenerCategorias from "scripts/obtenerCategorias";
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Button,
+	Paper,
+	TextField,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	InputAdornment,
+	Box,
+	Grid,
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add'; // Importamos el ícono "+" (Add)
+import obtenerCategorias from 'scripts/obtenerCategorias';
 
 const CategoryManagement = () => {
   const [error, setError] = useState("");
@@ -264,6 +259,7 @@ const CategoryManagement = () => {
       {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
     </div>
   );
+
 };
 
 export default CategoryManagement;

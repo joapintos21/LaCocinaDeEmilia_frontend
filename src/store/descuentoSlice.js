@@ -8,8 +8,8 @@ export const descuentoSlice = createSlice({
       return action.payload;
     },
     addDescuento: (state, action) => {
-      state.push(action.payload);
-    },
+			state.push(action.payload);
+		},
     updateDescuento: (state, action) => {
       const index = state.findIndex((descuento) => descuento.id === action.payload.id);
       if (index !== -1) {

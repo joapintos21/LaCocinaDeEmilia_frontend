@@ -1,135 +1,218 @@
-import React, { useState, useEffect } from "react";
-import tw from "twin.macro";
-import AnimationRevealPage from "helpers/AnimationRevealPage.js";
-import Header from "components/headers/light.js";
+import React, { useState, useEffect } from 'react';
+import tw from 'twin.macro';
+import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
+import Header from 'components/headers/light.js';
+import { useSelector } from 'react-redux';
+import { format, parse } from 'date-fns';
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const PedidoItem = tw.div`flex justify-between items-center border-b pb-2 mb-2 p-4 rounded-lg shadow-md bg-gray-100`;
 const Button = tw.button`px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700`;
-const AssignButton = tw.button`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700`;
+const AssignedPedidoItem = tw(PedidoItem)`bg-[#99cdb6]`;
+const BluePedidoItem = tw(PedidoItem)`bg-blue-100`;
 const SectionTitle = tw.h3`text-lg font-bold cursor-pointer flex justify-between items-center`;
+const Divider = tw.hr`my-2 border-t border-gray-300`;
 
 const PanelCocineras = () => {
-  const [pedidosSinAsignar, setPedidosSinAsignar] = useState([]);
-  const [pedidosAsignados, setPedidosAsignados] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const token = sessionStorage.getItem("token");
-  const userId = sessionStorage.getItem("user_id");
+	const [pedidosHoy, setPedidosHoy] = useState([]);
+	const [pedidosPosteriores, setPedidosPosteriores] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const token = sessionStorage.getItem('token');
+	const userId = useSelector((state) => state.usuario.userInfo.id);
 
-  const fetchPedidos = async () => {
-    try {
-      const response = await fetch(`/api/pedidos/obtenerPedidosParaCocinera?usuario_id=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPedidosSinAsignar(data.sinAsignar);
-        setPedidosAsignados(data.asignados);
-      } else {
-        console.error("Error al obtener pedidos:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error al obtener pedidos:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+	const fetchPedidos = async () => {
+		try {
+			const response = await fetch(`/pedidos/obtenerPedidosParaCocinera?usuario_id=${userId}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
 
-  const asignarPedido = async (pedidoId) => {
-    try {
-      const response = await fetch(`/api/pedidos/asignar`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pedido_id: pedidoId, cocinera_id: userId }),
-      });
-      if (response.ok) {
-        fetchPedidos();
-        alert("Pedido asignado correctamente");
-      } else {
-        console.error("Error al asignar pedido:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error al asignar pedido:", error);
-    }
-  };
+			if (response.ok) {
+				const data = await response.json();
+				setPedidosHoy(data.pedidosHoy);
+				setPedidosPosteriores(data.pedidosPosteriores);
+			} else {
+				console.error('Error al obtener pedidos:', response.statusText);
+				alert('Hubo un problema al obtener los pedidos.');
+			}
+		} catch (error) {
+			console.error('Error al obtener pedidos:', error);
+			alert('No se pudo conectar al servidor.');
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-  const cambiarEstado = async (pedidoId) => {
-    try {
-      const response = await fetch(`/api/pedidos/cambiar-estado/${pedidoId}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        fetchPedidos();
-        alert("Estado cambiado a 'LISTO_PARA_ENVIAR'");
-      } else {
-        console.error("Error al cambiar estado:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error al cambiar estado:", error);
-    }
-  };
+	const marcarComoTerminado = async (pedidoId) => {
+		try {
+			const response = await fetch('/pedidos/marcarComoTerminado', {
+				method: 'PUT',
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ pedido_id: pedidoId }),
+			});
+			if (response.ok) {
+				setPedidosHoy((prevPedidos) => prevPedidos.filter((pedido) => pedido.id !== pedidoId));
+			} else {
+				console.error('Error al marcar pedido como terminado:', response.statusText);
+				alert('No se pudo marcar el pedido como terminado.');
+			}
+		} catch (error) {
+			console.error('Error al marcar pedido como terminado:', error);
+			alert('Error al conectar con el servidor.');
+		}
+	};
 
-  useEffect(() => {
-    fetchPedidos();
-  }, []);
+	const reasignarPedido = async (pedidoId) => {
+		try {
+			const response = await fetch('/pedidos/reasignarPedido', {
+				method: 'PUT',
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ pedido_id: pedidoId, userId: userId }),
+			});
+			if (response.ok) {
+				fetchPedidos();
+			} else {
+				console.error('Error al reasignar pedido:', response.statusText);
+				alert('No se pudo reasignar el pedido.');
+			}
+		} catch (error) {
+			console.error('Error al reasignar pedido:', error);
+			alert('Error al conectar con el servidor.');
+		}
+	};
 
-  return (
-    <AnimationRevealPage>
-      <Header />
-      <Container>
-    {isLoading ? (
-      <p>Cargando pedidos...</p>
-    ) : (
-      <>
-        {/* Pedidos sin asignar */}
-        <SectionTitle>Pedidos sin asignar</SectionTitle>
-        {pedidosSinAsignar.length > 0 ? (
-          pedidosSinAsignar.map((pedido) => (
-            <PedidoItem key={pedido.id}>
-              <div>
-                <p>Pedido #{pedido.id}</p>
-                <p>Cliente: {pedido.cliente_id}</p>
-                <p>Total: ${pedido.total}</p>
-              </div>
-              <AssignButton onClick={() => asignarPedido(pedido.id)}>
-                Asignarme
-              </AssignButton>
-            </PedidoItem>
-          ))
-        ) : (
-          <p>No hay pedidos sin asignar.</p>
-        )}
+	useEffect(() => {
+		fetchPedidos();
+	}, []);
 
-        {/* Pedidos asignados */}
-        <SectionTitle>Mis pedidos asignados</SectionTitle>
-        {pedidosAsignados.length > 0 ? (
-          pedidosAsignados.map((pedido) => (
-            <PedidoItem key={pedido.id}>
-              <div>
-                <p>Pedido #{pedido.id}</p>
-                <p>Cliente: {pedido.cliente_id}</p>
-                <p>Total: ${pedido.total}</p>
-              </div>
-              <Button onClick={() => cambiarEstado(pedido.id)}>
-                Marcar como Listo para Enviar
-              </Button>
-            </PedidoItem>
-          ))
-        ) : (
-          <p>No tienes pedidos asignados.</p>
-        )}
-      </>
-    )}
-  </Container>
-    </AnimationRevealPage>
-  );
+	return (
+		<AnimationRevealPage>
+			<Header />
+			<Container>
+				{isLoading ? (
+					<p>Cargando pedidos...</p>
+				) : (
+					<>
+						<SectionTitle>Pedidos para entregar hoy</SectionTitle>
+						{pedidosHoy.length > 0 ? (
+							pedidosHoy.map((pedido) => {
+								if (pedido.cocinera_asignada === userId) {
+									return (
+										<AssignedPedidoItem key={pedido.id}>
+											<div>
+												<p>Pedido #{pedido.id}</p>
+												<Divider />
+												<div>
+													{pedido.detalles
+														?.filter((detalle) => detalle.descripcion !== 'Envío')
+														.map((detalle, index) => (
+															<div key={index}>
+																<p>Producto: {detalle.descripcion}</p>
+																<p>Cantidad: {detalle.cantidad}</p>
+																<Divider />
+															</div>
+														))}
+												</div>
+											</div>
+											<Button onClick={() => marcarComoTerminado(pedido.id)}>
+												Marcar como Terminado
+											</Button>
+										</AssignedPedidoItem>
+									);
+								} else if (pedido.cocinera_asignada === null) {
+									return (
+										<PedidoItem key={pedido.id} style={{ backgroundColor: '#f0f0f0' }}>
+											<div>
+												<p>Pedido #{pedido.id}</p>
+												<Divider />
+												<div>
+													{pedido.detalles
+														?.filter((detalle) => detalle.descripcion !== 'Envío')
+														.map((detalle, index) => (
+															<div key={index}>
+																<p>Producto: {detalle.descripcion}</p>
+																<p>Cantidad: {detalle.cantidad}</p>
+																<Divider />
+															</div>
+														))}
+												</div>
+												<p>No tiene cocinera asignada</p>
+											</div>
+											<Button onClick={() => reasignarPedido(pedido.id)}>Asignar</Button>
+										</PedidoItem>
+									);
+								} else {
+									return (
+										<BluePedidoItem key={pedido.id}>
+											<div>
+												<p>Pedido #{pedido.id}</p>
+												<Divider />
+												<div>
+													{pedido.detalles
+														?.filter((detalle) => detalle.descripcion !== 'Envío')
+														.map((detalle, index) => (
+															<div key={index}>
+																<p>Producto: {detalle.descripcion}</p>
+																<p>Cantidad: {detalle.cantidad}</p>
+																<Divider />
+															</div>
+														))}
+												</div>
+												<p>Cocinera Asignada: {pedido.cocinera_asignada}</p>
+											</div>
+											<Button onClick={() => reasignarPedido(pedido.id)}>Reasignar</Button>
+										</BluePedidoItem>
+									);
+								}
+							})
+						) : (
+							<p>No hay pedidos para entregar hoy.</p>
+						)}
+
+						<SectionTitle>Pedidos posteriores</SectionTitle>
+						{pedidosPosteriores.length > 0 ? (
+							pedidosPosteriores.map((pedido) => (
+								<PedidoItem key={pedido.id}>
+									<div>
+										<p>Pedido #{pedido.id}</p>
+										<Divider />
+										<div>
+											{pedido.detalles
+												?.filter((detalle) => detalle.descripcion !== 'Envío')
+												.map((detalle, index) => (
+													<div key={index}>
+														<p>Producto: {detalle.descripcion}</p>
+														<p>Cantidad: {detalle.cantidad}</p>
+														<Divider />
+													</div>
+												))}
+										</div>
+										<p>
+											Fecha de entrega:{' '}
+											{pedido.fecha_entrega
+												? format(
+														parse(pedido.fecha_entrega, 'yyyy-MM-dd', new Date()),
+														'dd/MM/yyyy',
+												  )
+												: 'Sin fecha definida'}
+										</p>
+									</div>
+								</PedidoItem>
+							))
+						) : (
+							<p>No hay pedidos posteriores a hoy.</p>
+						)}
+					</>
+				)}
+			</Container>
+		</AnimationRevealPage>
+	);
 };
 
 export default PanelCocineras;

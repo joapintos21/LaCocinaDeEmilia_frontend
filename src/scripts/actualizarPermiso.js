@@ -34,4 +34,3 @@ export const actualizarPermiso = async (id, endpoint, tipo, rolId, token) => {
       throw error;  // Lanza el error para que lo maneje el llamador
     }
   };
-  

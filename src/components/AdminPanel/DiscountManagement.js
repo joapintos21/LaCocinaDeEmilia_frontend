@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addDescuento, updateDescuento, deleteDescuento } from 'store/descuentoSlice'; // Asegúrate de que las acciones estén correctamente definidas en el slice
+import { crearDescuento } from 'scripts/crearDescuento'; // Función para crear descuento
+import { actualizarDescuento } from 'scripts/actualizarDescuento'; // Función para actualizar descuento
+import { borrarDescuento } from 'scripts/borrarDescuento'; // Función para eliminar descuento
 import {
   addDescuento,
   updateDescuento,
@@ -80,14 +84,14 @@ const DiscountManagement = () => {
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+	const handleClose = () => {
+		setOpen(false);
+	};
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewDescuento({ ...newDescuento, [name]: value });
-  };
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setNewDescuento({ ...newDescuento, [name]: value });
+	};
 
   const handleSaveDescuento = () => {
     if (
@@ -338,10 +342,10 @@ const DiscountManagement = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Mostrar errores */}
-      {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
-    </div>
-  );
+			{/* Mostrar errores */}
+			{error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+		</div>
+	);
 };
 
 export default DiscountManagement;

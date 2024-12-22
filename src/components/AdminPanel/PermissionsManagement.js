@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPermisos, addPermiso, updatePermiso, deletePermiso } from 'store/permisoSlice'; // Asegúrate de crear las acciones correspondientes en tu slice
+import { crearPermiso } from 'scripts/crearPermiso'; // Función para crear permiso
+import { actualizarPermiso } from 'scripts/actualizarPermiso'; // Función para actualizar permiso
+import { borrarPermiso } from 'scripts/borrarPermiso'; // Función para eliminar permiso
 import {
   setPermisos,
   addPermiso,
@@ -346,6 +350,7 @@ const PermissionsManagement = () => {
       {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
     </div>
   );
+
 };
 
 export default PermissionsManagement;

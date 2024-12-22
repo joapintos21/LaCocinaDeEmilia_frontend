@@ -74,18 +74,29 @@ const ProductManagement = () => {
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState('');
+	const [minPrice, setMinPrice] = useState('');
+	const [maxPrice, setMaxPrice] = useState('');
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewProduct({ ...newProduct, [name]: value });
-  };
+	const handleOpen = (product = null) => {
+		if (product) {
+			setNewProduct({ ...product });
+		} else {
+			setNewProduct({
+				id: null,
+				descripcion: '',
+				precio: '',
+				categoria: '',
+				visible: true,
+			});
+		}
+		setOpen(true);
+	};
 
-  const handleCategoryChange = (e) => {
-    setNewProduct({ ...newProduct, categoria: e.target.value });
-  };
+	const handleClose = () => {
+		setOpen(false);
+	};
 
   const handleSaveProduct = () => {
     if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {

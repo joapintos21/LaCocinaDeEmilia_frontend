@@ -3,13 +3,13 @@ import { setProductos } from 'store/productoSlice';
 export const obtenerProductos = async (dispatch) => {
   let url = "/productos"; 
 
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      },
-    });
+	try {
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
 
     if (!response.ok) {
       const errorData = await response.json();

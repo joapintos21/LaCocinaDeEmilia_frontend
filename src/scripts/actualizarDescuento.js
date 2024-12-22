@@ -31,4 +31,3 @@ export const actualizarDescuento = async (id, tipoId, valor, fechaInicio, fechaF
       throw error;  
     }
   };
-  

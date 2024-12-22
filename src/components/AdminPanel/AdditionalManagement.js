@@ -290,6 +290,5 @@ const AdditionalManagement = () => {
       {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
     </div>
   );
-};
 
 export default AdditionalManagement;

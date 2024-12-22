@@ -31,4 +31,3 @@ export const actualizarUsuario = async (id, telefono, nombre, email, rolId, stat
       throw error;  
     }
   };
-  
