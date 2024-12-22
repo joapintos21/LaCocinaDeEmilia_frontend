@@ -3,22 +3,22 @@ let request, url, body;
 export const crearPermiso = async (endpoint, tipo, rolId, token) => {
 	request = '/permisos/create';
 	url = `${request}`;
+  
+  body = {
+    endpoint: endpoint,
+    tipo: tipo,
+    rol_id : parseInt(rolId)
+  };
 
-	body = {
-		endpoint: endpoint,
-		tipo: tipo,
-		rolId: rolId,
-	};
-
-	try {
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`, // Pasa el token en el header
-			},
-			body: JSON.stringify(body),
-		});
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}` // Pasa el token en el header
+      },
+      body: JSON.stringify(body)
+    });
 
 		// Maneja errores fuera del rango 200-299
 		if (!response.ok) {

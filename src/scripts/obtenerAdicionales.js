@@ -1,15 +1,16 @@
 import { setAdicionales } from '../store/adicionalSlice';
 
-export const obtenerAdicionales = async (dispatch) => {
-	let url = '/listarAdicionales/listarAdicionales?producto_id=1';
+export const obtenerAdicionales = async (dispatch, token) => {
+  let url = "/listarAdicionales/listarAdicionales?producto_id=1";
 
-	try {
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+    });
 
 		// Maneja errores fuera del rango 200-299
 		if (!response.ok) {

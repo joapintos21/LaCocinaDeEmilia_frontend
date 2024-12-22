@@ -113,103 +113,109 @@ const OrderManagement = () => {
 				</Grid>
 			</Box>
 
-			{/* Tabla de pedidos */}
-			<TableContainer component={Paper} sx={{ maxHeight: 400, overflow: 'auto' }}>
-				<Table>
-					<TableHead sx={{ position: 'sticky', top: 0 }}>
-						<TableRow>
-							<TableCell>Cliente</TableCell>
-							<TableCell>Artículos</TableCell>
-							<TableCell>Total</TableCell>
-							<TableCell>Estado</TableCell>
-							<TableCell>Acciones</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{filteredOrders.length > 0 ?
-							filteredOrders.map((order) => (
-								<TableRow key={order.id}>
-									<TableCell>{order.customerName}</TableCell>
-									<TableCell>{order.items}</TableCell>
-									<TableCell>${order.total.toFixed(2)}</TableCell>
-									<TableCell>{order.status}</TableCell>
-									<TableCell>
-										<Button
-											variant="outlined"
-											color="primary"
-											onClick={() => handleOpen(order)}
-											sx={{ marginRight: 2 }}
-										>
-											Editar
-										</Button>
-										<Button
-											variant="outlined"
-											color="secondary"
-											onClick={() => handleDelete(order.id)}
-										>
-											Eliminar
-										</Button>
-									</TableCell>
-								</TableRow>
-							))
-						:	<TableRow>
-								<TableCell colSpan={5} style={{ textAlign: 'center' }}>
-									No hay pedidos disponibles.
-								</TableCell>
-							</TableRow>
-						}
-					</TableBody>
-				</Table>
-			</TableContainer>
+      {/* Tabla de pedidos */}
+      <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
+        <Table>
+          <TableHead sx={{ position: "sticky", top: 0 , backgroundColor: "#FFFFFF" }}>
+            <TableRow>
+              <TableCell>Cliente</TableCell>
+              <TableCell>Artículos</TableCell>
+              <TableCell>Total</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell>{order.customerName}</TableCell>
+                  <TableCell>{order.items}</TableCell>
+                  <TableCell>${order.total.toFixed(2)}</TableCell>
+                  <TableCell>{order.status}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleOpen(order)}
+                      sx={{ marginRight: 2 }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDelete(order.id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} style={{ textAlign: "center" }}>
+                  No hay pedidos disponibles.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-			{/* Formulario */}
-			<Dialog open={open} onClose={handleClose}>
-				<DialogTitle>{isEditing ? 'Editar Pedido' : 'Agregar Pedido'}</DialogTitle>
-				<DialogContent>
-					<TextField
-						label="Nombre del Cliente"
-						name="customerName"
-						value={currentOrder.customerName}
-						onChange={handleInputChange}
-						fullWidth
-						sx={{ marginBottom: 2 }}
-					/>
-					<TextField
-						label="Artículos"
-						name="items"
-						value={currentOrder.items}
-						onChange={handleInputChange}
-						fullWidth
-						sx={{ marginBottom: 2 }}
-					/>
-					<TextField
-						label="Total"
-						name="total"
-						type="number"
-						value={currentOrder.total}
-						onChange={handleInputChange}
-						fullWidth
-						sx={{ marginBottom: 2 }}
-					/>
-					<FormControl fullWidth sx={{ marginBottom: 2 }}>
-						<InputLabel>Estado</InputLabel>
-						<Select label="Estado" name="status" value={currentOrder.status} onChange={handleInputChange}>
-							<MenuItem value="Pendiente">Pendiente</MenuItem>
-							<MenuItem value="Enviado">Enviado</MenuItem>
-						</Select>
-					</FormControl>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleClose} color="secondary">
-						Cancelar
-					</Button>
-					<Button onClick={handleSaveOrder} color="primary">
-						{isEditing ? 'Guardar Cambios' : 'Agregar'}
-					</Button>
-				</DialogActions>
-			</Dialog>
-		</div>
-	);
+      {/* Formulario */}
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>{isEditing ? "Editar Pedido" : "Agregar Pedido"}</DialogTitle>
+        <DialogContent>
+        Nombre del Cliente
+          <TextField
+            name="customerName"
+            value={currentOrder.customerName}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          Artículos
+          <TextField
+            name="items"
+            value={currentOrder.items}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          Total
+          <TextField
+            name="total"
+            type="number"
+            value={currentOrder.total}
+            onChange={handleInputChange}
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Estado</InputLabel>
+            <Select
+              label="Estado"
+              name="status"
+              value={currentOrder.status}
+              onChange={handleInputChange}
+            >
+              <MenuItem value="Pendiente">Pendiente</MenuItem>
+              <MenuItem value="Enviado">Enviado</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleSaveOrder} color="primary">
+            {isEditing ? "Guardar Cambios" : "Agregar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
 };
 
 export default OrderManagement;

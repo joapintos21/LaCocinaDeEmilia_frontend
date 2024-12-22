@@ -1,33 +1,35 @@
-let request, queryParams, url;
+let url, body;
 
-export const crearUsuario = async (emailInput, passwordInput) => {
-	request = '/usuarios/create';
+export const crearUsuario = async (emailInput, passwordInput, nombreInput, telefonoInput, rolIdInput) => {
+  url = "/usuarios/create";
 
-	queryParams = new URLSearchParams({
-		email: emailInput,
-		password: passwordInput,
-	}).toString();
+  body = {
+    email: emailInput,
+    password: passwordInput,
+    nombre: nombreInput,
+    telefono: telefonoInput, 
+    rol_id: parseInt(rolIdInput)
+  };
 
-	url = `${request}?${queryParams}`;
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body)
+    });
 
-	try {
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Se produjo un error desconocido.");
+    }
 
-		// Maneja errores fuera del rango 200-299
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
+    const data = await response.json();
+    return data; 
 
-		const data = await response.json();
-		return data; // Devuelve los datos de la respuesta
-	} catch (error) {
-		console.error(error);
-		throw error; // Lanza el error para que sea capturado en el evento
-	}
+  } catch (error) {
+    console.error(error);
+    throw error; 
+  }
 };

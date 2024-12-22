@@ -1,28 +1,29 @@
-import { setPermisos } from '../store/descuentoSlice';
+import { setPermisos } from '../store/gestionPermisosSlice';
 
-export const obtenerPermisos = async (dispatch) => {
-	let url = '/permisos/obtenerPermisos?tipo_usuario=4';
+export const obtenerPermisos = async (dispatch, token) => {
+  let url = "/permisos";
 
-	try {
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
+  try {
+    const response = await fetch(url, { 
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, 
+      },
+    });
 
-		// Maneja errores fuera del rango 200-299
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Se produjo un error desconocido.");
+    }
 
-		const data = await response.json();
-		dispatch(setPermisos(data)); // Almacena las categorías en Redux
-	} catch (error) {
-		console.error(error);
-		throw error; // Lanza el error para que sea capturado en el evento
-	}
+    const data = await response.json();
+    dispatch(setPermisos(data)); 
+
+  } catch (error) {
+    console.error(error);
+    throw error; 
+  }
 };
 
 export default obtenerPermisos;
