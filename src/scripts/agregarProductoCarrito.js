@@ -1,39 +1,36 @@
-let request, url, body;
+// Ruta: src/scripts/agregarProductoCarrito.js
+import apiClient from '../utils/apiCliente'; // Asegúrate de que la ruta sea correcta
 
 export const agregarProductoACarrito = async (clienteId, productoId, cantidad, token) => {
-	request = '/carrito/agregarProductoACarrito';
-	url = `${request}`;
-	if (clienteId) {
-		body = {
-			userId: clienteId,
-			productoId: productoId,
-			cantidad: cantidad,
-		};
+  if (!clienteId) {
+    throw new Error("Debe iniciar sesión para poder agregar productos.");
+  }
 
-		try {
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`, // Incluir el token en el header de autorización
-				},
-				body: JSON.stringify(body),
-			});
+  const body = {
+    userId: clienteId,
+    productoId: productoId,
+    cantidad: cantidad,
+  };
 
-			// Maneja errores fuera del rango 200-299
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || 'Se produjo un error desconocido.');
-			}
+  try {
+    // Realiza la solicitud POST usando el apiCliente
+    const response = await apiClient.post('/carrito/agregarProductoACarrito', body, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Incluir el token en el header de autorización
+      },
+    });
 
-			const data = await response.json();
-
-			return data; // Devuelve los datos de la respuesta
-		} catch (error) {
-			console.error(error);
-			throw error; // Lanza el error para que sea capturado en el evento
-		}
-	} else {
-		throw new Error('Debe iniciar sesión para poder agregar productos.');
-	}
+    // Devuelve los datos de la respuesta
+    return response.data;
+  } catch (error) {
+    // Manejo de errores
+    if (error.response) {
+      const errorData = error.response.data;
+      throw new Error(errorData.error || "Se produjo un error desconocido.");
+    } else if (error.request) {
+      throw new Error("No se pudo establecer conexión con el servidor.");
+    } else {
+      throw new Error("Error al realizar la solicitud.");
+    }
+  }
 };
