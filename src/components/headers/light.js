@@ -105,6 +105,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 		<NavLinks key={1}>
 			{userInfo && userInfo.rol === 'Administrador' && <NavLink href="/paneladministrador">Panel</NavLink>}
 			<NavLink href="/panelcocineras">Cocineras</NavLink>
+			<NavLink href="/panelcadetes">Cadetes</NavLink>
 			<NavLink href="/nosotros">Nosotros</NavLink>
 			<NavLink href="/pricing">Pricing</NavLink>
 			<NavLink href="/contacto">Contactenos</NavLink>
