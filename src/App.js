@@ -122,6 +122,7 @@ import ScrollToTop from 'helpers/ScrollToTop';
 import { limpiarCarrito } from 'store/carritoSlice';
 import PanelCocineras from 'pages/PanelCocineras';
 import PaginaPedidos from 'pages/PaginaPedidos';
+import PanelCadetes from 'pages/PanelCadete';
 
 const theme = createTheme({
 	palette: {
@@ -189,6 +190,7 @@ export default function App() {
 						<Route path="/paneladministrador" element={<PanelAdministrador />} />
 						<Route path="/mis_pedidos" element={<PaginaPedidos />} />
 						<Route path="/panelcocineras" element={<PanelCocineras />} />
+						<Route path="/panelcadetes" element={<PanelCadetes />} />
 						<Route path="/" element={<RestaurantLandingPage />} />
 					</Routes>
 				</Router>
