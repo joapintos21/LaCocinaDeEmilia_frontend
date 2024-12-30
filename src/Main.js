@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 import { css } from 'styled-components/macro'; //eslint-disable-line
 import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
-import Hero from 'components/hero/TwoColumnWithVideo.js';
+
+import Header from 'components/headers/light.js';
 import Features from 'components/features/ThreeColSimple.js';
 import MainFeature from 'components/features/TwoColWithButton.js';
 import MainFeature2 from 'components/features/TwoColSingleFeatureWithStats2.js';
@@ -14,16 +15,54 @@ import celebrationIconImageSrc from 'images/celebration-icon.svg';
 import shopIconImageSrc from 'images/shop-icon.svg';
 import TabCategoryGrid from 'components/cards/TabCategoryGrid';
 import { useSelector } from 'react-redux';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import { obtenerIGMedia } from 'scripts/obtenerIGMedia';
 
 export default () => {
 	const Subheading = tw.span`tracking-wider text-sm font-medium`;
 	const HighlightedText = tw.span`bg-[#99cdb6] text-gray-100 px-4 transform -skew-x-12 inline-block`;
 	const HighlightedTextInverse = tw.span`bg-gray-100 text-primary-500 px-4 transform -skew-x-12 inline-block`;
 	const Description = tw.span`inline-block mt-8`;
+	const CarruselContainer = tw.div`container mx-auto p-4`;
+	const SwiperStyled = tw(Swiper)`
+	w-10/12
+	h-[300px] // Altura base
+	sm:h-[400px] // Altura en pantallas medianas
+	lg:h-[500px] // Altura en pantallas grandes`;
+	const SlideContent = tw.div`flex w-full h-full`;
+	const MediaColumn = tw.div`w-1/2 h-full flex items-center justify-end p-2`;
+	const TextColumn = tw.div`w-1/2 h-full flex flex-col justify-center items-center pr-8 pl-2`;
+	const MediaImage = tw.img`max-w-full max-h-full object-contain rounded-lg`;
+	const MediaVideo = tw.video`max-w-full max-h-full object-contain rounded-lg`;
+	const CaptionText = tw.div`text-lg font-medium text-gray-700`;
+	const TimestampText = tw.div`mt-2 text-sm text-gray-500`;
+
 	const imageCss = tw`rounded-4xl`;
 	const [categories, setCategories] = useState([]);
 	const categoriasRedux = useSelector((state) => state.categorias); // Obtener las categorías de Redux si ya están almacenadas
+	const [media, setMedia] = useState([]);
+	const [error, setError] = useState('');
 
+	useEffect(() => {
+		const fetchMedia = async () => {
+			try {
+				const data = await obtenerIGMedia();
+				setMedia(data);
+			} catch (err) {
+				setError('No se pudo cargar el contenido. Intenta nuevamente más tarde.');
+			}
+		};
+
+		fetchMedia();
+	}, []);
+
+	if (error) {
+		return <div className="text-red-500 text-center mt-4">{error}</div>;
+	}
 	// Transforma las categorías al formato requerido para `TabCategoryGrid`
 	useEffect(() => {
 		if (categoriasRedux && categoriasRedux.length > 0) {
@@ -41,19 +80,49 @@ export default () => {
 
 	return (
 		<AnimationRevealPage>
-			<Hero
-				heading={
-					<>
-						La cocina <HighlightedText>de Emilia.</HighlightedText>
-					</>
-				}
-				description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-				imageSrc="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=768&q=80"
-				imageCss={imageCss}
-				imageDecoratorBlob={true}
-				primaryButtonText="Order Now"
-				watchVideoButtonText="Meet The Chefs"
-			/>
+			<Header />
+			<CarruselContainer>
+				<SwiperStyled
+					modules={[Navigation, Pagination, Autoplay]}
+					spaceBetween={30}
+					slidesPerView={1}
+					navigation
+					pagination={{ clickable: true }}
+					autoplay={{ delay: 8000 }}
+				>
+					{media.map(
+						(item) =>
+							item.media_type !== 'CAROUSEL_ALBUM' && (
+								<SwiperSlide key={item.id}>
+									<SlideContent>
+										<MediaColumn>
+											{item.media_type === 'IMAGE' && (
+												<MediaImage src={item.media_url} alt="Instagram Media" />
+											)}
+											{item.media_type === 'VIDEO' && (
+												<MediaVideo autoPlay muted loop>
+													<source src={item.media_url} type="video/mp4" />
+												</MediaVideo>
+											)}
+										</MediaColumn>
+										<TextColumn>
+											{item.caption && <CaptionText>{item.caption}</CaptionText>}
+											{item.timestamp && (
+												<TimestampText>
+													{new Date(item.timestamp).toLocaleDateString('es-ES', {
+														year: 'numeric',
+														month: 'long',
+														day: 'numeric',
+													})}
+												</TimestampText>
+											)}
+										</TextColumn>
+									</SlideContent>
+								</SwiperSlide>
+							),
+					)}
+				</SwiperStyled>
+			</CarruselContainer>
 			<MainFeature
 				subheading={<Subheading>Established Since 2014</Subheading>}
 				heading={
