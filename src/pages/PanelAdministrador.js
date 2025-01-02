@@ -33,19 +33,17 @@ export default () => {
 			const data = await response.json();
 			const base64Data = data.file;
 
-			// Decodifica Base64 a binario y crea Blob
 			const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 			const blob = new Blob([binaryData], { type: 'application/pdf' });
 
-			// Descarga el archivo sin usar un enlace
 			const fileName = 'reporte.pdf';
 			const link = document.createElement('a');
 			link.href = URL.createObjectURL(blob);
 			link.download = fileName;
-			document.body.appendChild(link); // Añadir el enlace al DOM temporalmente
+			document.body.appendChild(link);
 			link.click();
-			document.body.removeChild(link); // Remover el enlace del DOM
-			URL.revokeObjectURL(link.href); // Limpia el objeto URL
+			document.body.removeChild(link);
+			URL.revokeObjectURL(link.href);
 		} catch (error) {
 			console.error('Error al descargar el PDF:', error);
 			alert('No se pudo descargar el reporte');
@@ -68,19 +66,17 @@ export default () => {
 			const data = await response.json();
 			const base64Data = data.file;
 	
-			// Decodifica Base64 a binario y crea Blob
 			const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 			const blob = new Blob([binaryData], { type: 'application/pdf' });
 	
-			// Descarga el archivo sin usar un enlace
 			const fileName = 'reporte_usuarios.pdf';
 			const link = document.createElement('a');
 			link.href = URL.createObjectURL(blob);
 			link.download = fileName;
-			document.body.appendChild(link); // Añadir el enlace al DOM temporalmente
+			document.body.appendChild(link);
 			link.click();
-			document.body.removeChild(link); // Remover el enlace del DOM
-			URL.revokeObjectURL(link.href); // Limpia el objeto URL
+			document.body.removeChild(link);
+			URL.revokeObjectURL(link.href);
 		} catch (error) {
 			console.error('Error al descargar el PDF:', error);
 			alert('No se pudo descargar el reporte de usuarios');
