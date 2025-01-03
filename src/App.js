@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Importa los estilos por defecto de react-toastify
 import GlobalStyles from 'styles/GlobalStyles';
@@ -150,30 +150,41 @@ export default function App() {
 			};
 			fetchCategorias();
 
-      const fetchPacks = async () => {
-        await obtenerPacks(dispatch);
-      };
-      fetchPacks();
-      
-      if(user && user.rol === "Cliente" && token){
-        const fetchPedido = async () => {
-          await obtenerPedidoEnProgreso(user.id, token, dispatch).catch((e) => {
-            console.log("Error en el Obtener Pedido:" + e)
-            dispatch(limpiarCarrito())
-          }); // Llama al script para cargar las categorías en Redux
-        };
-        fetchPedido();
-      }else{
-        dispatch(limpiarCarrito())
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  }, [dispatch, user, token]);
+			const fetchPacks = async () => {
+				await obtenerPacks(dispatch);
+			};
+			fetchPacks();
 
+			if (user && user.rol === 'Cliente' && token) {
+				const fetchPedido = async () => {
+					await obtenerPedidoEnProgreso(user.id, token, dispatch).catch((e) => {
+						console.log('Error en el Obtener Pedido:' + e);
+						dispatch(limpiarCarrito());
+					}); // Llama al script para cargar las categorías en Redux
+				};
+				fetchPedido();
+			} else {
+				dispatch(limpiarCarrito());
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}, [dispatch, user, token]);
 
 	return (
 		<>
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light" // Opciones: light, dark, colored
+			/>
 			<GlobalStyles />
 			<ThemeProvider theme={theme}>
 				<Router>

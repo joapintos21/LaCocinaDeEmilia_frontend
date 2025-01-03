@@ -8,7 +8,7 @@ import illustration from 'images/signup-illustration.svg';
 import logo from 'images/logo.svg';
 import { ReactComponent as SignUpIcon } from 'feather-icons/dist/icons/user-plus.svg';
 import { crearUsuario } from 'scripts/signUp';
-import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center -m-8`;
 const Content = tw.div`max-w-screen-xl m-0 sm:mx-20 sm:my-16 bg-white text-gray-900 shadow sm:rounded-lg flex justify-center flex-1`;
@@ -51,15 +51,24 @@ export default ({
 	const [nombre, setNombre] = useState('');
 	const [telefono, setTelefono] = useState('');
 	const [error, setError] = useState('');
-	const rol_id = 1;
-	const navigate = useNavigate();
+	const rol_id = 4; //Cliente
+
+	const limpiarFormulario = () => {
+		setEmail('');
+		setPassword('');
+		setNombre('');
+		setTelefono('');
+		setError('');
+	};
 
 	const handleCreateUser = (event) => {
 		event.preventDefault();
 		crearUsuario(email, password, nombre, telefono, rol_id)
 			.then((data) => {
-				console.log(data);
-				navigate('/');
+				toast.warn(
+					'Usuario creado con éxito. Por favor, vaya a su casilla de correo electrónico para verificar su cuenta.',
+				);
+				limpiarFormulario();
 			})
 			.catch((error) => {
 				console.error('Error al crear el usuario:', error.message);
