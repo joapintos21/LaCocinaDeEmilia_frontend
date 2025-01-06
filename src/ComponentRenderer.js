@@ -90,7 +90,7 @@ import TwoColContactUsFullForm from 'components/forms/TwoColContactUsWithIllustr
 
 import GetStartedCTA from 'components/cta/GetStarted.js';
 import GetStartedLightCTA from 'components/cta/GetStartedLight.js';
-import DownloadAppCTA from 'components/cta/DownloadApp.js';
+//import DownloadAppCTA from 'components/cta/DownloadApp.js';
 
 import SimpleFiveColumnFooter from 'components/footers/SimpleFiveColumn.js';
 import FiveColumnWithInputFormFooter from 'components/footers/FiveColumnWithInputForm.js';
@@ -462,11 +462,11 @@ export const components = {
 					component: GetStartedLightCTA,
 					url: '/components/blocks/CTA/GetStartedLight',
 				},
-				DownloadApp: {
+				/*DownloadApp: {
 					name: 'Download App',
 					component: DownloadAppCTA,
 					url: '/components/blocks/CTA/DownloadApp',
-				},
+				},*/
 			},
 		},
 
