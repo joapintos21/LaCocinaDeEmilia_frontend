@@ -18,7 +18,7 @@ export default () => {
 	const categoriasRedux = useSelector((state) => state.categorias);
 
   const modules = [
-    { title: "Dashboard", component: <Dashboard /> },
+    //{ title: "Dashboard", component: <Dashboard /> },
     //{ title: "Gestión de Pedidos", component: <OrderManagement /> },
     { title: "Gestión de Categorías", component: <CategoryManagement /> },
     { title: "Gestión de Productos", component: <ProductManagement /> },
