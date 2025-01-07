@@ -32,14 +32,6 @@ export default () => {
 	window.gtag('js', new Date());
 	window.gtag('config', 'UA-45799926-9');
 
-	const downloadUrl = '/treact-ui.zip';
-	React.useEffect(() => {
-		var iframe = document.createElement('iframe');
-		iframe.style.display = 'none';
-		iframe.src = downloadUrl;
-		document.body.appendChild(iframe);
-	}, []);
-
 	return (
 		<AnimationRevealPage disabled>
 			<Container tw="-mx-8 -mt-8 pt-8 px-8">
