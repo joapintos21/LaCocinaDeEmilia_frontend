@@ -85,7 +85,7 @@ export default () => {
 
   const modules = [
     //{ title: "Dashboard", component: <Dashboard /> },
-    //{ title: "Gestión de Pedidos", component: <OrderManagement /> },
+    { title: "Gestión de Pedidos", component: <OrderManagement /> },
     { title: "Gestión de Categorías", component: <CategoryManagement /> },
     { title: "Gestión de Productos", component: <ProductManagement /> },
     //{ title: "Gestión de Adicionales de Productos", component: <AdditionalManagement /> },
