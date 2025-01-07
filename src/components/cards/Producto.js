@@ -7,8 +7,7 @@ import { calcularPrecioConDescuento } from 'utils/descuentoUtils';
 import { handleAddToCart } from 'utils/carritoUtils';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CustomDialog from "helpers/Dialog";
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -58,36 +57,27 @@ const BackButton = styled.button`
 `;
 
 const Producto = ({ producto }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleConfirm = () => {
-    console.log('Confirmación realizada');
-    setOpen(false);
-  };
-
-  const dispatch = useDispatch();
-  const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
-  const user = useSelector((state) => state.usuario); // ID del cliente desde el store
-  let clienteId = null;
-  if(user.isLoggedIn){
-    clienteId = user.userInfo.id;
-  }
+	const dispatch = useDispatch();
+	const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
+	const user = useSelector((state) => state.usuario); // ID del cliente desde el store
+	let clienteId = null;
+	if (user.isLoggedIn) {
+		clienteId = user.userInfo.id;
+	}
 
 	const [cantidad, setCantidad] = useState(1);
 
 	const precioConDescuento = calcularPrecioConDescuento(producto.precio, producto.descuentos || []);
 
-  const handleAgregarACarrito = () => {
-    handleAddToCart(producto, cantidad, token, clienteId, "producto", dispatch).then(() => {
-      handleOpen();
-      toast.success('Producto agregado al carrito.');
-    }).catch((e) => {
-      console.log(e.message);
-    });
-  }
+	const handleAgregarACarrito = () => {
+		handleAddToCart(producto, cantidad, token, clienteId, 'producto', dispatch)
+			.then(() => {
+				toast.success('Producto agregado al carrito.');
+			})
+			.catch((e) => {
+				console.log(e.message);
+			});
+	};
 
 	const incrementarCantidad = () => {
 		setCantidad((prevCantidad) => prevCantidad + 1);
@@ -104,71 +94,57 @@ const Producto = ({ producto }) => {
 
 	const navigate = useNavigate();
 
-  return (
-    <Content>
-      <BackButton onClick={() => navigate("/productos")}>
-          <ArrowBackIcon fontSize="small" /> <span>Volver a productos</span>
-       </BackButton>
-      <ImageContainer>
-        <Image
-          src={
-            producto.imageSrc ||
-            "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-          }
-          alt={producto.titulo}
-        />
-      </ImageContainer>
-      <Details>
-        <Title>{producto.descripcion || "Producto sin título"}</Title>
-        <Description>
-          {producto.descripcion || "Este producto no tiene descripción disponible."}
-        </Description>
-        <PriceContainer>
-          {producto.descuentos && producto.descuentos.length > 0 && (
-            <>
-              <OriginalPrice>${producto.precio.toFixed(2)}</OriginalPrice>
-              <DiscountedPrice>${precioConDescuento.toFixed(2)}</DiscountedPrice>
-            </>
-          )}
-          {!producto.descuentos || producto.descuentos.length === 0 ? (
-            <DiscountedPrice>${producto.precio.toFixed(2)}</DiscountedPrice>
-          ) : null}
-        </PriceContainer>
-        {producto.descuentos && producto.descuentos.length > 0 && (
-          <DiscountList>
-            {producto.descuentos.map((item) => (
-              <DiscountItem key={item.id}>
-                {item.descuento.descripcion} -{" "}
-                {item.descuento.tipo === "PORCENTAJE"
-                  ? `${(item.descuento.valor * 100).toFixed(2)}%`
-                  : `$${item.descuento.valor.toFixed(2)}`}
-              </DiscountItem>
-            ))}
-          </DiscountList>
-        )}
-        <QuantityContainer>
-          <QuantityButton onClick={decrementarCantidad}>-</QuantityButton>
-          <QuantityInput
-            type="number"
-            value={cantidad}
-            onChange={handleCantidadChange}
-            min="1"
-          />
-          <QuantityButton onClick={incrementarCantidad}>+</QuantityButton>
-        </QuantityContainer>
-        <ButtonContainer>
-          <PrimaryButton onClick={handleAgregarACarrito}>Agregar al carrito</PrimaryButton>
-        </ButtonContainer>
-      </Details>
-      <CustomDialog
-        open={open}
-        title="Confirmacion"
-        content="Desea agregar el producto al carrito?"
-        onClose={handleClose}
-        onConfirm={handleConfirm}
-      />
-    </Content>
-  );
+	return (
+		<Content>
+			<BackButton onClick={() => navigate('/productos')}>
+				<ArrowBackIcon fontSize="small" /> <span>Volver a productos</span>
+			</BackButton>
+			<ImageContainer>
+				<Image
+					src={
+						producto.imageSrc ||
+						'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
+					}
+					alt={producto.titulo}
+				/>
+			</ImageContainer>
+			<Details>
+				<Title>{producto.descripcion || 'Producto sin título'}</Title>
+				<Description>{producto.descripcion || 'Este producto no tiene descripción disponible.'}</Description>
+				<PriceContainer>
+					{producto.descuentos && producto.descuentos.length > 0 && (
+						<>
+							<OriginalPrice>${producto.precio.toFixed(2)}</OriginalPrice>
+							<DiscountedPrice>${precioConDescuento.toFixed(2)}</DiscountedPrice>
+						</>
+					)}
+					{!producto.descuentos || producto.descuentos.length === 0 ? (
+						<DiscountedPrice>${producto.precio.toFixed(2)}</DiscountedPrice>
+					) : null}
+				</PriceContainer>
+				{producto.descuentos && producto.descuentos.length > 0 && (
+					<DiscountList>
+						{producto.descuentos.map((item) => (
+							<DiscountItem key={item.id}>
+								{item.descuento.descripcion} -{' '}
+								{item.descuento.tipo === 'PORCENTAJE'
+									? `${(item.descuento.valor * 100).toFixed(2)}%`
+									: `$${item.descuento.valor.toFixed(2)}`}
+							</DiscountItem>
+						))}
+					</DiscountList>
+				)}
+				<QuantityContainer>
+					<QuantityButton onClick={decrementarCantidad}>-</QuantityButton>
+					<QuantityInput type="number" value={cantidad} onChange={handleCantidadChange} min="1" />
+					<QuantityButton onClick={incrementarCantidad}>+</QuantityButton>
+				</QuantityContainer>
+				<ButtonContainer>
+					<PrimaryButton onClick={handleAgregarACarrito}>Agregar al carrito</PrimaryButton>
+				</ButtonContainer>
+			</Details>
+		</Content>
+	);
 };
 
 export default Producto;

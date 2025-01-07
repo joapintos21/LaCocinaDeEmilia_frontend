@@ -13,14 +13,11 @@ const apiCliente = axios.create({
 apiCliente.interceptors.request.use(
 	(config) => {
 		const token = sessionStorage.getItem('token');
-
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
-
 		return config;
 	},
-
 	(error) => {
 		return Promise.reject(error);
 	},
@@ -32,21 +29,14 @@ apiCliente.interceptors.response.use(
 	(response) => {
 		return response;
 	},
-
 	(error) => {
 		if (error.response) {
 			const { status } = error.response;
 
 			// Manejo de errores 401 (No autorizado)
-
 			if (status === 401) {
 				// Limpia el sessionStorage y redirige al login
-
 				sessionStorage.clear();
-
-				alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-
-				window.location.href = '/login'; // Redirige al login
 			}
 
 			// Manejo de otros errores globales
