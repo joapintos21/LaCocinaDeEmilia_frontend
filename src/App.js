@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Importa los estilos por defecto de react-toastify
 import GlobalStyles from 'styles/GlobalStyles';
 import { css } from 'styled-components/macro'; //eslint-disable-line
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -153,7 +155,7 @@ export default function App() {
 			};
 			fetchPacks();
 
-			if (user && user.rol === 'Cliente') {
+			if (user && user.rol === 'Cliente' && token) {
 				const fetchPedido = async () => {
 					await obtenerPedidoEnProgreso(user.id, token, dispatch).catch((e) => {
 						console.log('Error en el Obtener Pedido:' + e);
@@ -167,10 +169,22 @@ export default function App() {
 		} catch (e) {
 			console.log(e);
 		}
-	}, []);
+	}, [dispatch, user, token]);
 
 	return (
 		<>
+			<ToastContainer
+				position="top-right"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light" // Opciones: light, dark, colored
+			/>
 			<GlobalStyles />
 			<ThemeProvider theme={theme}>
 				<Router>

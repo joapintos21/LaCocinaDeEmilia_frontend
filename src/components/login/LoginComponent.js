@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from 'store/usuarioSlice'; // Importa la acción login desde el slice
 import broadcastService from 'utils/broadcastService';
+import { toast } from 'react-toastify';
 
 const Form = tw.form`mx-auto max-w-xs`;
 const Input = tw.input`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`;
@@ -27,7 +28,7 @@ const LoginComponente = () => {
 		// Muestra un mensaje si la cuenta ha sido verificada
 		const params = new URLSearchParams(location.search);
 		if (params.get('mensaje') === 'verificado') {
-			alert('Cuenta activada con éxito. Por favor, inicia sesión.');
+			toast.success('Cuenta activada con éxito. Por favor, inicia sesión.');
 		}
 	}, [location]);
 
