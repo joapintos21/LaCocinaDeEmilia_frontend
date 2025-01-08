@@ -84,14 +84,13 @@ export default () => {
 	};
 
   const modules = [
-    //{ title: "Dashboard", component: <Dashboard /> },
-    //{ title: "Gestión de Pedidos", component: <OrderManagement /> },
-    { title: "Gestión de Categorías", component: <CategoryManagement /> },
-    { title: "Gestión de Productos", component: <ProductManagement /> },
-    //{ title: "Gestión de Adicionales de Productos", component: <AdditionalManagement /> },
-    { title: "Gestión de Descuentos", component: <DiscountManagement /> },
-    { title: "Gestión de Usuarios", component: <UserManagement /> },
-    { title: "Gestión de Permisos", component: <PermissionsManagement /> },
+    { title: "Dashboard", component: <Dashboard /> },
+    { title: "Pedidos", component: <OrderManagement /> },
+    { title: "Categorías", component: <CategoryManagement /> },
+    { title: "Productos", component: <ProductManagement /> },
+    { title: "Descuentos", component: <DiscountManagement /> },
+    { title: "Usuarios", component: <UserManagement /> },
+    { title: "Permisos", component: <PermissionsManagement /> },
 	{
 		title: 'Reporte de pedidos',
 		component: (
@@ -156,12 +155,12 @@ export default () => {
 							'& .MuiDrawer-paper': {
 								width: 240,
 								boxSizing: 'border-box',
-								position: 'fixed', // Fijo a la pantalla
-								top: 230, // Ajusta la posición debajo del encabezado
-								overflow: 'auto', // Habilita scroll interno en el Drawer si es necesario
-								backgroundColor: 'transparent', // Fondo transparente
-								border: 'none', // Sin bordes
-								zIndex: 1200, // Asegura que el Drawer esté sobre otros elementos
+								position: 'fixed', 
+								top: 230, 
+								overflow: 'auto', 
+								backgroundColor: 'transparent', 
+								border: 'none', 
+								zIndex: 1200, 
 							},
 						}}
 					>
@@ -198,9 +197,9 @@ export default () => {
 						sx={{
 							flexGrow: 1,
 							padding: 3,
-							marginLeft: '240px', // Ajusta el espacio para la barra lateral
-							marginTop: '64px', // Ajusta el espacio para el encabezado
-							height: 'calc(100vh - 64px)', // Asegura que el contenido se ajuste al espacio restante
+							marginLeft: '240px', 
+							marginTop: '64px', 
+							height: 'calc(100vh - 64px)', 
 						}}
 					>
 						{/* Renderizar el módulo activo */}
