@@ -1,5 +1,5 @@
 export const actualizarUsuario = async (id, telefono, nombre, email, rolId, status, token) => {
-    const url = `/usuarios/update/${id}`;  
+    const url = `/usuarios/update?id=${id}`;  
   
     const body = {
       telefono: telefono,

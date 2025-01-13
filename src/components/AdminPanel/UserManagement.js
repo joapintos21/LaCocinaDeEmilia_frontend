@@ -27,6 +27,19 @@ import AddIcon from '@mui/icons-material/Add';
 import { obtenerUsuarios } from 'scripts/obtenerUsuarios';
 import { obtenerRolesUsuario } from 'scripts/obtenerRolesUsuario';
 
+function capitalizeFirstLetter(str) {
+	if (typeof str !== 'string' || str.length === 0) {
+		return '';
+	}
+	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+function esSoloNumerico(cadena) {
+	// La expresión regular permite un "+" al inicio, seguido solo de dígitos
+	const patron = /^\+?[0-9]+$/;
+	return patron.test(cadena);
+}
+
 const UserManagement = () => {
 	const [error, setError] = useState('');
 	const dispatch = useDispatch();
@@ -36,8 +49,6 @@ const UserManagement = () => {
 	const fetchRolesUsuario = async () => {
 		await obtenerRolesUsuario(dispatch, sessionStorage.getItem('token'));
 	};
-	const usuarios = useSelector((state) => state.usuarios || []);
-	const roles = useSelector((state) => state.rolesUsuario || []);
 
 	const [open, setOpen] = useState(false);
 	const [newUsuario, setNewUsuario] = useState({
@@ -49,8 +60,11 @@ const UserManagement = () => {
 		rol: '',
 		status: '',
 	});
+
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchEmail, setSearchEmail] = useState('');
+	const usuarios = useSelector((state) => state.usuarios || []);
+	const roles = useSelector((state) => state.rolesUsuario || []);
 
 	useEffect(() => {
 		try {
@@ -65,13 +79,19 @@ const UserManagement = () => {
 	const handleOpen = (usuario = null) => {
 		setNewUsuario(
 			usuario
-				? { ...usuario }
+				? {
+						...usuario,
+						rol_id: usuario.rol_id || '',
+						rol: usuario.rol || '',
+						status: usuario.status || '',
+				  }
 				: {
 						id: null,
 						nombre: '',
 						password: '',
 						email: '',
 						telefono: '',
+						rol_id: '',
 						rol: '',
 						status: '',
 				  },
@@ -89,36 +109,43 @@ const UserManagement = () => {
 	};
 
 	const handleSaveUsuario = () => {
-		if (newUsuario.nombre && newUsuario.email && newUsuario.telefono && newUsuario.rol) {
-			if (newUsuario.id === null) {
-				const usuarioToAdd = { ...newUsuario };
-				dispatch(addUsuario(usuarioToAdd));
-
-				crearUsuario(
-					newUsuario.email,
-					newUsuario.password,
-					newUsuario.nombre,
-					newUsuario.telefono,
-					newUsuario.rol,
-					sessionStorage.getItem('token'),
-				)
-					.then((data) => {
-						console.log('Usuario agregado:', data);
-						fetchUsuarios();
-						fetchRolesUsuario();
-					})
-					.catch((error) => {
-						console.error('Error al crear el usuario:', error.message);
-						setError(error.message);
-					});
+		if (newUsuario.id === null) {
+			if (newUsuario.nombre && newUsuario.email && newUsuario.telefono && newUsuario.rol_id) {
+				if (esSoloNumerico(newUsuario.telefono)) {
+					crearUsuario(
+						newUsuario.email,
+						newUsuario.password,
+						newUsuario.nombre,
+						newUsuario.telefono,
+						newUsuario.rol_id,
+						sessionStorage.getItem('token'),
+					)
+						.then((data) => {
+							console.log('Usuario agregado:', data);
+							fetchUsuarios();
+							fetchRolesUsuario();
+						})
+						.catch((error) => {
+							console.error('Error al crear el usuario:', error.message);
+							setError(error.message);
+						});
+					fetchUsuarios();
+					fetchRolesUsuario();
+				} else {
+					setError('El numero de telefono debe ser numerico.');
+				}
 			} else {
-				if (newUsuario.status) {
+				setError('Por favor, complete todos los campos.');
+			}
+		} else {
+			if (newUsuario.nombre && newUsuario.telefono && newUsuario.email && newUsuario.rol && newUsuario.status) {
+				if (esSoloNumerico(newUsuario.telefono)) {
 					actualizarUsuario(
 						newUsuario.id,
 						newUsuario.telefono,
 						newUsuario.nombre,
 						newUsuario.email,
-						newUsuario.rol,
+						newUsuario.rol_id,
 						newUsuario.status,
 						sessionStorage.getItem('token'),
 					)
@@ -131,24 +158,26 @@ const UserManagement = () => {
 							console.error('Error al actualizar el usuario:', error.message);
 							setError(error.message);
 						});
-					dispatch(updateUsuario(newUsuario));
+					fetchUsuarios();
+					fetchRolesUsuario();
 				} else {
-					setError('Por favor, complete todos los campos.');
+					setError('El numero de telefono debe ser numerico.');
 				}
+			} else {
+				setError('Por favor, complete todos los campos.');
 			}
-
-			setNewUsuario({
-				nombre: '',
-				password: '',
-				email: '',
-				telefono: '',
-				rol: '',
-				status: '',
-			});
-			handleClose();
-		} else {
-			setError('Por favor, complete todos los campos.');
 		}
+
+		setNewUsuario({
+			nombre: '',
+			password: '',
+			email: '',
+			telefono: '',
+			rol_id: '',
+			rol: '',
+			status: '',
+		});
+		handleClose();
 	};
 
 	const handleDelete = (id) => {
@@ -229,12 +258,20 @@ const UserManagement = () => {
 			{/* Tabla de usuarios */}
 			<TableContainer component={Paper} sx={{ maxHeight: 400, overflow: 'auto' }}>
 				<Table>
-					<TableHead sx={{ position: 'sticky', top: 0, backgroundColor: '#FFFFFF' }}>
+					<TableHead
+						sx={{
+							position: 'sticky',
+							top: 0,
+							backgroundColor: '#FFFFFF',
+							zIndex: 1,
+						}}
+					>
 						<TableRow>
 							<TableCell>Nombre</TableCell>
 							<TableCell>Correo</TableCell>
 							<TableCell>Telefono</TableCell>
 							<TableCell>Rol</TableCell>
+							<TableCell>Estado</TableCell>
 							<TableCell>Acciones</TableCell>
 						</TableRow>
 					</TableHead>
@@ -246,6 +283,7 @@ const UserManagement = () => {
 									<TableCell>{usuario.email}</TableCell>
 									<TableCell>{usuario.telefono}</TableCell>
 									<TableCell>{usuario.rol}</TableCell>
+									<TableCell>{capitalizeFirstLetter(usuario.status)}</TableCell>
 									<TableCell>
 										<Button
 											variant="outlined"
@@ -298,7 +336,7 @@ const UserManagement = () => {
 						fullWidth
 						sx={{ marginBottom: 2 }}
 					/>
-					{/* Campos de contraseña y teléfono: solo visibles si el usuario está siendo creado */}
+					{/* Campos de contraseña: solo visiblee si el usuario está siendo creado */}
 					{!newUsuario.id && (
 						<>
 							{/* Campo de contraseña */}
@@ -313,22 +351,21 @@ const UserManagement = () => {
 							/>
 						</>
 					)}
-          {/* Campo de teléfono */}
-							Teléfono
-							<TextField
-								name="telefono"
-								type="number"
-								value={newUsuario.telefono}
-								onChange={handleInputChange}
-								fullWidth
-								sx={{ marginBottom: 2 }}
-							/>
+					{/* Campo de teléfono */}
+					Teléfono
+					<TextField
+						name="telefono"
+						value={newUsuario.telefono}
+						onChange={handleInputChange}
+						fullWidth
+						sx={{ marginBottom: 2 }}
+					/>
 					{/* Campo de rol */}
 					Rol
 					<TextField
-						name="rol"
+						name="rol_id"
 						variant="outlined"
-						value={newUsuario.rol}
+						value={newUsuario.rol_id}
 						onChange={handleInputChange}
 						fullWidth
 						select
@@ -344,26 +381,29 @@ const UserManagement = () => {
 							</option>
 						))}
 					</TextField>
-					{/* Campo de estado */}
-					Estado
-					<TextField
-						name="status"
-						variant="outlined"
-						value={newUsuario.status}
-						onChange={handleInputChange}
-						fullWidth
-						select
-						SelectProps={{
-							native: true,
-						}}
-						style={{ marginBottom: '10px' }}
-					>
-						<option value="">Seleccionar estado</option>
-						<option value={'activo'}>Activo</option>
-						<option value={'pendiente'}>Pendiente</option>
-					</TextField>
+					{/* Campo de estado: solo visible si el usuario esta siendo actualizado */}
+					{newUsuario.id && (
+						<>
+							Estado
+							<TextField
+								name="status"
+								variant="outlined"
+								value={newUsuario.status}
+								onChange={handleInputChange}
+								fullWidth
+								select
+								SelectProps={{
+									native: true,
+								}}
+								style={{ marginBottom: '10px' }}
+							>
+								<option value="">Seleccionar estado</option>
+								<option value="activo">Activo</option>
+								<option value="pendiente">Pendiente</option>
+							</TextField>
+						</>
+					)}
 				</DialogContent>
-
 				{/* Botones de acción */}
 				<DialogActions>
 					<Button onClick={handleClose} color="secondary">
