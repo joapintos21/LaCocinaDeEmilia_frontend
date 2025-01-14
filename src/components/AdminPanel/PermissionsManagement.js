@@ -82,7 +82,6 @@ const PermissionsManagement = () => {
 		if (newPermiso.endpoint && newPermiso.tipo && newPermiso.rol_id) {
 			if (newPermiso.id === null) {
 				const permisoToAdd = { ...newPermiso };
-				//dispatch(addPermiso(permisoToAdd));
 
 				crearPermiso(newPermiso.endpoint, newPermiso.tipo, newPermiso.rol_id, sessionStorage.getItem('token'))
 					.then((data) => {
@@ -111,7 +110,6 @@ const PermissionsManagement = () => {
 						console.error('Error al actualizar el permiso:', error.message);
 						setError(error.message);
 					});
-				//dispatch(updatePermiso(newPermiso));
 			}
 
 			setNewPermiso({ endpoint: '', tipo: '', rol_id: '' });

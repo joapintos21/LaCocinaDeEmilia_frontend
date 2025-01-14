@@ -99,7 +99,6 @@ const ProductManagement = () => {
 				)
 					.then((data) => {
 						if (data && data.id) {
-							fetchProductos();
 							console.log('Producto creado:', data);
 						} else {
 							setError('Error al crear el producto en la base de datos.');
@@ -109,6 +108,7 @@ const ProductManagement = () => {
 						console.error('Error al crear el producto:', error.message);
 						setError(error.message);
 					});
+				fetchProductos();
 			} else {
 				actualizarProducto(
 					newProduct.id,

@@ -7,6 +7,7 @@ import { calcularPrecioConDescuento } from 'utils/descuentoUtils';
 import { handleAddToCart } from 'utils/carritoUtils';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { toast } from 'react-toastify';
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -71,10 +72,10 @@ const Producto = ({ producto }) => {
 	const handleAgregarACarrito = () => {
 		handleAddToCart(producto, cantidad, token, clienteId, 'producto', dispatch)
 			.then(() => {
-				alert('Producto agregado al carrito');
+				toast.success('Producto agregado al carrito.');
 			})
 			.catch((e) => {
-				alert(e.message);
+				console.log(e.message);
 			});
 	};
 
@@ -117,18 +118,18 @@ const Producto = ({ producto }) => {
 							<DiscountedPrice>${precioConDescuento.toFixed(2)}</DiscountedPrice>
 						</>
 					)}
-					{!producto.descuentos || producto.descuentos.length === 0 ?
+					{!producto.descuentos || producto.descuentos.length === 0 ? (
 						<DiscountedPrice>${producto.precio.toFixed(2)}</DiscountedPrice>
-					:	null}
+					) : null}
 				</PriceContainer>
 				{producto.descuentos && producto.descuentos.length > 0 && (
 					<DiscountList>
 						{producto.descuentos.map((item) => (
 							<DiscountItem key={item.id}>
 								{item.descuento.descripcion} -{' '}
-								{item.descuento.tipo === 'PORCENTAJE' ?
-									`${(item.descuento.valor * 100).toFixed(2)}%`
-								:	`$${item.descuento.valor.toFixed(2)}`}
+								{item.descuento.tipo === 'PORCENTAJE'
+									? `${(item.descuento.valor * 100).toFixed(2)}%`
+									: `$${item.descuento.valor.toFixed(2)}`}
 							</DiscountItem>
 						))}
 					</DiscountList>

@@ -1,33 +1,28 @@
-let request, queryParams, url;
+// Ruta: src/scripts/loginScript.js
+import apiClient from '../utils/apiCliente'; // Asegúrate de que la ruta sea correcta
 
 export const iniciarSesion = async (emailInput, passwordInput) => {
-	request = '/login/iniciarSesion';
-
-	queryParams = new URLSearchParams({
-		email: emailInput,
-		password: passwordInput,
-	}).toString();
-
-	url = `${request}?${queryParams}`;
-
 	try {
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
+		// Realiza la solicitud POST usando el cliente API
+		const response = await apiClient.post('/login/iniciarSesion', {
+			email: emailInput,
+			password: passwordInput,
 		});
 
-		// Maneja errores fuera del rango 200-299
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		const data = await response.json();
-		return data; // Devuelve los datos de la respuesta
+		// Devuelve los datos de la respuesta
+		return response.data;
 	} catch (error) {
-		console.error(error);
-		throw error; // Lanza el error para que sea capturado en el evento
+		// Manejo de errores
+		if (error.response) {
+			// Si el error tiene respuesta, lanza el mensaje adecuado
+			const errorData = error.response.data;
+			throw new Error(errorData.error || 'Se produjo un error desconocido.');
+		} else if (error.request) {
+			// Si no se recibe respuesta del servidor
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			// Error al configurar la solicitud
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };
