@@ -45,6 +45,7 @@ const CartPage = () => {
 	const user = useSelector((state) => state.usuario); // ID del cliente desde el store
 	const [isLoading, setIsLoading] = useState(true); // Estado para el loader
 	const [preferenceId, setPreferenceId] = useState(null);
+
 	let userId = null;
 	if (user.isLoggedIn) {
 		userId = user.userInfo.id;
@@ -103,7 +104,7 @@ const CartPage = () => {
 		0,
 	);
 	const total = (subtotal + (costoEnvio > 0 ? costoEnvio : 0)) * (1 + (comisionMP > 0 ? comisionMP / 100 : 0));
-
+	
 	const handleIncrement = (item) => {
 		handleAddToCart(item, 1, token, userId, item.tipo, dispatch);
 	};
@@ -199,7 +200,7 @@ const CartPage = () => {
 	}, []);
 
 	const [isOpenAgendar, setIsOpenAgendar] = useState(false);
-	const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
+	const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
 	const [fechasOcupadas, setFechasOcupadas] = useState([]);
 	const [fechaFormateada, setFechaFormateada] = useState(null);
 
@@ -266,9 +267,9 @@ const CartPage = () => {
 		}
 	};
 
-	const [metodoPago, setMetodoPago] = useState(''); // Almacena el método de pago seleccionado
+	const [metodoPago, setMetodoPago] = useState('');
 	const [mostrarModalTransferencia, setMostrarModalTransferencia] = useState(false); // Estado para mostrar el modal
-
+	
 	useEffect(() => {
 		if (metodoPago === 'mercado-pago') {
 			dispatch(setComisionMP(5.99));
@@ -277,10 +278,12 @@ const CartPage = () => {
 		}
 	}, [metodoPago]);
 
-	const handleSeleccionMetodoPago = (metodo) => {
-		setMetodoPago(metodo);
-		setPreferenceId('');
-	};
+	  const handleSeleccionMetodoPago = (metodo) => {
+		if (direccionId && fechaSeleccionada) {
+		  setMetodoPago(metodo);
+		  setPreferenceId('');
+		  }
+	  	};
 
 	const handleFinalizarCompraTransferencia = () => {
 		setMostrarModalTransferencia(true);
@@ -419,11 +422,11 @@ const CartPage = () => {
 								value="mercado-pago"
 								onChange={() => {
 									handleSeleccionMetodoPago('mercado-pago');
-									handleMercadoPago(); // Llamada a la función cuando se selecciona Mercado Pago
-								}}
+									handleMercadoPago();}}
+								disabled={!direccionId || !fechaSeleccionada}
 							/>
 							<Label htmlFor="mercado-pago">
-								Pagar con Mercado Pago (+ comision de 5,99% a cargo del cliente)
+								Pagar con Mercado Pago (+ comisión de 5,99% a cargo del cliente)
 							</Label>
 						</PaymentOption>
 						<PaymentOption>
@@ -433,9 +436,10 @@ const CartPage = () => {
 								name="metodo-pago"
 								value="transferencia"
 								onChange={() => handleSeleccionMetodoPago('transferencia')}
+								disabled={!direccionId || !fechaSeleccionada}
 							/>
 							<Label htmlFor="transferencia">Pagar por Transferencia</Label>
-						</PaymentOption>
+							</PaymentOption>
 					</PaymentSection>
 					<TransferenciaModal
 						mostrarModalTransferencia={mostrarModalTransferencia}

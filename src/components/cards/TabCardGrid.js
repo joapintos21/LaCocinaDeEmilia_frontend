@@ -92,26 +92,27 @@ export default () => {
 		fetchProductos();
 	}, [dispatch]);
 
-	// Transformar productos y packs al formato requerido
 	useEffect(() => {
 		if (productosRedux && productosRedux.length > 0) {
-			const transformedProducts = productosRedux.map((producto) => ({
-				id: producto.id,
-				imageSrc:
-					producto.imageUrl ||
-					'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
-				title: producto.descripcion || 'Sin nombre',
-				price: producto.precio || '$0.00',
-				category: producto.categoria.titulo || 'Otros',
-				url: `/producto/${producto.id}`,
-			}));
+			const transformedProducts = productosRedux
+				.filter((producto) => producto.visible)
+				.map((producto) => ({
+					id: producto.id,
+					imageSrc:
+						producto.imageUrl ||
+						'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
+					title: producto.descripcion || 'Sin nombre',
+					price: producto.precio || '$0.00',
+					category: producto.categoria.titulo || 'Otros',
+					url: `/producto/${producto.id}`,
+				}));
 			setProducts(transformedProducts);
 		}
-
+	
 		if (packsRedux && packsRedux.length > 0) {
 			const transformedPacks = packsRedux.map((pack) => ({
 				id: pack.id,
-				imageSrc: 'https://via.placeholder.com/150', // Pack no tiene imágenes
+				imageSrc: 'https://via.placeholder.com/150',
 				title: pack.nombre || 'Pack sin nombre',
 				price: pack.precio || '$0.00',
 				category: 'Packs',
