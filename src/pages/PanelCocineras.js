@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import tw from 'twin.macro';
 import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
-import Header from 'components/headers/light.js';
 import { useSelector } from 'react-redux';
 import { format, parse } from 'date-fns';
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
@@ -93,7 +92,6 @@ const PanelCocineras = () => {
 
 	return (
 		<AnimationRevealPage>
-			<Header />
 			<Container>
 				{isLoading ? (
 					<p>Cargando pedidos...</p>

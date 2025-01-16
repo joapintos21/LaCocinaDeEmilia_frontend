@@ -7,11 +7,17 @@ import { agregarItem } from 'store/carritoSlice';
 /**
  * Agregar un producto al carrito
  */
-export const handleAddToCart = async (producto, cantidad, token, clienteId, tipo, dispatch) => {
+export const handleAddToCart = async (producto, cantidad, selectedAdicional, token, clienteId, tipo, dispatch) => {
 	let response;
+	let adicional = producto.adicional;
+	if (!adicional) {
+		adicional = selectedAdicional
+			? producto.adicionales.filter((adicional) => adicional.id === parseInt(selectedAdicional))[0]
+			: null;
+	}
 
 	if (tipo === 'producto') {
-		response = await agregarProductoACarrito(clienteId, producto.id, cantidad, token);
+		response = await agregarProductoACarrito(clienteId, producto.id, cantidad, adicional?.id, token);
 	} else {
 		response = await agregarPackACarrito(clienteId, producto.id, cantidad, token);
 	}
@@ -20,7 +26,7 @@ export const handleAddToCart = async (producto, cantidad, token, clienteId, tipo
 	const pedidoId = response?.pedido_id;
 
 	// Crear el objeto con la información del producto y el pedido_id
-	const productoConCantidad = { ...producto, cantidad, tipo, pedido_id: pedidoId };
+	const productoConCantidad = { ...producto, cantidad, tipo, pedido_id: pedidoId, adicional };
 
 	dispatch(agregarItem(productoConCantidad));
 };
@@ -28,10 +34,10 @@ export const handleAddToCart = async (producto, cantidad, token, clienteId, tipo
 /**
  * Quitar un producto del carrito
  */
-export const handleQuitarDeCarrito = async (userId, productoId, cantidad, tipo, token) => {
+export const handleQuitarDeCarrito = async (userId, productoId, cantidad, tipo, adicionalId, token) => {
 	try {
 		if (tipo === 'producto') {
-			await quitarProductoCarrito(userId, productoId, cantidad, token);
+			await quitarProductoCarrito(userId, productoId, cantidad, adicionalId, token);
 		} else {
 			await quitarPackCarrito(userId, productoId, cantidad, token);
 		}

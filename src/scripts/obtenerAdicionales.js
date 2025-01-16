@@ -1,16 +1,14 @@
-import { setAdicionales } from '../store/adicionalSlice';
+export const obtenerAdicionales = async (productoId, dispatch, token) => {
+	let url = `/productos/listarAdicionales?producto_id=${productoId}`;
 
-export const obtenerAdicionales = async (dispatch, token) => {
-  let url = "/listarAdicionales/listarAdicionales?producto_id=1";
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-    });
+	try {
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
 		// Maneja errores fuera del rango 200-299
 		if (!response.ok) {
@@ -19,7 +17,7 @@ export const obtenerAdicionales = async (dispatch, token) => {
 		}
 
 		const data = await response.json();
-		dispatch(setAdicionales(data)); // Almacena las categorías en Redux
+		return data; // Almacena las categorías en Redux
 	} catch (error) {
 		console.error(error);
 		throw error; // Lanza el error para que sea capturado en el evento

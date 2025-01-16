@@ -16,7 +16,12 @@ const carritoSlice = createSlice({
 	reducers: {
 		agregarItem: (state, action) => {
 			const newItem = action.payload;
-			const existingItem = state.items.find((item) => item.id === newItem.id && item.tipo === newItem.tipo);
+			const existingItem = state.items.find(
+				(item) =>
+					item.id === newItem.id &&
+					item.adicional?.id === newItem.adicional?.id &&
+					item.tipo === newItem.tipo,
+			);
 
 			if (existingItem) {
 				existingItem.cantidad += newItem.cantidad || 1; // Incrementa la cantidad
@@ -28,27 +33,50 @@ const carritoSlice = createSlice({
 					tipo: newItem.tipo, // "producto" o "pack"
 					precio: newItem.precio,
 					cantidad: newItem.cantidad || 1,
-					precioTotal: newItem.precio * (newItem.cantidad || 1),
+					precioTotal: (newItem.precio + (newItem.adicional?.costoAdicional || 0)) * (newItem.cantidad || 1),
+					adicional: newItem.adicional,
 				});
 			}
 			state.cantidadProductos += newItem.cantidad || 1;
-			state.precioTotal += newItem.precio * (newItem.cantidad || 1);
+			state.precioTotal += (newItem.precio + (newItem.adicional?.costoAdicional || 0)) * (newItem.cantidad || 1);
 			state.pedidoId = newItem.pedido_id;
 		},
 
 		quitarItem: (state, action) => {
-			const { id, tipo } = action.payload;
+			const { id, tipo, adicional, cantidad = 1 } = action.payload;
 
-			const existingItemIndex = state.items.findIndex((item) => item.id === id && item.tipo === tipo);
+			// Buscar el índice del producto-adicional en el carrito
+			const existingItemIndex = state.items.findIndex(
+				(item) =>
+					item.id === id &&
+					item.tipo === tipo &&
+					(adicional
+						? item.adicional?.id === adicional.id // Verificar adicional coincidente
+						: !item.adicional), // Buscar productos sin adicional si adicional es null
+			);
 
 			if (existingItemIndex !== -1) {
 				const existingItem = state.items[existingItemIndex];
 
-				state.cantidadProductos -= existingItem.cantidad;
-				state.precioTotal -= existingItem.precioTotal;
+				if (existingItem.cantidad > cantidad) {
+					// Reducir cantidad del producto-adicional
+					existingItem.cantidad -= cantidad;
+					existingItem.precioTotal -=
+						(existingItem.precio + (existingItem.adicional?.costoAdicional || 0)) * cantidad;
 
-				state.items.splice(existingItemIndex, 1);
+					// Ajustar los totales
+					state.cantidadProductos -= cantidad;
+					state.precioTotal -=
+						(existingItem.precio + (existingItem.adicional?.costoAdicional || 0)) * cantidad;
+				} else {
+					// Eliminar el producto-adicional del carrito
+					state.cantidadProductos -= existingItem.cantidad;
+					state.precioTotal -= existingItem.precioTotal;
+					state.items.splice(existingItemIndex, 1);
+				}
 			}
+
+			// Si el carrito queda vacío, limpiar pedidoId y direccionId
 			if (state.cantidadProductos < 1) {
 				state.pedidoId = '';
 				state.direccionId = '';
@@ -56,36 +84,54 @@ const carritoSlice = createSlice({
 		},
 
 		incrementarCantidad: (state, action) => {
-			const { id, tipo } = action.payload;
+			const { id, tipo, adicional } = action.payload;
 
-			const existingItem = state.items.find((item) => item.id === id && item.tipo === tipo);
+			const existingItem = state.items.find(
+				(item) =>
+					item.id === id &&
+					item.tipo === tipo &&
+					(adicional ? item.adicional?.id === adicional.id : !item.adicional),
+			);
 
 			if (existingItem) {
 				existingItem.cantidad += 1;
-				existingItem.precioTotal += existingItem.precio;
+				existingItem.precioTotal += existingItem.precio + (existingItem.adicional?.costoAdicional || 0);
 				state.cantidadProductos += 1;
-				state.precioTotal += existingItem.precio;
+				state.precioTotal += existingItem.precio + (existingItem.adicional?.costoAdicional || 0);
 			}
 		},
 
 		decrementarCantidad: (state, action) => {
-			const { id, tipo } = action.payload;
+			const { id, tipo, adicional } = action.payload;
 
-			const existingItem = state.items.find((item) => item.id === id && item.tipo === tipo);
+			const existingItem = state.items.find(
+				(item) =>
+					item.id === id &&
+					item.tipo === tipo &&
+					(adicional ? item.adicional?.id === adicional.id : !item.adicional),
+			);
 
 			if (existingItem) {
 				if (existingItem.cantidad > 1) {
 					existingItem.cantidad -= 1;
-					existingItem.precioTotal -= existingItem.precio;
+					existingItem.precioTotal -= existingItem.precio + (existingItem.adicional?.costoAdicional || 0);
 					state.cantidadProductos -= 1;
-					state.precioTotal -= existingItem.precio;
+					state.precioTotal -= existingItem.precio + (existingItem.adicional?.costoAdicional || 0);
 				} else {
-					// Si la cantidad es 1, elimina el producto o pack
-					state.items = state.items.filter((item) => item.id !== id || item.tipo !== tipo);
+					// Si la cantidad es 1, elimina el producto-adicional
+					state.items = state.items.filter(
+						(item) =>
+							!(
+								item.id === id &&
+								item.tipo === tipo &&
+								(adicional ? item.adicional?.id === adicional.id : !item.adicional)
+							),
+					);
 					state.cantidadProductos -= 1;
-					state.precioTotal -= existingItem.precio;
+					state.precioTotal -= existingItem.precio + (existingItem.adicional?.costoAdicional || 0);
 				}
 			}
+
 			if (state.cantidadProductos < 1) {
 				state.pedidoId = '';
 				state.direccionId = '';
@@ -120,7 +166,8 @@ const carritoSlice = createSlice({
 					tipo: 'producto', // Identifica como producto
 					precio: producto.precio,
 					cantidad: producto.cantidad,
-					precioTotal: producto.precio * producto.cantidad,
+					precioTotal: (producto.precio + (producto.adicional?.costoAdicional || 0)) * producto.cantidad,
+					adicional: producto.adicional,
 				})),
 				...packs.map((pack) => ({
 					id: pack.id,

@@ -37,7 +37,7 @@ const TransferenciaModal = ({
 	};
 
 	return (
-		<div>
+		<div style={{ zIndex: '1000' }}>
 			{/* Modal de Transferencia */}
 			<Modal
 				isOpen={mostrarModalTransferencia}
@@ -56,7 +56,7 @@ const TransferenciaModal = ({
 						padding: '20px',
 						borderRadius: '10px',
 					},
-					overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' },
+					overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1001 },
 				}}
 			>
 				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -100,7 +100,7 @@ const TransferenciaModal = ({
 						padding: '20px',
 						borderRadius: '10px',
 					},
-					overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' },
+					overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1001 },
 				}}
 			>
 				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

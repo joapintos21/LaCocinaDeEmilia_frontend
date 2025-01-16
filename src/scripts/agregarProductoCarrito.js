@@ -2,15 +2,16 @@
 import { toast } from 'react-toastify';
 import apiClient from '../utils/apiCliente'; // Asegúrate de que la ruta sea correcta
 
-export const agregarProductoACarrito = async (clienteId, productoId, cantidad, token) => {
-	if (!clienteId) {
-		throw new Error('Debe iniciar sesión para poder agregar productos.');
-	}
+export const agregarProductoACarrito = async (clienteId, productoId, cantidad, selectedAdicional, token) => {
+	// if (!clienteId) {
+	// 	throw new Error('Debe iniciar sesión para poder agregar productos.');
+	// }
 
 	const body = {
 		userId: clienteId,
 		productoId: productoId,
 		cantidad: cantidad,
+		adicionalId: selectedAdicional,
 	};
 
 	try {

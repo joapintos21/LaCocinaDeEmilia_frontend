@@ -1,12 +1,13 @@
 import React from 'react';
 import tw from 'twin.macro';
+import Header from 'components/headers/light.js';
 
 /* framer-motion and useInView here are used to animate the sections in when we reach them in the viewport
  */
 import { motion } from 'framer-motion';
 import useInView from 'helpers/useInView';
 
-const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 overflow-hidden`;
+const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 overflow-hidden mt-32`;
 function AnimationReveal({ disabled, children }) {
 	if (disabled) {
 		return <>{children}</>;
@@ -53,6 +54,7 @@ function AnimatedSlideInComponent({ direction = 'left', offset = 30, children })
 
 export default (props) => (
 	<StyledDiv className="App">
+		<Header />
 		<AnimationReveal {...props} />
 	</StyledDiv>
 );

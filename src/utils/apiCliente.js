@@ -35,7 +35,7 @@ apiCliente.interceptors.response.use(
 
 			// Manejo de errores 401 (No autorizado)
 			if (status === 401) {
-				// Limpia el sessionStorage y redirige al login
+				// Limpia el sessionStorage
 				sessionStorage.clear();
 			}
 

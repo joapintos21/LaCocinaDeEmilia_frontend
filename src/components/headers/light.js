@@ -18,8 +18,8 @@ import { handleQuitarDeCarrito } from 'utils/carritoUtils.js';
 import broadcastService from 'utils/broadcastService.js';
 
 const Header = tw.header`
-  flex justify-between items-center
-  max-w-screen-xl mx-auto
+	fixed top-0 left-0 w-full z-50 bg-white shadow-md
+	flex justify-between items-center pl-10 pr-10 pt-2 pb-2
 `;
 
 export const NavLinks = tw.div`inline-block`;
@@ -66,7 +66,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 	// Obtener información del usuario y carrito desde Redux
 	const userInfo = useSelector((state) => state.usuario.userInfo);
 	const cartItems = useSelector((state) => state.carrito.items);
-	const totalPrice = cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
+	const totalPrice = useSelector((state) => state.carrito.precioTotal);
 	const token = sessionStorage.getItem('token');
 
 	// Manejo de carrito
@@ -74,7 +74,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 	const handleCartClose = () => setCartAnchorEl(null);
 
 	const handleQuitarCarrito = (item) => {
-		handleQuitarDeCarrito(userInfo.id, item.id, item.cantidad, item.tipo, token);
+		handleQuitarDeCarrito(userInfo.id, item.id, item.cantidad, item.tipo, item.adicional?.id, token);
 		dispatch(quitarItem(item));
 	};
 

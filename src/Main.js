@@ -26,7 +26,7 @@ export default () => {
 	const HighlightedText = tw.span`bg-[#99cdb6] text-gray-100 px-4 transform -skew-x-12 inline-block`;
 	const HighlightedTextInverse = tw.span`bg-gray-100 text-primary-500 px-4 transform -skew-x-12 inline-block`;
 	const Description = tw.span`inline-block mt-8`;
-	const CarruselContainer = tw.div`container mx-auto p-4`;
+	const CarruselContainer = tw.div`container mx-auto mt-4 p-4`;
 	const SwiperStyled = tw(Swiper)`
 	w-10/12
 	h-[300px] // Altura base
@@ -79,7 +79,6 @@ export default () => {
 
 	return (
 		<AnimationRevealPage>
-			<Header />
 			<CarruselContainer>
 				<SwiperStyled
 					modules={[Navigation, Pagination, Autoplay]}
