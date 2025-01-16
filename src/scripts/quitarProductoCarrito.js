@@ -1,6 +1,6 @@
 let request, url, body;
 
-export const quitarProductoCarrito = async (clienteId, productoId, cantidad, token) => {
+export const quitarProductoCarrito = async (clienteId, productoId, cantidad, adicionalId, token) => {
 	request = '/carrito/quitarProductoCarrito';
 	url = `${request}`;
 
@@ -8,6 +8,7 @@ export const quitarProductoCarrito = async (clienteId, productoId, cantidad, tok
 		userId: clienteId,
 		productoId: productoId,
 		cantidad: cantidad,
+		adicionalId: adicionalId,
 	};
 
 	try {

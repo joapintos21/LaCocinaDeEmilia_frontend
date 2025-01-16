@@ -25,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
 	itemText: {
 		marginLeft: theme.spacing(2),
 	},
+	adicionalText: {
+		fontStyle: 'italic',
+		color: theme.palette.text.secondary,
+	},
 	totalPrice: {
 		fontWeight: 'bold',
 	},
@@ -48,8 +52,19 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 						<img src={item.thumbnail} alt="thumb" style={{ width: 50, height: 50 }} />
 					</figure>
 					<ListItemText
-						primary={item.name}
-						secondary={`Cantidad: ${item.cantidad} Item - $${item.precio * item.cantidad}`}
+						primary={item.descripcion}
+						secondary={
+							<>
+								<span>
+									Cantidad: {item.cantidad} Item - ${item.precioTotal}
+								</span>
+								{item.adicional && (
+									<Typography variant="body2" className={classes.adicionalText}>
+										Adicional: {item.adicional.descripcion} (+${item.adicional.costoAdicional})
+									</Typography>
+								)}
+							</>
+						}
 						className={classes.itemText}
 					/>
 					<ListItemSecondaryAction>
@@ -89,12 +104,13 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 				}
 				className={classes.cartWrap}
 			>
-				{dataCart.length < 1 ?
+				{dataCart.length < 1 ? (
 					<div className={classes.empty}>
 						<Typography variant="subtitle1">Carrito vacío</Typography>
 						<Typography variant="caption">Tus productos aparecerán aquí</Typography>
 					</div>
-				:	<Fragment>
+				) : (
+					<Fragment>
 						{getCartItem(dataCart)}
 						<ListItem className={classes.totalPrice}>
 							<Typography variant="subtitle1">
@@ -110,7 +126,7 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 							</Button>
 						</ListItem>
 					</Fragment>
-				}
+				)}
 			</List>
 		</Menu>
 	);

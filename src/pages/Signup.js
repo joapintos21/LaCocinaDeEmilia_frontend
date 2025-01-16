@@ -10,7 +10,7 @@ import { ReactComponent as SignUpIcon } from 'feather-icons/dist/icons/user-plus
 import { crearUsuario } from 'scripts/signUp';
 import { toast } from 'react-toastify';
 
-const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center -m-8`;
+const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center`;
 const Content = tw.div`max-w-screen-xl m-0 sm:mx-20 sm:my-16 bg-white text-gray-900 shadow sm:rounded-lg flex justify-center flex-1`;
 const MainContainer = tw.div`lg:w-1/2 xl:w-5/12 p-6 sm:p-12`;
 const LogoLink = tw.a``;
@@ -77,77 +77,75 @@ export default ({
 	};
 
 	return (
-		<AnimationRevealPage>
-			<Container>
-				<Content>
-					<MainContainer>
-						<LogoLink href={logoLinkUrl}>
-							<LogoImage src={logo} />
-						</LogoLink>
-						<MainContent>
-							<Heading>{headingText}</Heading>
-							<FormContainer>
-								<Form onSubmit={handleCreateUser}>
-									<Input
-										type="text"
-										placeholder="Nombre completo"
-										value={nombre}
-										onChange={(e) => setNombre(e.target.value)}
-									/>
-									<Input
-										type="text"
-										placeholder="Numero de teléfono/celular"
-										value={telefono}
-										onChange={(e) => setTelefono(e.target.value)}
-									/>
-									<Input
-										type="email"
-										placeholder="Email"
-										value={email}
-										onChange={(e) => setEmail(e.target.value)}
-									/>
-									<Input
-										type="password"
-										placeholder="Contraseña"
-										value={password}
-										onChange={(e) => setPassword(e.target.value)}
-									/>
-									<SubmitButton type="submit">
-										<SubmitButtonIcon className="icon" />
-										<span className="text">{submitButtonText}</span>
-									</SubmitButton>
-									{error && (
-										<p style={{ color: 'red' }} tw="mt-5 text-center">
-											{error}
-										</p>
-									)}
-									<p tw="mt-6 text-xs text-gray-600 text-center">
-										Al registrarse, acepta los{' '}
-										<a href={tosUrl} tw="border-b border-gray-500 border-dotted">
-											Términos de servicio
-										</a>{' '}
-										y la{' '}
-										<a href={privacyPolicyUrl} tw="border-b border-gray-500 border-dotted">
-											Política de privacidad
-										</a>
-										.
+		<Container>
+			<Content>
+				<MainContainer>
+					<LogoLink href={logoLinkUrl}>
+						<LogoImage src={logo} />
+					</LogoLink>
+					<MainContent>
+						<Heading>{headingText}</Heading>
+						<FormContainer>
+							<Form onSubmit={handleCreateUser}>
+								<Input
+									type="text"
+									placeholder="Nombre completo"
+									value={nombre}
+									onChange={(e) => setNombre(e.target.value)}
+								/>
+								<Input
+									type="text"
+									placeholder="Numero de teléfono/celular"
+									value={telefono}
+									onChange={(e) => setTelefono(e.target.value)}
+								/>
+								<Input
+									type="email"
+									placeholder="Email"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+								/>
+								<Input
+									type="password"
+									placeholder="Contraseña"
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+								/>
+								<SubmitButton type="submit">
+									<SubmitButtonIcon className="icon" />
+									<span className="text">{submitButtonText}</span>
+								</SubmitButton>
+								{error && (
+									<p style={{ color: 'red' }} tw="mt-5 text-center">
+										{error}
 									</p>
+								)}
+								<p tw="mt-6 text-xs text-gray-600 text-center">
+									Al registrarse, acepta los{' '}
+									<a href={tosUrl} tw="border-b border-gray-500 border-dotted">
+										Términos de servicio
+									</a>{' '}
+									y la{' '}
+									<a href={privacyPolicyUrl} tw="border-b border-gray-500 border-dotted">
+										Política de privacidad
+									</a>
+									.
+								</p>
 
-									<p tw="mt-8 text-sm text-gray-600 text-center">
-										¿Ya tienes una cuenta?{' '}
-										<a href={signInUrl} tw="border-b border-gray-500 border-dotted">
-											Iniciar sesión
-										</a>
-									</p>
-								</Form>
-							</FormContainer>
-						</MainContent>
-					</MainContainer>
-					<IllustrationContainer>
-						<IllustrationImage imageSrc={illustrationImageSrc} />
-					</IllustrationContainer>
-				</Content>
-			</Container>
-		</AnimationRevealPage>
+								<p tw="mt-8 text-sm text-gray-600 text-center">
+									¿Ya tienes una cuenta?{' '}
+									<a href={signInUrl} tw="border-b border-gray-500 border-dotted">
+										Iniciar sesión
+									</a>
+								</p>
+							</Form>
+						</FormContainer>
+					</MainContent>
+				</MainContainer>
+				<IllustrationContainer>
+					<IllustrationImage imageSrc={illustrationImageSrc} />
+				</IllustrationContainer>
+			</Content>
+		</Container>
 	);
 };

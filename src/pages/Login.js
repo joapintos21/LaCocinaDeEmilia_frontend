@@ -1,5 +1,4 @@
 import React from 'react';
-import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
 import { Container as ContainerBase } from 'components/misc/Layouts';
 import tw from 'twin.macro';
 import styled from 'styled-components';
@@ -13,7 +12,7 @@ import logo from 'images/logo.svg';
 //import { ReactComponent as LoginIcon } from "feather-icons/dist/icons/log-in.svg";
 import LoginComponent from 'components/login/LoginComponent.js';
 
-const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center -m-8`;
+const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center`;
 const Content = tw.div`max-w-screen-xl m-0 sm:mx-20 sm:my-16 bg-white text-gray-900 shadow sm:rounded-lg flex justify-center flex-1`;
 const MainContainer = tw.div`lg:w-1/2 xl:w-5/12 p-6 sm:p-12`;
 const LogoLink = tw.a``;
@@ -67,35 +66,33 @@ export default ({
 	forgotPasswordUrl = '#',
 	signupUrl = 'signup',
 }) => (
-	<AnimationRevealPage>
-		<Container>
-			<Content>
-				<MainContainer>
-					<LogoLink href={logoLinkUrl}>
-						<LogoImage src={logo} />
-					</LogoLink>
-					<MainContent>
-						<Heading>{headingText}</Heading>
-						<FormContainer>
-							<LoginComponent />
-							<p tw="mt-6 text-xs text-gray-600 text-center">
-								<a href={forgotPasswordUrl} tw="border-b border-gray-500 border-dotted">
-									¿Olvidaste la contraseña?
-								</a>
-							</p>
-							<p tw="mt-8 text-sm text-gray-600 text-center">
-								¿Todavia no tienes una cuenta?{' '}
-								<a href={signupUrl} tw="border-b border-gray-500 border-dotted">
-									Registrarse
-								</a>
-							</p>
-						</FormContainer>
-					</MainContent>
-				</MainContainer>
-				<IllustrationContainer>
-					<IllustrationImage imageSrc={illustrationImageSrc} />
-				</IllustrationContainer>
-			</Content>
-		</Container>
-	</AnimationRevealPage>
+	<Container>
+		<Content>
+			<MainContainer>
+				<LogoLink href={logoLinkUrl}>
+					<LogoImage src={logo} />
+				</LogoLink>
+				<MainContent>
+					<Heading>{headingText}</Heading>
+					<FormContainer>
+						<LoginComponent />
+						<p tw="mt-6 text-xs text-gray-600 text-center">
+							<a href={forgotPasswordUrl} tw="border-b border-gray-500 border-dotted">
+								¿Olvidaste la contraseña?
+							</a>
+						</p>
+						<p tw="mt-8 text-sm text-gray-600 text-center">
+							¿Todavia no tienes una cuenta?{' '}
+							<a href={signupUrl} tw="border-b border-gray-500 border-dotted">
+								Registrarse
+							</a>
+						</p>
+					</FormContainer>
+				</MainContent>
+			</MainContainer>
+			<IllustrationContainer>
+				<IllustrationImage imageSrc={illustrationImageSrc} />
+			</IllustrationContainer>
+		</Content>
+	</Container>
 );

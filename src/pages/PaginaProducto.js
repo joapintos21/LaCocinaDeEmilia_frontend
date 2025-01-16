@@ -24,7 +24,6 @@ const PaginaProducto = () => {
 
 	return (
 		<AnimationRevealPage>
-			<Header />
 			<Container>
 				<ContentWithPaddingXl>
 					<Producto producto={producto} />

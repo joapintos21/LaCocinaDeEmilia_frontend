@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import tw from 'twin.macro';
 import styled from 'styled-components';
-import { PrimaryButton as PrimaryButtonBase } from 'components/misc/Buttons.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { calcularPrecioConDescuento } from 'utils/descuentoUtils';
 import { handleAddToCart } from 'utils/carritoUtils';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { toast } from 'react-toastify';
+import obtenerAdicionales from 'scripts/obtenerAdicionales';
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -42,7 +42,13 @@ const QuantityInput = styled.input`
 	${tw`w-12 text-center border border-gray-300 rounded-md`}
 `;
 
-const PrimaryButton = styled(PrimaryButtonBase)`
+const SelectContainer = tw.div`flex flex-col mt-4`;
+const SelectLabel = tw.label`text-sm font-medium text-gray-700 mb-2`;
+const Select = styled.select`
+	${tw`px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500`}
+`;
+
+const PrimaryButton = styled.button`
 	${tw`px-6 py-3 bg-primary-500 text-white font-medium rounded-lg shadow-lg`}
 	&:hover {
 		${tw`bg-primary-700`}
@@ -58,19 +64,33 @@ const BackButton = styled.button`
 
 const Producto = ({ producto }) => {
 	const dispatch = useDispatch();
-	const token = sessionStorage.getItem('token'); // Asegúrate de que el token esté en el store
-	const user = useSelector((state) => state.usuario); // ID del cliente desde el store
+	const token = sessionStorage.getItem('token');
+	const user = useSelector((state) => state.usuario);
 	let clienteId = null;
 	if (user.isLoggedIn) {
 		clienteId = user.userInfo.id;
 	}
 
 	const [cantidad, setCantidad] = useState(1);
+	const [adicionales, setAdicionales] = useState([]);
+	const [selectedAdicional, setSelectedAdicional] = useState(0);
 
 	const precioConDescuento = calcularPrecioConDescuento(producto.precio, producto.descuentos || []);
 
+	useEffect(() => {
+		const fetchAdicionales = async () => {
+			try {
+				const response = await obtenerAdicionales(producto.id, dispatch, token);
+				setAdicionales(response); // Asumiendo que `obtenerAdicionales` devuelve un array
+			} catch (error) {
+				console.error('Error al obtener adicionales:', error);
+			}
+		};
+		fetchAdicionales();
+	}, [producto.id, dispatch, token]);
+
 	const handleAgregarACarrito = () => {
-		handleAddToCart(producto, cantidad, token, clienteId, 'producto', dispatch)
+		handleAddToCart(producto, cantidad, selectedAdicional, token, clienteId, 'producto', dispatch)
 			.then(() => {
 				toast.success('Producto agregado al carrito.');
 			})
@@ -90,6 +110,10 @@ const Producto = ({ producto }) => {
 	const handleCantidadChange = (e) => {
 		const value = parseInt(e.target.value, 10);
 		setCantidad(isNaN(value) || value <= 0 ? 1 : value);
+	};
+
+	const handleSelectChange = (e) => {
+		setSelectedAdicional(e.target.value);
 	};
 
 	const navigate = useNavigate();
@@ -139,6 +163,19 @@ const Producto = ({ producto }) => {
 					<QuantityInput type="number" value={cantidad} onChange={handleCantidadChange} min="1" />
 					<QuantityButton onClick={incrementarCantidad}>+</QuantityButton>
 				</QuantityContainer>
+				{adicionales.length > 0 && (
+					<SelectContainer>
+						<SelectLabel>Selecciona un adicional:</SelectLabel>
+						<Select value={selectedAdicional} onChange={handleSelectChange}>
+							{adicionales &&
+								adicionales.map((adicional) => (
+									<option key={adicional.id} value={adicional.id}>
+										{adicional.descripcion} - ${adicional.costoAdicional}
+									</option>
+								))}
+						</Select>
+					</SelectContainer>
+				)}
 				<ButtonContainer>
 					<PrimaryButton onClick={handleAgregarACarrito}>Agregar al carrito</PrimaryButton>
 				</ButtonContainer>

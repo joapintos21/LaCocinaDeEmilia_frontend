@@ -12,11 +12,13 @@ import PermissionsManagement from 'components/AdminPanel/PermissionsManagement';
 import AdditionalManagement from 'components/AdminPanel/AdditionalManagement';
 import Header from 'components/headers/light.js';
 import { Container, ContentWithPaddingXl } from 'components/misc/Layouts';
+import tw from 'twin.macro';
+const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 overflow-hidden mt-32`;
 
 export default () => {
 	const dispatch = useDispatch();
 	const [activeModule, setActiveModule] = useState('Dashboard');
-  
+
 	const descargarPDF = async () => {
 		try {
 			const response = await fetch('/reporte/generarReportePedidos', {
@@ -58,17 +60,17 @@ export default () => {
 					'Content-Type': 'application/json',
 				},
 			});
-	
+
 			if (!response.ok) {
 				throw new Error('Error al generar el reporte de usuarios');
 			}
-	
+
 			const data = await response.json();
 			const base64Data = data.file;
-	
+
 			const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 			const blob = new Blob([binaryData], { type: 'application/pdf' });
-	
+
 			const fileName = 'reporte_usuarios.pdf';
 			const link = document.createElement('a');
 			link.href = URL.createObjectURL(blob);
@@ -83,68 +85,56 @@ export default () => {
 		}
 	};
 
-  const modules = [
-    { title: "Dashboard", component: <Dashboard /> },
-    { title: "Pedidos", component: <OrderManagement /> },
-    { title: "Categorías", component: <CategoryManagement /> },
-    { title: "Productos", component: <ProductManagement /> },
-    { title: "Descuentos", component: <DiscountManagement /> },
-    { title: "Usuarios", component: <UserManagement /> },
-    { title: "Permisos", component: <PermissionsManagement /> },
-	{
-		title: 'Reporte de pedidos',
-		component: (
-			<button
-				onClick={descargarPDF}
-				style={{
-					backgroundColor: '#99cdb6',
-					color: 'white',
-					padding: '10px 20px',
-					borderRadius: '5px',
-					border: 'none',
-					cursor: 'pointer',
-				}}
-			>
-				Descargar Reporte
-			</button>
-		),
-	},
-	{
-		title: 'Reporte de usuarios',
-		component: (
-			<button
-				onClick={descargarReporteUsuarios}
-				style={{
-					backgroundColor: '#99cdb6',
-					color: 'white',
-					padding: '10px 20px',
-					borderRadius: '5px',
-					border: 'none',
-					cursor: 'pointer',
-				}}
-			>
-				Descargar Reporte de Usuarios
-			</button>
-		),
-	}
-  ];
+	const modules = [
+		{ title: 'Dashboard', component: <Dashboard /> },
+		{ title: 'Pedidos', component: <OrderManagement /> },
+		{ title: 'Categorías', component: <CategoryManagement /> },
+		{ title: 'Productos', component: <ProductManagement /> },
+		{ title: 'Descuentos', component: <DiscountManagement /> },
+		{ title: 'Usuarios', component: <UserManagement /> },
+		{ title: 'Permisos', component: <PermissionsManagement /> },
+		{
+			title: 'Reporte de pedidos',
+			component: (
+				<button
+					onClick={descargarPDF}
+					style={{
+						backgroundColor: '#99cdb6',
+						color: 'white',
+						padding: '10px 20px',
+						borderRadius: '5px',
+						border: 'none',
+						cursor: 'pointer',
+					}}
+				>
+					Descargar Reporte
+				</button>
+			),
+		},
+		{
+			title: 'Reporte de usuarios',
+			component: (
+				<button
+					onClick={descargarReporteUsuarios}
+					style={{
+						backgroundColor: '#99cdb6',
+						color: 'white',
+						padding: '10px 20px',
+						borderRadius: '5px',
+						border: 'none',
+						cursor: 'pointer',
+					}}
+				>
+					Descargar Reporte de Usuarios
+				</button>
+			),
+		},
+	];
 
 	return (
 		<>
 			<Header />
-			<Container>
-				<Typography
-					variant="h4"
-					gutterBottom
-					sx={{
-						textAlign: 'center',
-						color: '#333',
-						fontWeight: 'bold',
-						marginBottom: 4,
-					}}
-				>
-					Panel de Administrador
-				</Typography>
+			<StyledDiv>
 				<Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
 					{/* Barra lateral fija */}
 					<Drawer
@@ -155,12 +145,12 @@ export default () => {
 							'& .MuiDrawer-paper': {
 								width: 240,
 								boxSizing: 'border-box',
-								position: 'fixed', 
-								top: 230, 
-								overflow: 'auto', 
-								backgroundColor: 'transparent', 
-								border: 'none', 
-								zIndex: 1200, 
+								position: 'fixed',
+								top: 230,
+								overflow: 'auto',
+								backgroundColor: 'transparent',
+								border: 'none',
+								zIndex: 1200,
 							},
 						}}
 					>
@@ -197,9 +187,9 @@ export default () => {
 						sx={{
 							flexGrow: 1,
 							padding: 3,
-							marginLeft: '240px', 
-							marginTop: '64px', 
-							height: 'calc(100vh - 64px)', 
+							marginLeft: '240px',
+							marginTop: '64px',
+							height: 'calc(100vh - 64px)',
 						}}
 					>
 						{/* Renderizar el módulo activo */}
@@ -223,7 +213,7 @@ export default () => {
 						</Grid>
 					</Box>
 				</Box>
-			</Container>
+			</StyledDiv>
 		</>
 	);
 };

@@ -60,6 +60,7 @@ export default () => {
 	const packsRedux = useSelector((state) => state.packs);
 	const categoriasRedux = useSelector((state) => state.categorias);
 	const [activeTab, setActiveTab] = useState('Todos');
+	const [noResults, setNoResults] = useState(false);
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -131,7 +132,7 @@ export default () => {
 		Todos: filteredProducts.length > 0 ? filteredProducts : products,
 		Packs: packs,
 		...categoriasRedux.reduce((acc, categoria) => {
-			acc[categoria.titulo] = products.filter((product) => product.category === categoria.titulo);
+			acc[categoria.titulo] = filteredProducts.filter((product) => product.category === categoria.titulo);
 			return acc;
 		}, {}),
 	};
@@ -140,6 +141,8 @@ export default () => {
 	const handleSearch = async () => {
 		if (searchText.trim() === '') {
 			setFilteredProducts(products); // Restablece todos los productos si el campo de búsqueda está vacío
+			setActiveTab('Todos');
+			setNoResults(false);
 		} else {
 			try {
 				const resultados = await buscarProducto(searchText);
@@ -150,10 +153,16 @@ export default () => {
 						'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
 					title: producto.descripcion || 'Sin nombre',
 					price: producto.precio || '$0.00',
-					category: producto.categoria || 'Otros',
+					category: producto.categoria.titulo || 'Otros',
 					url: '#',
 				}));
-				setActiveTab('');
+				if (transformedResults.length === 0) {
+					setNoResults(true);
+					setActiveTab('');
+				} else {
+					setNoResults(false);
+					setActiveTab('Todos');
+				}
 				setFilteredProducts(transformedResults);
 			} catch (error) {
 				console.error('Error en la búsqueda:', error);
@@ -244,6 +253,7 @@ export default () => {
 						))}
 					</TabContent>
 				))}
+				{noResults && <p>No se encontraron resultados</p>}
 			</ContentWithPaddingXl>
 		</Container>
 	);

@@ -60,7 +60,7 @@ const DireccionesModal = ({ userId, mostrarModalDirecciones, setMostrarModalDire
 						padding: '20px',
 						borderRadius: '10px',
 					},
-					overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' },
+					overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: '1000' },
 				}}
 			>
 				<Titulo>Agregar Dirección</Titulo>

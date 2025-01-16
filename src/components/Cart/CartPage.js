@@ -16,6 +16,10 @@ import DireccionesModal from './DireccionesModal';
 import { crearDireccion } from 'scripts/crearDireccion';
 import Spinner from 'components/Spinner';
 import { format } from 'date-fns';
+// Importar el locale en español desde date-fns
+import { registerLocale } from 'react-datepicker';
+import es from 'date-fns/locale/es'; // Español
+registerLocale('es', es);
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
 const Content = tw.div`flex flex-col w-full`;
@@ -98,23 +102,27 @@ const CartPage = () => {
 	const costoEnvio = useSelector((state) => state.carrito.costoEnvio);
 	const comisionMP = useSelector((state) => state.carrito.comisionMP);
 	const direccionId = useSelector((state) => state.carrito.direccionId);
-	const subtotal = cartItems.reduce(
-		(acc, item) => acc + calcularPrecioConDescuento(item.precioTotal, obtenerDescuentos(item)),
-		0,
-	);
+	// Calcular el subtotal de cada ítem, sumando el costo del adicional si existe
+	const calcularSubtotalItem = (item) => {
+		const precioConDescuento = calcularPrecioConDescuento(item.precio, obtenerDescuentos(item));
+		const adicionalCosto = item.adicional?.costoAdicional || 0;
+		return (precioConDescuento + adicionalCosto) * item.cantidad;
+	};
+	const subtotal = cartItems.reduce((acc, item) => acc + calcularSubtotalItem(item), 0);
+
 	const total = (subtotal + (costoEnvio > 0 ? costoEnvio : 0)) * (1 + (comisionMP > 0 ? comisionMP / 100 : 0));
 
 	const handleIncrement = (item) => {
-		handleAddToCart(item, 1, token, userId, item.tipo, dispatch);
+		handleAddToCart(item, 1, item.adicional?.id, token, userId, item.tipo, dispatch);
 	};
 
 	const handleDecrement = (item) => {
-		handleQuitarDeCarrito(userId, item.id, 1, item.tipo, token);
+		handleQuitarDeCarrito(userId, item.id, 1, item.tipo, item.adicional?.id, token);
 		dispatch(decrementarCantidad(item));
 	};
 
 	const handleQuitarCarrito = (item) => {
-		handleQuitarDeCarrito(userId, item.id, item.cantidad, item.tipo, token);
+		handleQuitarDeCarrito(userId, item.id, item.cantidad, item.tipo, item.adicional?.id, token);
 		dispatch(quitarItem(item));
 	};
 
@@ -303,6 +311,12 @@ const CartPage = () => {
 								/>
 								<Info>
 									<Name>{item.descripcion}</Name>
+									{item.adicional && (
+										<p tw="text-sm text-gray-600">
+											Adicional: {item.adicional.descripcion} (+$
+											{item.adicional.costoAdicional.toFixed(2)})
+										</p>
+									)}
 									{descuentoAplicado > 0 && <OriginalPrice>${item.precio.toFixed(2)}</OriginalPrice>}
 									<Price>${precioConDescuento.toFixed(2)}</Price>
 									{descuentoAplicado > 0 && (
@@ -310,7 +324,7 @@ const CartPage = () => {
 											Ahorras ${descuentoAplicado.toFixed(2)} gracias a descuentos aplicados.
 										</DiscountInfo>
 									)}
-									<Price>Total: ${(precioConDescuento * item.cantidad).toFixed(2)}</Price>
+									<Price>Total: ${calcularSubtotalItem(item).toFixed(2)}</Price>
 								</Info>
 								<Actions>
 									<Quantity>
@@ -347,10 +361,12 @@ const CartPage = () => {
 									minDate={new Date().setDate(new Date().getDate())}
 									filterDate={(date) => !isDateDisabled(date)}
 									inline
+									locale="es" // Configuración del idioma
+									dateFormat="dd/MM/yyyy" // Formato de fecha en español
 								/>
 								{fechaSeleccionada && (
 									<p tw="text-sm text-green-600">
-										Fecha seleccionada: {fechaSeleccionada.toLocaleDateString()}
+										Fecha seleccionada: {fechaSeleccionada.toLocaleDateString('es-ES')}
 									</p>
 								)}
 							</CollapsibleContent>

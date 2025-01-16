@@ -3,7 +3,6 @@ let request, url, body;
 export const crearDireccion = async (direccion, token) => {
 	request = '/direcciones/create';
 	url = `${request}`;
-	console.log(direccion);
 	body = {
 		...direccion,
 	};
