@@ -125,6 +125,8 @@ import { limpiarCarrito } from 'store/carritoSlice';
 import PanelCocineras from 'pages/PanelCocineras';
 import PaginaPedidos from 'pages/PaginaPedidos';
 import PanelCadetes from 'pages/PanelCadete';
+import RecuperarPassword from 'pages/RecuperarPassword';
+import ResetearPassword from 'pages/ResetearPassword';
 
 const theme = createTheme({
 	palette: {
@@ -191,6 +193,8 @@ export default function App() {
 					<ScrollToTop />
 					<Routes>
 						<Route path="/login" element={<Login />} />
+						<Route path="/forgot-password" element={<RecuperarPassword />} />
+						<Route path="/reset-password" element={<ResetearPassword />} />
 						<Route path="/signup" element={<SignUp />} />
 						<Route path="/verificar" element={<VerificarCuenta />} />
 						<Route path="/nosotros" element={<AboutUs />} />
