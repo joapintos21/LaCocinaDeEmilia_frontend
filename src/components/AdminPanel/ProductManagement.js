@@ -59,6 +59,20 @@ const ProductManagement = () => {
 	const [minPrice, setMinPrice] = useState('');
 	const [maxPrice, setMaxPrice] = useState('');
 
+	const handleImageChange = (e) => {
+		const file = e.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setNewProduct((prevState) => ({
+					...prevState,
+					imagen: reader.result.split(',')[1],
+				}));
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setNewProduct({ ...newProduct, [name]: value });
@@ -78,6 +92,7 @@ const ProductManagement = () => {
 				precio: '',
 				categoria: '',
 				visible: true,
+				imagen: null,
 			});
 		}
 		setOpen(true);
@@ -95,6 +110,7 @@ const ProductManagement = () => {
 					newProduct.precio,
 					newProduct.categoria,
 					newProduct.visible,
+					newProduct.imagen,
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
@@ -116,6 +132,7 @@ const ProductManagement = () => {
 					parseFloat(newProduct.precio),
 					parseInt(newProduct.categoria),
 					newProduct.visible,
+					newProduct.imagen,
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
@@ -132,6 +149,7 @@ const ProductManagement = () => {
 				precio: '',
 				categoria: '',
 				visible: true,
+				imagen: null,
 			});
 			handleClose();
 		} else {
@@ -331,6 +349,13 @@ const ProductManagement = () => {
 							</option>
 						))}
 					</TextField>
+					Imagen
+					<input
+						type="file"
+						accept="image/*"
+						onChange={handleImageChange} // Evento para manejar cambios
+						style={{ marginBottom: '10px', display: 'block' }}
+					/>
 					<FormControlLabel
 						control={
 							<Checkbox

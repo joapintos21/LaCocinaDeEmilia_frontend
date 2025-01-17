@@ -64,6 +64,9 @@ const Producto = ({ producto }) => {
 	if (user.isLoggedIn) {
 		clienteId = user.userInfo.id;
 	}
+	const imageUrl =
+		producto.imageSrc ||
+		'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80';
 
 	const [cantidad, setCantidad] = useState(1);
 
@@ -100,13 +103,7 @@ const Producto = ({ producto }) => {
 				<ArrowBackIcon fontSize="small" /> <span>Volver a productos</span>
 			</BackButton>
 			<ImageContainer>
-				<Image
-					src={
-						producto.imageSrc ||
-						'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-					}
-					alt={producto.titulo}
-				/>
+				<Image src={imageUrl} alt={producto.titulo} />
 			</ImageContainer>
 			<Details>
 				<Title>{producto.descripcion || 'Producto sin título'}</Title>
