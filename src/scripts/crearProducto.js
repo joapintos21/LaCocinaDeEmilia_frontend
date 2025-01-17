@@ -1,6 +1,6 @@
 let request, url, body;
 
-export const crearProducto = async (descripcion, precio, categoria_id, visible, token) => {
+export const crearProducto = async (descripcion, precio, categoria_id, visible, imagen, token) => {
 	request = '/productos/create'; // Endpoint para crear el producto
 	url = `${request}`; // URL del API para crear producto
 
@@ -10,6 +10,7 @@ export const crearProducto = async (descripcion, precio, categoria_id, visible, 
 		precio: parseFloat(precio), // Precio del producto (asegurándose de que es un número flotante)
 		categoria_id: parseInt(categoria_id), // ID de la categoría (asegurándose de que es un número entero)
 		visible: visible, // Indica si el producto es visible (booleano)
+		imagen: imagen,
 	};
 
 	try {

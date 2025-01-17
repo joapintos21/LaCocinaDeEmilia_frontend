@@ -100,7 +100,7 @@ export default () => {
 				.map((producto) => ({
 					id: producto.id,
 					imageSrc:
-						producto.imageUrl ||
+						producto.imageSrc ||
 						'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
 					title: producto.descripcion || 'Sin nombre',
 					price: producto.precio || '$0.00',
@@ -109,7 +109,7 @@ export default () => {
 				}));
 			setProducts(transformedProducts);
 		}
-	
+
 		if (packsRedux && packsRedux.length > 0) {
 			const transformedPacks = packsRedux.map((pack) => ({
 				id: pack.id,
