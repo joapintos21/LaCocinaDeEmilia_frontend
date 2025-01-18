@@ -76,16 +76,21 @@ const Producto = ({ producto }) => {
 
 	const [cantidad, setCantidad] = useState(1);
 	const [adicionales, setAdicionales] = useState([]);
-	const [selectedAdicional, setSelectedAdicional] = useState(0);
+	const [selectedAdicional, setSelectedAdicional] = useState(null);
 
 	const precioConDescuento = calcularPrecioConDescuento(producto.precio, producto.descuentos || []);
 
 	useEffect(() => {
 		const fetchAdicionales = async () => {
 			try {
-				const response = await obtenerAdicionales(producto.id, dispatch, token);
-				setAdicionales(response); // Asumiendo que `obtenerAdicionales` devuelve un array
+				obtenerAdicionales(producto.id, dispatch, token).then((data) => {
+					if (data.length === 0) {
+						setSelectedAdicional(0);
+					}
+					setAdicionales(data); // Asumiendo que `obtenerAdicionales` devuelve un array
+				});
 			} catch (error) {
+				setSelectedAdicional(null);
 				console.error('Error al obtener adicionales:', error);
 			}
 		};
@@ -93,13 +98,17 @@ const Producto = ({ producto }) => {
 	}, [producto.id, dispatch, token]);
 
 	const handleAgregarACarrito = () => {
-		handleAddToCart(producto, cantidad, selectedAdicional, token, clienteId, 'producto', dispatch)
-			.then(() => {
-				toast.success('Producto agregado al carrito.');
-			})
-			.catch((e) => {
-				console.log(e.message);
-			});
+		if (selectedAdicional === null) {
+			toast.error('Debe elegir un adicional.');
+		} else {
+			handleAddToCart(producto, cantidad, selectedAdicional, token, clienteId, 'producto', dispatch)
+				.then(() => {
+					toast.success('Producto agregado al carrito.');
+				})
+				.catch((e) => {
+					console.log(e.message);
+				});
+		}
 	};
 
 	const incrementarCantidad = () => {
@@ -164,6 +173,9 @@ const Producto = ({ producto }) => {
 					<SelectContainer>
 						<SelectLabel>Selecciona un adicional:</SelectLabel>
 						<Select value={selectedAdicional} onChange={handleSelectChange}>
+							<option selected={true} value={0} disabled={true}>
+								Seleccionar
+							</option>
 							{adicionales &&
 								adicionales.map((adicional) => (
 									<option key={adicional.id} value={adicional.id}>
