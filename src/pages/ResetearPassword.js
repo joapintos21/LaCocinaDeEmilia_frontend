@@ -56,14 +56,13 @@ export default ({
 		}
 		resetearPassword(token, password)
 			.then((data) => {
-				toast.success(data.message, {
-					onClose: () => {
-						window.location.href = '/login';
-					},
-				});
+				toast.success(data.message);
 				setError('');
 				setPassword('');
 				setConfirmPassword('');
+				setTimeout(() => {
+					window.location.href = '/login';
+				}, 3000);
 			})
 			.catch((error) => {
 				setError(error.message);

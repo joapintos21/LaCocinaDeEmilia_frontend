@@ -5,7 +5,7 @@ import axios from 'axios';
 const apiCliente = axios.create({
 	baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080', // URL base de tu backend
 
-	timeout: 10000, // Tiempo de espera máximo
+	timeout: 20000, // Tiempo de espera máximo
 });
 
 // Interceptor de solicitudes para agregar el token
