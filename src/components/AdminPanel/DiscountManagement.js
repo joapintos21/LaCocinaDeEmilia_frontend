@@ -33,16 +33,16 @@ const DiscountManagement = () => {
 	const fetchDescuentos = async () => {
 		await obtenerDescuentos(dispatch, sessionStorage.getItem('token'));
 	};
-	const fetchTiposDescuento = async () => {
+	const fetchtiposDescuento = async () => {
 		await obtenerTiposDescuento(dispatch, sessionStorage.getItem('token'));
 	};
 	const [open, setOpen] = useState(false);
 	const [newDescuento, setNewDescuento] = useState({
 		id: null,
-		tipo: '',
-		valor: '',
-		fechaInicio: '',
-		fechaFin: '',
+		tipoDescuento: null,
+		valor: null,
+		fechainicio: null,
+		fechafin: null,
 		descripcion: '',
 	});
 	const [searchDescripcion, setSearchDescripcion] = useState('');
@@ -50,7 +50,7 @@ const DiscountManagement = () => {
 	useEffect(() => {
 		try {
 			fetchDescuentos();
-			fetchTiposDescuento();
+			fetchtiposDescuento();
 		} catch (e) {
 			console.log(e);
 		}
@@ -61,15 +61,18 @@ const DiscountManagement = () => {
 	const tiposDescuento = useSelector((state) => state.tiposDescuento || []);
 
 	const handleOpen = (descuento = null) => {
+		const tipoId =
+			descuento && descuento.tipo ? tiposDescuento.find((tipo) => tipo.nombre === descuento.tipo)?.id : null;
+
 		setNewDescuento(
 			descuento
-				? { ...descuento }
+				? { ...descuento, tipoDescuento: tipoId }
 				: {
 						id: null,
-						tipo: '',
-						valor: '',
-						fechaInicio: '',
-						fechaFin: '',
+						tipoDescuento: null,
+						valor: null,
+						fechainicio: null,
+						fechafin: null,
 						descripcion: '',
 				  },
 		);
@@ -87,10 +90,10 @@ const DiscountManagement = () => {
 
 	const handleSaveDescuento = () => {
 		if (
-			newDescuento.tipo &&
+			newDescuento.tipoDescuento &&
 			newDescuento.valor &&
-			newDescuento.fechaInicio &&
-			newDescuento.fechaFin &&
+			newDescuento.fechainicio &&
+			newDescuento.fechafin &&
 			newDescuento.descripcion
 		) {
 			if (newDescuento.id === null) {
@@ -98,10 +101,10 @@ const DiscountManagement = () => {
 				dispatch(addDescuento(descuentoToAdd));
 
 				crearDescuento(
-					newDescuento.tipo,
+					newDescuento.tipoDescuento,
 					newDescuento.valor,
-					newDescuento.fechaInicio,
-					newDescuento.fechaFin,
+					newDescuento.fechainicio,
+					newDescuento.fechafin,
 					newDescuento.descripcion,
 					sessionStorage.getItem('token'),
 				)
@@ -116,10 +119,10 @@ const DiscountManagement = () => {
 			} else {
 				actualizarDescuento(
 					newDescuento.id,
-					newDescuento.tipo,
+					newDescuento.tipoDescuento,
 					newDescuento.valor,
-					newDescuento.fechaInicio,
-					newDescuento.fechaFin,
+					newDescuento.fechainicio,
+					newDescuento.fechafin,
 					newDescuento.descripcion,
 					sessionStorage.getItem('token'),
 				)
@@ -135,11 +138,11 @@ const DiscountManagement = () => {
 			}
 
 			setNewDescuento({
-				valor: '',
-				fechaInicio: '',
-				fechaFin: '',
+				valor: 0,
+				fechainicio: null,
+				fechafin: null,
 				descripcion: '',
-				tipo: '',
+				tipoDescuento: null,
 			});
 			handleClose();
 		} else {
@@ -151,10 +154,8 @@ const DiscountManagement = () => {
 		borrarDescuento(id, sessionStorage.getItem('token'))
 			.then((data) => console.log('Descuento eliminado:', data))
 			.catch((error) => {
-				console.error('Error al eliminar el descuento:', error.message);
-				setError(error.message);
+				setError('Error al eliminar el descuento.');
 			});
-		dispatch(deleteDescuento(id));
 		fetchDescuentos();
 	};
 
@@ -259,9 +260,9 @@ const DiscountManagement = () => {
 				<DialogContent>
 					Tipo de descuento
 					<TextField
-						name="tipo"
+						name="tipoDescuento"
 						variant="outlined"
-						value={newDescuento.tipo}
+						value={newDescuento.tipoDescuento}
 						onChange={handleInputChange}
 						fullWidth
 						select
@@ -288,18 +289,18 @@ const DiscountManagement = () => {
 					/>
 					Fecha de Inicio
 					<TextField
-						name="fechaInicio"
+						name="fechainicio"
 						type="date"
-						value={newDescuento.fechaInicio}
+						value={newDescuento.fechainicio}
 						onChange={handleInputChange}
 						fullWidth
 						sx={{ marginBottom: 2 }}
 					/>
 					Fecha de Fin
 					<TextField
-						name="fechaFin"
+						name="fechafin"
 						type="date"
-						value={newDescuento.fechaFin}
+						value={newDescuento.fechafin}
 						onChange={handleInputChange}
 						fullWidth
 						sx={{ marginBottom: 2 }}

@@ -360,27 +360,31 @@ const UserManagement = () => {
 						fullWidth
 						sx={{ marginBottom: 2 }}
 					/>
-					{/* Campo de rol */}
-					Rol
-					<TextField
-						name="rol_id"
-						variant="outlined"
-						value={newUsuario.rol_id}
-						onChange={handleInputChange}
-						fullWidth
-						select
-						SelectProps={{
-							native: true,
-						}}
-						style={{ marginBottom: '10px' }}
-					>
-						<option value="">Seleccionar rol</option>
-						{roles.map((rol) => (
-							<option key={rol.id} value={rol.id}>
-								{rol.nombre}
-							</option>
-						))}
-					</TextField>
+					{/* Campo de Rol: solo visible si el usuario esta siendo creado */}
+					{!newUsuario.id && (
+						<>
+							Rol
+							<TextField
+								name="rol_id"
+								variant="outlined"
+								value={newUsuario.rol_id}
+								onChange={handleInputChange}
+								fullWidth
+								select
+								SelectProps={{
+									native: true,
+								}}
+								style={{ marginBottom: '10px' }}
+							>
+								<option value="">Seleccionar rol</option>
+								{roles.map((rol) => (
+									<option key={rol.id} value={rol.id}>
+										{rol.nombre}
+									</option>
+								))}
+							</TextField>
+						</>
+					)}
 					{/* Campo de estado: solo visible si el usuario esta siendo actualizado */}
 					{newUsuario.id && (
 						<>
