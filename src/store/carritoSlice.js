@@ -35,6 +35,7 @@ const carritoSlice = createSlice({
 					cantidad: newItem.cantidad || 1,
 					precioTotal: (newItem.precio + (newItem.adicional?.costoAdicional || 0)) * (newItem.cantidad || 1),
 					adicional: newItem.adicional,
+					imageSrc: newItem.imagen ? `data:image/jpeg;base64,${newItem.imagen}` : null,
 				});
 			}
 			state.cantidadProductos += newItem.cantidad || 1;
@@ -168,6 +169,7 @@ const carritoSlice = createSlice({
 					cantidad: producto.cantidad,
 					precioTotal: (producto.precio + (producto.adicional?.costoAdicional || 0)) * producto.cantidad,
 					adicional: producto.adicional,
+					imageSrc: producto.imagen ? `data:image/jpeg;base64,${producto.imagen}` : null,
 				})),
 				...packs.map((pack) => ({
 					id: pack.id,
@@ -176,6 +178,7 @@ const carritoSlice = createSlice({
 					precio: pack.precio,
 					cantidad: pack.cantidad,
 					precioTotal: pack.precio * pack.cantidad,
+					imageSrc: pack.imagen ? `data:image/jpeg;base64,${pack.imagen}` : null,
 				})),
 			];
 
