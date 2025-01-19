@@ -52,7 +52,7 @@ const ProductManagement = () => {
 			console.log(e);
 		}
 		setError('');
-	}, []);
+	}, [dispatch]);
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState('');
@@ -91,7 +91,7 @@ const ProductManagement = () => {
 				descripcion: '',
 				precio: '',
 				categoria: '',
-				visible: true,
+				visible: "true",
 				imagen: null,
 			});
 		}
@@ -108,23 +108,22 @@ const ProductManagement = () => {
 				crearProducto(
 					newProduct.descripcion,
 					newProduct.precio,
-					newProduct.categoria,
+					parseInt(newProduct.categoria),
 					newProduct.visible,
 					newProduct.imagen,
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
 						if (data && data.id) {
-							console.log('Producto creado:', data);
+							fetchProductos();
 						} else {
 							setError('Error al crear el producto en la base de datos.');
 						}
 					})
 					.catch((error) => {
-						console.error('Error al crear el producto:', error.message);
-						setError(error.message);
+						setError('Error al crear el producto:');
 					});
-				fetchProductos();
+				
 			} else {
 				actualizarProducto(
 					newProduct.id,
@@ -136,11 +135,10 @@ const ProductManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
-						console.log('Producto actualizado:', data);
+						fetchProductos();
 					})
 					.catch((error) => {
-						console.error('Error al actualizar el producto:', error.message);
-						setError(error.message);
+						setError('Error al actualizar el producto:');
 					});
 				fetchProductos();
 			}
@@ -148,7 +146,7 @@ const ProductManagement = () => {
 				descripcion: '',
 				precio: '',
 				categoria: '',
-				visible: true,
+				visible: "true",
 				imagen: null,
 			});
 			handleClose();
@@ -333,7 +331,7 @@ const ProductManagement = () => {
 					<TextField
 						name="categoria"
 						variant="outlined"
-						value={newProduct.categoria}
+						value={newProduct.categoria.id}
 						onChange={handleCategoryChange}
 						fullWidth
 						select

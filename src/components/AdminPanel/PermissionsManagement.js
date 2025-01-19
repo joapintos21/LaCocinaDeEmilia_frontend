@@ -62,10 +62,16 @@ const PermissionsManagement = () => {
 
 	const handleOpen = (permiso = null) => {
 		if (permiso) {
-			setNewPermiso({ ...permiso });
+			setNewPermiso({
+				id: permiso.id || null,
+				endpoint: permiso.endpoint.toLowerCase() || '',
+				tipo: permiso.tipo.toLowerCase() || '',
+				rol_id: permiso.rol_id || '',
+			});
 		} else {
-			setNewPermiso({ id: null, endpoint: null, tipo: null, rol_id: '' });
+			setNewPermiso({ id: null, endpoint: '', tipo: '', rol_id: '' });
 		}
+		setError(''); 
 		setOpen(true);
 	};
 
@@ -160,28 +166,11 @@ const PermissionsManagement = () => {
 
 					<Grid item xs={12} sm={6} md={3}>
 						<TextField
-							label="Buscar por funcion"
+							label="Buscar por permiso"
 							variant="outlined"
 							fullWidth
 							value={searchEndpoint}
 							onChange={(e) => setSearchEndpoint(e.target.value)}
-							InputProps={{
-								startAdornment: (
-									<InputAdornment position="start">
-										<SearchIcon />
-									</InputAdornment>
-								),
-							}}
-						/>
-					</Grid>
-
-					<Grid item xs={12} sm={6} md={3}>
-						<TextField
-							label="Buscar por descripción"
-							variant="outlined"
-							fullWidth
-							value={searchTipo}
-							onChange={(e) => setSearchTipo(e.target.value)}
 							InputProps={{
 								startAdornment: (
 									<InputAdornment position="start">
@@ -274,7 +263,7 @@ const PermissionsManagement = () => {
 					<TextField
 						name="tipo"
 						variant="outlined"
-						value={newPermiso.tipo}
+						value={newPermiso.tipo.toUpperCase()}
 						onChange={handleInputChange}
 						fullWidth
 						select

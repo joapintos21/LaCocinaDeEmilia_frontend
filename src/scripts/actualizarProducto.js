@@ -1,37 +1,33 @@
-export const actualizarProducto = async (id, descripcion, precio, categoria_id, visible, token) => {
-	// Usar el ID directamente en la URL del endpoint
-	const url = `/productos/update/${id}`; // Asumiendo que el servidor espera el ID en la URL
+export const actualizarProducto = async (id, descripcion, precio, categoria_id, visible, imagen, token) => {
+	const url = `/productos/update?id=${id}`; 
 
-	// Crear el objeto de datos que se enviará en el cuerpo de la solicitud
 	const body = {
 		descripcion: descripcion,
 		precio: precio,
 		categoria_id: categoria_id,
 		visible: visible,
+		imagen: imagen
 	};
 
 	try {
-		// Hacer la solicitud PUT
 		const response = await fetch(url, {
-			method: 'PUT', // Método PUT
+			method: 'PUT', 
 			headers: {
-				'Content-Type': 'application/json', // El contenido es JSON
-				Authorization: `Bearer ${token}`, // Incluir el token en el header de autorización
+				'Content-Type': 'application/json', 
+				Authorization: `Bearer ${token}`, 
 			},
-			body: JSON.stringify(body), // Convertimos el body a JSON
+			body: JSON.stringify(body)
 		});
 
-		// Manejar errores fuera del rango 200-299
 		if (!response.ok) {
-			const errorData = await response.json(); // Extraer datos del error
+			const errorData = await response.json(); 
 			throw new Error(errorData.error || 'Se produjo un error desconocido.');
 		}
 
-		// Obtener y retornar los datos de la respuesta
 		const data = await response.json();
 		return data;
 	} catch (error) {
 		console.error(error);
-		throw error; // Lanza el error para que lo maneje el llamador
+		throw error; 
 	}
 };
