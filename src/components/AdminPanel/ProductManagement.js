@@ -43,6 +43,7 @@ const ProductManagement = () => {
 		precio: '',
 		categoria: '',
 		visible: true,
+		imagen: '',
 	});
 
 	useEffect(() => {
@@ -79,7 +80,8 @@ const ProductManagement = () => {
 	};
 
 	const handleCategoryChange = (e) => {
-		setNewProduct({ ...newProduct, categoria: e.target.value });
+		const selectedCategory = categorias.find((categoria) => categoria.id === parseInt(e.target.value));
+		setNewProduct({ ...newProduct, categoria: selectedCategory });
 	};
 
 	const handleOpen = (product = null) => {
@@ -91,7 +93,7 @@ const ProductManagement = () => {
 				descripcion: '',
 				precio: '',
 				categoria: '',
-				visible: "true",
+				visible: 'true',
 				imagen: null,
 			});
 		}
@@ -108,7 +110,7 @@ const ProductManagement = () => {
 				crearProducto(
 					newProduct.descripcion,
 					newProduct.precio,
-					parseInt(newProduct.categoria),
+					parseInt(newProduct.categoria.id),
 					newProduct.visible,
 					newProduct.imagen,
 					sessionStorage.getItem('token'),
@@ -123,13 +125,12 @@ const ProductManagement = () => {
 					.catch((error) => {
 						setError('Error al crear el producto:');
 					});
-				
 			} else {
 				actualizarProducto(
 					newProduct.id,
 					newProduct.descripcion,
 					parseFloat(newProduct.precio),
-					parseInt(newProduct.categoria),
+					parseInt(newProduct.categoria.id),
 					newProduct.visible,
 					newProduct.imagen,
 					sessionStorage.getItem('token'),
@@ -146,7 +147,7 @@ const ProductManagement = () => {
 				descripcion: '',
 				precio: '',
 				categoria: '',
-				visible: "true",
+				visible: 'true',
 				imagen: null,
 			});
 			handleClose();

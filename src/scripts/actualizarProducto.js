@@ -1,33 +1,34 @@
-export const actualizarProducto = async (id, descripcion, precio, categoria_id, visible, imagen, token) => {
-	const url = `/productos/update?id=${id}`; 
+import apiCliente from 'utils/apiCliente';
 
-	const body = {
+let request, body;
+
+export const actualizarProducto = async (id, descripcion, precio, categoria_id, visible, imagen, token) => {
+	request = '/productos/update';
+
+	body = {
+		id: id,
 		descripcion: descripcion,
 		precio: precio,
 		categoria_id: categoria_id,
 		visible: visible,
-		imagen: imagen
+		imagen: imagen,
 	};
 
 	try {
-		const response = await fetch(url, {
-			method: 'PUT', 
-			headers: {
-				'Content-Type': 'application/json', 
-				Authorization: `Bearer ${token}`, 
-			},
-			body: JSON.stringify(body)
-		});
-
-		if (!response.ok) {
-			const errorData = await response.json(); 
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		const data = await response.json();
-		return data;
+		const response = await apiCliente.post(request, body);
+		return response.data; // Devuelve los datos de la respuesta
 	} catch (error) {
-		console.error(error);
-		throw error; 
+		// Manejo de errores
+		if (error.response) {
+			// Si el error tiene respuesta, lanza el mensaje adecuado
+			const errorData = error.response.data;
+			throw new Error(errorData.error || 'Se produjo un error desconocido.');
+		} else if (error.request) {
+			// Si no se recibe respuesta del servidor
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			// Error al configurar la solicitud
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };
