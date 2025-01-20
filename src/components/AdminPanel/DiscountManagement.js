@@ -26,6 +26,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { obtenerDescuentos } from 'scripts/obtenerDescuentos';
+import { mostrarValorDescuento } from 'utils/descuentosUtils';
 
 const DiscountManagement = () => {
 	const [error, setError] = useState('');
@@ -97,9 +98,6 @@ const DiscountManagement = () => {
 			newDescuento.descripcion
 		) {
 			if (newDescuento.id === null) {
-				const descuentoToAdd = { ...newDescuento };
-				dispatch(addDescuento(descuentoToAdd));
-
 				crearDescuento(
 					newDescuento.tipoDescuento,
 					newDescuento.valor,
@@ -109,12 +107,11 @@ const DiscountManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
-						console.log('Descuento agregado:', data);
 						fetchDescuentos();
+						setError('');
 					})
 					.catch((error) => {
-						console.error('Error al crear el descuento:', error.message);
-						setError(error.message);
+						setError('Error al crear el descuento.');
 					});
 			} else {
 				actualizarDescuento(
@@ -128,13 +125,11 @@ const DiscountManagement = () => {
 				)
 					.then((data) => {
 						fetchDescuentos();
-						console.log('Descuento actualizado:', data);
+						setError('');
 					})
 					.catch((error) => {
-						console.error('Error al actualizar el descuento:', error.message);
-						setError(error.message);
+						setError('Error al actualizar el descuento.');
 					});
-				dispatch(updateDescuento(newDescuento));
 			}
 
 			setNewDescuento({
@@ -152,11 +147,13 @@ const DiscountManagement = () => {
 
 	const handleDelete = (id) => {
 		borrarDescuento(id, sessionStorage.getItem('token'))
-			.then((data) => console.log('Descuento eliminado:', data))
+			.then((data) => {
+				fetchDescuentos();
+				setError('');
+			})
 			.catch((error) => {
 				setError('Error al eliminar el descuento.');
 			});
-		fetchDescuentos();
 	};
 
 	// Filtra los descuentos asegurándote de que `descuentos` es un array
@@ -220,7 +217,7 @@ const DiscountManagement = () => {
 							filteredDescuentos.map((descuento) => (
 								<TableRow key={descuento.id}>
 									<TableCell>{descuento.tipo}</TableCell>
-									<TableCell>{descuento.valor}</TableCell>
+									<TableCell>{mostrarValorDescuento(descuento.valor, descuento.tipo)}</TableCell>
 									<TableCell>{descuento.fechainicio}</TableCell>
 									<TableCell>{descuento.fechafin}</TableCell>
 									<TableCell>{descuento.descripcion}</TableCell>

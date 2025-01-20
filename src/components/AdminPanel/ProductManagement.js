@@ -27,6 +27,9 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import { obtenerTodosAdicionales } from 'scripts/obtenerTodosAdicionales';
+import { obtenerDescuentos } from 'scripts/obtenerDescuentos'; 
+import { mostrarValorDescuento } from 'utils/descuentosUtils'; 
 
 const ProductManagement = () => {
 	const [error, setError] = useState('');
@@ -36,28 +39,44 @@ const ProductManagement = () => {
 	const fetchProductos = async () => {
 		await obtenerProductos(dispatch);
 	};
+	const fetchAdicionales = async () => {
+		await obtenerTodosAdicionales(dispatch, sessionStorage.getItem('token'));
+	};
+	const fetchDescuentos = async () => {
+		await obtenerDescuentos(dispatch, sessionStorage.getItem('token'));
+	};
 	const [open, setOpen] = useState(false);
 	const [newProduct, setNewProduct] = useState({
 		id: null,
 		descripcion: '',
 		precio: '',
-		categoria: '',
+		categoria: { id: '' },
 		visible: true,
+		adicionales: [],
 	});
-
 	useEffect(() => {
 		try {
 			fetchProductos();
+			fetchAdicionales();
+			fetchDescuentos();
 		} catch (e) {
 			console.log(e);
 		}
 		setError('');
 	}, [dispatch]);
 
+	const adicionales = useSelector((state) => state.gestionAdicionales || []);
+	const descuentos = useSelector((state) => state.descuentos || []);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState('');
 	const [minPrice, setMinPrice] = useState('');
 	const [maxPrice, setMaxPrice] = useState('');
+	const [searchDescuentos, setSearchDescuentos] = useState('');
+	const [descuentosSeleccionados, setDescuentosSeleccionados] = useState([]);
+
+	const filteredDescuentos = descuentos.filter((descuento) =>
+		descuento.descripcion.toLowerCase().includes(searchDescuentos.toLowerCase()),
+	);
 
 	const handleImageChange = (e) => {
 		const file = e.target.files[0];
@@ -70,6 +89,14 @@ const ProductManagement = () => {
 				}));
 			};
 			reader.readAsDataURL(file);
+		}
+	};
+
+	const handleDescuentoChange = (id) => {
+		if (descuentosSeleccionados.includes(id)) {
+			setDescuentosSeleccionados((prev) => prev.filter((descuentoId) => descuentoId !== id));
+		} else {
+			setDescuentosSeleccionados((prev) => [...prev, id]);
 		}
 	};
 
@@ -87,12 +114,11 @@ const ProductManagement = () => {
 			setNewProduct({ ...product });
 		} else {
 			setNewProduct({
-				id: null,
 				descripcion: '',
 				precio: '',
-				categoria: '',
-				visible: "true",
-				imagen: null,
+				categoria: { id: '' },
+				adicionales: [],
+				visible: false,
 			});
 		}
 		setOpen(true);
@@ -100,6 +126,20 @@ const ProductManagement = () => {
 
 	const handleClose = () => {
 		setOpen(false);
+	};
+
+	const handleAdicionalChange = (id) => {
+		if (newProduct.adicionales.includes(id)) {
+			setNewProduct((prevState) => ({
+				...prevState,
+				adicionales: prevState.adicionales.filter((adicionalId) => adicionalId !== id),
+			}));
+		} else {
+			setNewProduct((prevState) => ({
+				...prevState,
+				adicionales: [...prevState.adicionales, id],
+			}));
+		}
 	};
 
 	const handleSaveProduct = () => {
@@ -116,6 +156,7 @@ const ProductManagement = () => {
 					.then((data) => {
 						if (data && data.id) {
 							fetchProductos();
+							setError('');
 						} else {
 							setError('Error al crear el producto en la base de datos.');
 						}
@@ -123,7 +164,6 @@ const ProductManagement = () => {
 					.catch((error) => {
 						setError('Error al crear el producto:');
 					});
-				
 			} else {
 				actualizarProducto(
 					newProduct.id,
@@ -136,6 +176,7 @@ const ProductManagement = () => {
 				)
 					.then((data) => {
 						fetchProductos();
+						setError('');
 					})
 					.catch((error) => {
 						setError('Error al actualizar el producto:');
@@ -146,7 +187,7 @@ const ProductManagement = () => {
 				descripcion: '',
 				precio: '',
 				categoria: '',
-				visible: "true",
+				visible: 'true',
 				imagen: null,
 			});
 			handleClose();
@@ -158,15 +199,19 @@ const ProductManagement = () => {
 	const handleDelete = (id) => {
 		borrarProducto(id, sessionStorage.getItem('token'))
 			.then((data) => {
-				console.log('Producto eliminado:', data);
+				setError('');
 			})
 			.catch((error) => {
-				console.error('Error al eliminar el producto:', error.message);
-				setError(error.message);
+				setError('Error al eliminar el producto:');
 			});
-		dispatch(deleteProduct(id));
 		fetchProductos();
 	};
+
+	const [searchAdicionales, setSearchAdicionales] = useState('');
+
+	const filteredAdicionales = adicionales.filter((adicional) =>
+		adicional.descripcion.toLowerCase().includes(searchAdicionales.toLowerCase()),
+	);
 
 	const filteredProducts = productos.filter((product) => {
 		const matchesSearchTerm = product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
@@ -179,6 +224,8 @@ const ProductManagement = () => {
 		return matchesSearchTerm && matchesCategory && matchesMinPrice && matchesMaxPrice;
 	});
 
+	const adicionalesSeleccionados = Array.isArray(newProduct.adicionales) ? newProduct.adicionales : [];
+	
 	return (
 		<div style={{ marginTop: '20px' }}>
 			{/* Filtros y búsqueda */}
@@ -308,6 +355,7 @@ const ProductManagement = () => {
 			<Dialog open={open} onClose={handleClose}>
 				<DialogTitle>{newProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</DialogTitle>
 				<DialogContent>
+					{/* Descripción */}
 					Descripción
 					<TextField
 						name="descripcion"
@@ -317,6 +365,7 @@ const ProductManagement = () => {
 						fullWidth
 						style={{ marginBottom: '10px' }}
 					/>
+					{/* Precio */}
 					Precio
 					<TextField
 						name="precio"
@@ -327,6 +376,7 @@ const ProductManagement = () => {
 						type="number"
 						style={{ marginBottom: '10px' }}
 					/>
+					{/* Categoría */}
 					Categoría
 					<TextField
 						name="categoria"
@@ -347,6 +397,121 @@ const ProductManagement = () => {
 							</option>
 						))}
 					</TextField>
+					{/* Lista de adicionales */}
+					Adicionales
+					<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
+						<TextField
+							variant="outlined"
+							fullWidth
+							placeholder="Buscar adicionales..."
+							onChange={(e) => setSearchAdicionales(e.target.value)}
+							value={searchAdicionales}
+							style={{ marginBottom: '10px' }}
+							InputProps={{
+								startAdornment: (
+									<InputAdornment position="start">
+										<SearchIcon />
+									</InputAdornment>
+								),
+							}}
+						/>
+						<Box
+							style={{
+								border: '1px solid #ccc',
+								borderRadius: '8px',
+								padding: '10px',
+								maxHeight: '200px',
+								overflowY: 'auto',
+								backgroundColor: '#f9f9f9',
+							}}
+						>
+							{filteredAdicionales.length > 0 ? (
+								filteredAdicionales.map((adicional) => (
+									<Box
+										key={adicional.id}
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											marginBottom: '5px',
+											padding: '5px',
+											borderBottom: '1px solid #e0e0e0',
+										}}
+									>
+										<FormControlLabel
+											control={
+												<Checkbox
+													checked={adicionalesSeleccionados.includes(adicional.id)}
+													onChange={() => handleAdicionalChange(adicional.id)}
+													color="primary"
+												/>
+											}
+											label={adicional.descripcion}
+										/>
+									</Box>
+								))
+							) : (
+								<p style={{ textAlign: 'center', color: '#888' }}>No hay adicionales disponibles.</p>
+							)}
+						</Box>
+					</Box>
+					{/* Lista de descuentos */}
+					Descuentos
+					<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
+						<TextField
+							variant="outlined"
+							fullWidth
+							placeholder="Buscar descuentos..."
+							onChange={(e) => setSearchDescuentos(e.target.value)}
+							value={searchDescuentos}
+							style={{ marginBottom: '10px' }}
+							InputProps={{
+								startAdornment: (
+									<InputAdornment position="start">
+										<SearchIcon />
+									</InputAdornment>
+								),
+							}}
+						/>
+						<Box
+							style={{
+								border: '1px solid #ccc',
+								borderRadius: '8px',
+								padding: '10px',
+								maxHeight: '200px',
+								overflowY: 'auto',
+								backgroundColor: '#f9f9f9',
+							}}
+						>
+							{filteredDescuentos.length > 0 ? (
+								filteredDescuentos.map((descuento) => (
+									<Box
+										key={descuento.id}
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											marginBottom: '5px',
+											padding: '5px',
+											borderBottom: '1px solid #e0e0e0',
+										}}
+									>
+										<FormControlLabel
+											control={
+												<Checkbox
+													checked={descuentosSeleccionados.includes(descuento.id)}
+													onChange={() => handleDescuentoChange(descuento.id)}
+													color="primary"
+												/>
+											}
+											label={`${descuento.descripcion} - (Valor: ${mostrarValorDescuento(descuento.valor, descuento.tipo)})`}
+										/>
+									</Box>
+								))
+							) : (
+								<p style={{ textAlign: 'center', color: '#888' }}>No hay descuentos disponibles.</p>
+							)}
+						</Box>
+					</Box>
+					{/* Imagen */}
 					Imagen
 					<input
 						type="file"
@@ -354,6 +519,7 @@ const ProductManagement = () => {
 						onChange={handleImageChange} // Evento para manejar cambios
 						style={{ marginBottom: '10px', display: 'block' }}
 					/>
+					{/* Visible */}
 					<FormControlLabel
 						control={
 							<Checkbox

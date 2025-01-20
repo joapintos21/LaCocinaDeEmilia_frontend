@@ -6,7 +6,7 @@ export const crearAdicional = async (descripcion, costoAdicional, visible, token
 
 	body = {
 		descripcion: descripcion,
-		costoAdicional: costoAdicional,
+		costoAdicional: parseFloat(costoAdicional),
 		visible: visible,
 	};
 

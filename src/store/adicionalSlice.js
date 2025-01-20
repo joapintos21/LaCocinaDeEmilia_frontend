@@ -1,4 +1,3 @@
-// src/redux/categorySlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 export const adicionalSlice = createSlice({

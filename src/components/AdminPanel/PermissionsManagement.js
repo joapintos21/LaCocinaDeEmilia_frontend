@@ -64,14 +64,14 @@ const PermissionsManagement = () => {
 		if (permiso) {
 			setNewPermiso({
 				id: permiso.id || null,
-				endpoint: permiso.endpoint.toLowerCase() || '',
-				tipo: permiso.tipo.toLowerCase() || '',
+				endpoint: permiso.endpoint || '',
+				tipo: permiso.tipo || '',
 				rol_id: permiso.rol_id || '',
 			});
 		} else {
 			setNewPermiso({ id: null, endpoint: '', tipo: '', rol_id: '' });
 		}
-		setError(''); 
+		setError('');
 		setOpen(true);
 	};
 
@@ -87,34 +87,35 @@ const PermissionsManagement = () => {
 	const handleSavePermiso = () => {
 		if (newPermiso.endpoint && newPermiso.tipo && newPermiso.rol_id) {
 			if (newPermiso.id === null) {
-				const permisoToAdd = { ...newPermiso };
-
-				crearPermiso(newPermiso.endpoint, newPermiso.tipo, newPermiso.rol_id, sessionStorage.getItem('token'))
+				crearPermiso(
+					newPermiso.endpoint,
+					newPermiso.tipo.toUpperCase(),
+					newPermiso.rol_id,
+					sessionStorage.getItem('token'),
+				)
 					.then((data) => {
-						console.log('Permiso agregado:', data);
 						fetchPermisos();
 						fetchRolesUsuario();
+						setError('');
 					})
 					.catch((error) => {
-						console.error('Error al crear el permiso:', error.message);
-						setError(error.message);
+						setError('Error al crear el permiso.');
 					});
 			} else {
 				actualizarPermiso(
 					newPermiso.id,
 					newPermiso.endpoint,
-					newPermiso.tipo,
+					newPermiso.tipo.toUpperCase(),
 					newPermiso.rol_id,
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
-						console.log('Permiso actualizado:', data);
 						fetchPermisos();
 						fetchRolesUsuario();
+						setError('');
 					})
 					.catch((error) => {
-						console.error('Error al actualizar el permiso:', error.message);
-						setError(error.message);
+						setError('Error al actualizar el permiso.');
 					});
 			}
 
@@ -128,13 +129,12 @@ const PermissionsManagement = () => {
 	const handleDelete = (id) => {
 		borrarPermiso(id, sessionStorage.getItem('token'))
 			.then((data) => {
-				console.log('Permiso eliminado:', data);
 				fetchPermisos();
 				fetchRolesUsuario();
+				setError('');
 			})
 			.catch((error) => {
-				console.error('Error al eliminar el permiso:', error.message);
-				setError(error.message);
+				setError('Error al eliminar el permiso.');
 			});
 		dispatch(deletePermiso(id));
 	};
@@ -237,7 +237,7 @@ const PermissionsManagement = () => {
 					<TextField
 						name="endpoint"
 						variant="outlined"
-						value={newPermiso.endpoint}
+						value={newPermiso.endpoint!=null ? newPermiso.endpoint.toLowerCase() : newPermiso.endpoint}
 						onChange={handleInputChange}
 						fullWidth
 						select
@@ -263,7 +263,7 @@ const PermissionsManagement = () => {
 					<TextField
 						name="tipo"
 						variant="outlined"
-						value={newPermiso.tipo.toUpperCase()}
+						value={newPermiso.tipo}
 						onChange={handleInputChange}
 						fullWidth
 						select
@@ -273,8 +273,8 @@ const PermissionsManagement = () => {
 						style={{ marginBottom: '10px' }}
 					>
 						<option value="">Seleccionar tipo de permiso</option>
-						<option value={'ESCRITURA'}>Escritura</option>
-						<option value={'LECTURA'}>Lectura</option>
+						<option value={'Escritura'}>Escritura</option>
+						<option value={'Lectura'}>Lectura</option>
 					</TextField>
 					Rol
 					<TextField

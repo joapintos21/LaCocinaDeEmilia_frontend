@@ -17,7 +17,7 @@ export const obtenerProductos = async (dispatch) => {
     }
 
     const data = await response.json();
-    dispatch(setProductos(data)); // Almacena los productos en Redux
+    dispatch(setProductos(data)); 
 
   } catch (error) {
     console.error("Error al obtener productos:", error);
