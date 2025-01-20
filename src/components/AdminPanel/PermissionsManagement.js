@@ -54,7 +54,6 @@ const PermissionsManagement = () => {
 		} catch (e) {
 			console.log(e);
 		}
-		setError('');
 	}, [dispatch]);
 
 	const permisos = useSelector((state) => state.gestionPermisos || []);

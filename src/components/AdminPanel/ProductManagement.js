@@ -62,7 +62,6 @@ const ProductManagement = () => {
 		} catch (e) {
 			console.log(e);
 		}
-		setError('');
 	}, [dispatch]);
 
 	const adicionales = useSelector((state) => state.gestionAdicionales || []);

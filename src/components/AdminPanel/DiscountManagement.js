@@ -55,7 +55,6 @@ const DiscountManagement = () => {
 		} catch (e) {
 			console.log(e);
 		}
-		setError('');
 	}, []);
 
 	const descuentos = useSelector((state) => state.descuentos || []);
