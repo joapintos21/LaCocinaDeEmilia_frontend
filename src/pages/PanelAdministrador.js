@@ -10,6 +10,8 @@ import OrderManagement from 'components/AdminPanel/OrderManagement';
 import DiscountManagement from 'components/AdminPanel/DiscountManagement';
 import PermissionsManagement from 'components/AdminPanel/PermissionsManagement';
 import AdditionalManagement from 'components/AdminPanel/AdditionalManagement';
+import GastosManagement from 'components/AdminPanel/GastosManagement';
+import ReportManagement from 'components/AdminPanel/ReportManagement';
 import Header from 'components/headers/light.js';
 import { Container, ContentWithPaddingXl } from 'components/misc/Layouts';
 import tw from 'twin.macro';
@@ -94,42 +96,8 @@ export default () => {
 		{ title: 'Descuentos', component: <DiscountManagement /> },
 		{ title: 'Usuarios', component: <UserManagement /> },
 		{ title: 'Permisos', component: <PermissionsManagement /> },
-		{
-			title: 'Reporte de pedidos',
-			component: (
-				<button
-					onClick={descargarPDF}
-					style={{
-						backgroundColor: '#99cdb6',
-						color: 'white',
-						padding: '10px 20px',
-						borderRadius: '5px',
-						border: 'none',
-						cursor: 'pointer',
-					}}
-				>
-					Descargar Reporte
-				</button>
-			),
-		},
-		{
-			title: 'Reporte de usuarios',
-			component: (
-				<button
-					onClick={descargarReporteUsuarios}
-					style={{
-						backgroundColor: '#99cdb6',
-						color: 'white',
-						padding: '10px 20px',
-						borderRadius: '5px',
-						border: 'none',
-						cursor: 'pointer',
-					}}
-				>
-					Descargar Reporte de Usuarios
-				</button>
-			),
-		},
+		{ title: 'Gastos', component: <GastosManagement /> },
+		{ title: 'Reportes', component: <ReportManagement /> },
 	];
 
 	return (
