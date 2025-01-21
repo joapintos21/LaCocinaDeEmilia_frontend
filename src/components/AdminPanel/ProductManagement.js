@@ -4,6 +4,7 @@ import { addProduct, updateProduct, deleteProduct } from 'store/productoSlice';
 import { crearProducto } from 'scripts/crearProducto';
 import { actualizarProducto } from 'scripts/actualizarProducto';
 import { borrarProducto } from 'scripts/borrarProducto';
+import { asociarProductoDescuento } from 'scripts/asociarProductoDescuento';
 import { obtenerProductos } from 'scripts/obtenerProductosCategoria';
 import {
 	Table,
@@ -28,14 +29,33 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import { obtenerTodosAdicionales } from 'scripts/obtenerTodosAdicionales';
-import { obtenerDescuentos } from 'scripts/obtenerDescuentos'; 
-import { mostrarValorDescuento } from 'utils/descuentosUtils'; 
+import { obtenerDescuentos } from 'scripts/obtenerDescuentos';
+import { mostrarValorDescuento } from 'utils/descuentosUtils';
 
 const ProductManagement = () => {
 	const [error, setError] = useState('');
 	const dispatch = useDispatch();
+	const [descuentosSeleccionados, setDescuentosSeleccionados] = useState([]);
 	const productos = useSelector((state) => state.productos);
 	const categorias = useSelector((state) => state.categorias);
+	const adicionales = useSelector((state) => state.gestionAdicionales || []);
+	const descuentos = useSelector((state) => state.descuentos || []);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState('');
+	const [minPrice, setMinPrice] = useState('');
+	const [maxPrice, setMaxPrice] = useState('');
+	const [searchDescuentos, setSearchDescuentos] = useState('');
+	const [open, setOpen] = useState(false);
+	const [newProduct, setNewProduct] = useState({
+		id: null,
+		descripcion: '',
+		precio: '',
+		categoria: { id: '' },
+		visible: true,
+		adicionales: [],
+		imagen: '',
+	});
+
 	const fetchProductos = async () => {
 		await obtenerProductos(dispatch);
 	};
@@ -45,16 +65,7 @@ const ProductManagement = () => {
 	const fetchDescuentos = async () => {
 		await obtenerDescuentos(dispatch, sessionStorage.getItem('token'));
 	};
-	const [open, setOpen] = useState(false);
-	const [newProduct, setNewProduct] = useState({
-		id: null,
-		descripcion: '',
-		precio: '',
-		categoria: { id: '' },
-		visible: true,
-		adicionales: [],
-		imagen: ''
-	});
+	
 	useEffect(() => {
 		try {
 			fetchProductos();
@@ -64,15 +75,6 @@ const ProductManagement = () => {
 			console.log(e);
 		}
 	}, [dispatch]);
-
-	const adicionales = useSelector((state) => state.gestionAdicionales || []);
-	const descuentos = useSelector((state) => state.descuentos || []);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [selectedCategory, setSelectedCategory] = useState('');
-	const [minPrice, setMinPrice] = useState('');
-	const [maxPrice, setMaxPrice] = useState('');
-	const [searchDescuentos, setSearchDescuentos] = useState('');
-	const [descuentosSeleccionados, setDescuentosSeleccionados] = useState([]);
 
 	const filteredDescuentos = descuentos.filter((descuento) =>
 		descuento.descripcion.toLowerCase().includes(searchDescuentos.toLowerCase()),
@@ -183,7 +185,21 @@ const ProductManagement = () => {
 					.catch((error) => {
 						setError('Error al actualizar el producto:');
 					});
-				fetchProductos();
+
+				// Asociar los descuentos seleccionados
+				if(0 < descuentosSeleccionados.length){
+					const productId = newProduct.id;
+					for(var i = 0; i < descuentosSeleccionados.length; i+=1){
+						asociarProductoDescuento(descuentosSeleccionados[i], productId, sessionStorage.getItem('token')).then((data) => {
+							fetchProductos();
+							setError('');
+						})
+						.catch((error) => {
+							setError('Error al asociar el descuento al producto.');
+						});;
+					}
+					fetchProductos();
+				}
 			}
 			setNewProduct({
 				descripcion: '',
@@ -227,7 +243,7 @@ const ProductManagement = () => {
 	});
 
 	const adicionalesSeleccionados = Array.isArray(newProduct.adicionales) ? newProduct.adicionales : [];
-	
+
 	return (
 		<div style={{ marginTop: '20px' }}>
 			{/* Filtros y búsqueda */}
@@ -399,120 +415,132 @@ const ProductManagement = () => {
 							</option>
 						))}
 					</TextField>
-					{/* Lista de adicionales */}
-					Adicionales
-					<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
-						<TextField
-							variant="outlined"
-							fullWidth
-							placeholder="Buscar adicionales..."
-							onChange={(e) => setSearchAdicionales(e.target.value)}
-							value={searchAdicionales}
-							style={{ marginBottom: '10px' }}
-							InputProps={{
-								startAdornment: (
-									<InputAdornment position="start">
-										<SearchIcon />
-									</InputAdornment>
-								),
-							}}
-						/>
-						<Box
-							style={{
-								border: '1px solid #ccc',
-								borderRadius: '8px',
-								padding: '10px',
-								maxHeight: '200px',
-								overflowY: 'auto',
-								backgroundColor: '#f9f9f9',
-							}}
-						>
-							{filteredAdicionales.length > 0 ? (
-								filteredAdicionales.map((adicional) => (
-									<Box
-										key={adicional.id}
-										style={{
-											display: 'flex',
-											alignItems: 'center',
-											marginBottom: '5px',
-											padding: '5px',
-											borderBottom: '1px solid #e0e0e0',
-										}}
-									>
-										<FormControlLabel
-											control={
-												<Checkbox
-													checked={adicionalesSeleccionados.includes(adicional.id)}
-													onChange={() => handleAdicionalChange(adicional.id)}
-													color="primary"
+					
+					{newProduct.id && (
+						<>
+							{/* Lista de adicionales: Solo disponible en caso de actualizar producto */}
+							Adicionales
+							<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
+								<TextField
+									variant="outlined"
+									fullWidth
+									placeholder="Buscar adicionales..."
+									onChange={(e) => setSearchAdicionales(e.target.value)}
+									value={searchAdicionales}
+									style={{ marginBottom: '10px' }}
+									InputProps={{
+										startAdornment: (
+											<InputAdornment position="start">
+												<SearchIcon />
+											</InputAdornment>
+										),
+									}}
+								/>
+								<Box
+									style={{
+										border: '1px solid #ccc',
+										borderRadius: '8px',
+										padding: '10px',
+										maxHeight: '200px',
+										overflowY: 'auto',
+										backgroundColor: '#f9f9f9',
+									}}
+								>
+									{filteredAdicionales.length > 0 ? (
+										filteredAdicionales.map((adicional) => (
+											<Box
+												key={adicional.id}
+												style={{
+													display: 'flex',
+													alignItems: 'center',
+													marginBottom: '5px',
+													padding: '5px',
+													borderBottom: '1px solid #e0e0e0',
+												}}
+											>
+												<FormControlLabel
+													control={
+														<Checkbox
+															checked={adicionalesSeleccionados.includes(adicional.id)}
+															onChange={() => handleAdicionalChange(adicional.id)}
+															color="primary"
+														/>
+													}
+													label={adicional.descripcion}
 												/>
-											}
-											label={adicional.descripcion}
-										/>
-									</Box>
-								))
-							) : (
-								<p style={{ textAlign: 'center', color: '#888' }}>No hay adicionales disponibles.</p>
-							)}
-						</Box>
-					</Box>
-					{/* Lista de descuentos */}
-					Descuentos
-					<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
-						<TextField
-							variant="outlined"
-							fullWidth
-							placeholder="Buscar descuentos..."
-							onChange={(e) => setSearchDescuentos(e.target.value)}
-							value={searchDescuentos}
-							style={{ marginBottom: '10px' }}
-							InputProps={{
-								startAdornment: (
-									<InputAdornment position="start">
-										<SearchIcon />
-									</InputAdornment>
-								),
-							}}
-						/>
-						<Box
-							style={{
-								border: '1px solid #ccc',
-								borderRadius: '8px',
-								padding: '10px',
-								maxHeight: '200px',
-								overflowY: 'auto',
-								backgroundColor: '#f9f9f9',
-							}}
-						>
-							{filteredDescuentos.length > 0 ? (
-								filteredDescuentos.map((descuento) => (
-									<Box
-										key={descuento.id}
-										style={{
-											display: 'flex',
-											alignItems: 'center',
-											marginBottom: '5px',
-											padding: '5px',
-											borderBottom: '1px solid #e0e0e0',
-										}}
-									>
-										<FormControlLabel
-											control={
-												<Checkbox
-													checked={descuentosSeleccionados.includes(descuento.id)}
-													onChange={() => handleDescuentoChange(descuento.id)}
-													color="primary"
+											</Box>
+										))
+									) : (
+										<p style={{ textAlign: 'center', color: '#888' }}>
+											No hay adicionales disponibles.
+										</p>
+									)}
+								</Box>
+							</Box>
+							{/* Lista de descuentos: Solo disponible en caso de actualizar producto  */}
+							Descuentos
+							<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
+								<TextField
+									variant="outlined"
+									fullWidth
+									placeholder="Buscar descuentos..."
+									onChange={(e) => setSearchDescuentos(e.target.value)}
+									value={searchDescuentos}
+									style={{ marginBottom: '10px' }}
+									InputProps={{
+										startAdornment: (
+											<InputAdornment position="start">
+												<SearchIcon />
+											</InputAdornment>
+										),
+									}}
+								/>
+								<Box
+									style={{
+										border: '1px solid #ccc',
+										borderRadius: '8px',
+										padding: '10px',
+										maxHeight: '200px',
+										overflowY: 'auto',
+										backgroundColor: '#f9f9f9',
+									}}
+								>
+									{filteredDescuentos.length > 0 ? (
+										filteredDescuentos.map((descuento) => (
+											<Box
+												key={descuento.id}
+												style={{
+													display: 'flex',
+													alignItems: 'center',
+													marginBottom: '5px',
+													padding: '5px',
+													borderBottom: '1px solid #e0e0e0',
+												}}
+											>
+												<FormControlLabel
+													control={
+														<Checkbox
+															checked={descuentosSeleccionados.includes(descuento.id)}
+															onChange={() => handleDescuentoChange(descuento.id)}
+															color="primary"
+														/>
+													}
+													label={`${descuento.descripcion} - (Valor: ${mostrarValorDescuento(
+														descuento.valor,
+														descuento.tipo,
+													)})`}
 												/>
-											}
-											label={`${descuento.descripcion} - (Valor: ${mostrarValorDescuento(descuento.valor, descuento.tipo)})`}
-										/>
-									</Box>
-								))
-							) : (
-								<p style={{ textAlign: 'center', color: '#888' }}>No hay descuentos disponibles.</p>
-							)}
-						</Box>
-					</Box>
+											</Box>
+										))
+									) : (
+										<p style={{ textAlign: 'center', color: '#888' }}>
+											No hay descuentos disponibles.
+										</p>
+									)}
+								</Box>
+							</Box>
+						</>
+					)}
 					{/* Imagen */}
 					Imagen
 					<input
