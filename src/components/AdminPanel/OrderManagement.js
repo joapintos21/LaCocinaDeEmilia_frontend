@@ -51,7 +51,6 @@ const OrderManagement = () => {
 		} catch (e) {
 			console.log(e);
 		}
-		setError('');
 	}, [dispatch]);
 
 	const orders = useSelector((state) => state.pedidos || []);

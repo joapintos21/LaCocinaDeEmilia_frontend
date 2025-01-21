@@ -90,6 +90,7 @@ export default () => {
 		{ title: 'Pedidos', component: <OrderManagement /> },
 		{ title: 'Categorías', component: <CategoryManagement /> },
 		{ title: 'Productos', component: <ProductManagement /> },
+		{ title: 'Adicionales', component: <AdditionalManagement /> },
 		{ title: 'Descuentos', component: <DiscountManagement /> },
 		{ title: 'Usuarios', component: <UserManagement /> },
 		{ title: 'Permisos', component: <PermissionsManagement /> },

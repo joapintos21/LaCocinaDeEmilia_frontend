@@ -5,7 +5,7 @@ export const actualizarAdicional = async (id, descripcion, costoAdicional, visib
 	// Crear el objeto de datos que se enviará en el cuerpo de la solicitud
 	const body = {
 		descripcion: descripcion,
-		costoAdicional: costoAdicional,
+		costoAdicional: parseFloat(costoAdicional),
 		visible: visible,
 	};
 
