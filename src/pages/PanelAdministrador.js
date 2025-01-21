@@ -115,7 +115,7 @@ export default () => {
 								width: 240,
 								boxSizing: 'border-box',
 								position: 'fixed',
-								top: 230,
+								top: 200,
 								overflow: 'auto',
 								backgroundColor: 'transparent',
 								border: 'none',
