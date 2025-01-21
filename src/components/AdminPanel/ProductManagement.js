@@ -53,6 +53,7 @@ const ProductManagement = () => {
 		categoria: { id: '' },
 		visible: true,
 		adicionales: [],
+		imagen: ''
 	});
 	useEffect(() => {
 		try {
@@ -105,7 +106,8 @@ const ProductManagement = () => {
 	};
 
 	const handleCategoryChange = (e) => {
-		setNewProduct({ ...newProduct, categoria: e.target.value });
+		const selectedCategory = categorias.find((categoria) => categoria.id === parseInt(e.target.value));
+		setNewProduct({ ...newProduct, categoria: selectedCategory });
 	};
 
 	const handleOpen = (product = null) => {
@@ -117,7 +119,8 @@ const ProductManagement = () => {
 				precio: '',
 				categoria: { id: '' },
 				adicionales: [],
-				visible: false,
+				visible: 'true',
+				imagen: null,
 			});
 		}
 		setOpen(true);
@@ -147,7 +150,7 @@ const ProductManagement = () => {
 				crearProducto(
 					newProduct.descripcion,
 					newProduct.precio,
-					parseInt(newProduct.categoria),
+					parseInt(newProduct.categoria.id),
 					newProduct.visible,
 					newProduct.imagen,
 					sessionStorage.getItem('token'),
@@ -168,7 +171,7 @@ const ProductManagement = () => {
 					newProduct.id,
 					newProduct.descripcion,
 					parseFloat(newProduct.precio),
-					parseInt(newProduct.categoria),
+					parseInt(newProduct.categoria.id),
 					newProduct.visible,
 					newProduct.imagen,
 					sessionStorage.getItem('token'),
