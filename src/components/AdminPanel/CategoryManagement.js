@@ -39,13 +39,11 @@ const CategoryManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDescription, setSearchDescription] = useState("");
   useEffect(() => {
-
     try {
       fetchCategorias(); 
     } catch (e) {
       console.log(e)
     }
-    setError("");
   }, []);
   const handleOpen = (category = null) => {
     if (category) {
@@ -68,8 +66,6 @@ const CategoryManagement = () => {
   const handleSaveCategory = () => {
     if (newCategory.titulo && newCategory.descripcion) {
       if (newCategory.id === null) {
-        const categoryToAdd = { ...newCategory };
-        //dispatch(addCategory(categoryToAdd));
 
         crearCategoria(
           newCategory.titulo,
@@ -77,13 +73,12 @@ const CategoryManagement = () => {
           sessionStorage.getItem("token")
         )
           .then((data) => {
-            console.log("Categoría agregada:", data);
+            fetchCategorias();
+            setError("");
           })
           .catch((error) => {
-            console.error("Error al crear la categoria:", error.message);
-            setError(error.message);
+            setError("Error al crear la categoria.");
           });
-          fetchCategorias();
       } else {
         actualizarCategoria(
           newCategory.id,
@@ -92,16 +87,13 @@ const CategoryManagement = () => {
           sessionStorage.getItem("token")
         )
           .then((data) => {
-            console.log("Categoría actualizada:", data);
+            fetchCategorias();
+            setError("");
           })
           .catch((error) => {
-            console.error("Error al actualizar la categoria:", error.message);
-            setError(error.message);
+            setError("Error al actualizar la categoria.");
           });
-        //dispatch(updateCategory(newCategory));
       }
-      fetchCategorias();
-
       setNewCategory({ titulo: "", descripcion: "" });
       handleClose();
     } else {
@@ -112,12 +104,11 @@ const CategoryManagement = () => {
   const handleDelete = (id) => {
     borrarCategoria(id, sessionStorage.getItem("token"))
       .then((data) => {
-        console.log("Categoría eliminada:", data);
         fetchCategorias();
+        setError("");
       })
       .catch((error) => {
-        console.error("Error al eliminar la categoria:", error.message);
-        setError(error.message);
+        setError("Error al eliminar la categoria.");
       });
   };
 

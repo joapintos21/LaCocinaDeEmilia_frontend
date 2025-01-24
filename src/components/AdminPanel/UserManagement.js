@@ -121,13 +121,12 @@ const UserManagement = () => {
 						sessionStorage.getItem('token'),
 					)
 						.then((data) => {
-							console.log('Usuario agregado:', data);
+							setError("Usuario agregado:");
 							fetchUsuarios();
 							fetchRolesUsuario();
 						})
 						.catch((error) => {
-							console.error('Error al crear el usuario:', error.message);
-							setError(error.message);
+							setError("Error al crear el usuario.");
 						});
 					fetchUsuarios();
 					fetchRolesUsuario();
@@ -152,11 +151,10 @@ const UserManagement = () => {
 						.then((data) => {
 							fetchUsuarios();
 							fetchRolesUsuario();
-							console.log('Usuario actualizado:', data);
+							setError("Usuario actualizado");
 						})
 						.catch((error) => {
-							console.error('Error al actualizar el usuario:', error.message);
-							setError(error.message);
+							setError("Error al actualizar el usuario.");
 						});
 					fetchUsuarios();
 					fetchRolesUsuario();
@@ -185,11 +183,10 @@ const UserManagement = () => {
 			.then((data) => {
 				fetchUsuarios();
 				fetchRolesUsuario();
-				console.log('Usuario eliminado:', data);
+				setError("Usuario eliminado");
 			})
 			.catch((error) => {
-				console.error('Error al eliminar el usuario:', error.message);
-				setError(error.message);
+				setError("Error al eliminar el usuario.");
 			});
 		dispatch(deleteUsuario(id));
 	};

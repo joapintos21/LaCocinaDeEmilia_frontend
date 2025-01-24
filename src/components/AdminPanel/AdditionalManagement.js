@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAdicionales, addAdicional, updateAdicional, deleteAdicional } from 'store/adicionalSlice'; // Asegúrate de que las acciones estén correctamente configuradas en tu slice
-import { crearAdicional } from 'scripts/crearAdicional'; // Función para crear adicional
-import { actualizarAdicional } from 'scripts/actualizarAdicional'; // Función para actualizar adicional
-import { borrarAdicional } from 'scripts/borrarAdicional'; // Función para eliminar adicional
+import { setGestionAdicionales } from 'store/gestionAdicionalesSlice';
+import { crearAdicional } from 'scripts/crearAdicional';
+import { actualizarAdicional } from 'scripts/actualizarAdicional';
+import { borrarAdicional } from 'scripts/borrarAdicional';
 import {
 	Table,
 	TableBody,
@@ -20,17 +20,19 @@ import {
 	DialogTitle,
 	InputAdornment,
 	Box,
+	FormControlLabel,
+	Checkbox,
 	Grid,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { obtenerAdicionales } from 'scripts/obtenerAdicionales';
+import { obtenerTodosAdicionales } from 'scripts/obtenerTodosAdicionales';
 
 const AdditionalManagement = () => {
 	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const fetchAdicionales = async () => {
-		await obtenerAdicionales(dispatch, sessionStorage.getItem('token'));
+		await obtenerTodosAdicionales(dispatch, sessionStorage.getItem('token'));
 	};
 	useEffect(() => {
 		try {
@@ -40,14 +42,14 @@ const AdditionalManagement = () => {
 		}
 	}, [dispatch]);
 
-	const adicionales = useSelector((state) => state.adicionales || []);
+	const adicionales = useSelector((state) => state.gestionAdicionales || []);
 
 	const [open, setOpen] = useState(false);
 	const [newAdicional, setNewAdicional] = useState({
 		id: null,
 		descripcion: '',
-		costoAdicional: '',
-		visible: '',
+		costoAdicional: 0,
+		visible: true,
 	});
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchDescripcion, setSearchDescripcion] = useState('');
@@ -59,7 +61,7 @@ const AdditionalManagement = () => {
 			setNewAdicional({
 				id: null,
 				descripcion: '',
-				costoAdicional: '',
+				costoAdicional: 0,
 				visible: '',
 			});
 		}
@@ -76,11 +78,9 @@ const AdditionalManagement = () => {
 	};
 
 	const handleSaveAdicional = () => {
-		if (newAdicional.descripcion && newAdicional.costoAdicional && newAdicional.visible) {
+		if (newAdicional.descripcion && newAdicional.costoAdicional && newAdicional.visible != null) {
 			if (newAdicional.id === null) {
 				const adicionalToAdd = { ...newAdicional };
-				dispatch(addAdicional(adicionalToAdd));
-
 				crearAdicional(
 					newAdicional.descripcion,
 					newAdicional.costoAdicional,
@@ -88,12 +88,13 @@ const AdditionalManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
-						console.log('Adicional agregado:', data);
+						fetchAdicionales();
+						setError('');
 					})
 					.catch((error) => {
-						console.error('Error al crear el adicional:', error.message);
-						setError(error.message);
+						setError('Error al crear el adicional.');
 					});
+				fetchAdicionales();
 			} else {
 				actualizarAdicional(
 					newAdicional.id,
@@ -103,16 +104,15 @@ const AdditionalManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
-						console.log('Adicional actualizado:', data);
+						fetchAdicionales();
+						setError('');
 					})
 					.catch((error) => {
-						console.error('Error al actualizar el adicional:', error.message);
-						setError(error.message);
+						setError('Error al actualizar el adicional.');
 					});
-				dispatch(updateAdicional(newAdicional));
 			}
 
-			setNewAdicional({ descripcion: '', costoAdicional: '', visible: '' });
+			setNewAdicional({ descripcion: '', costoAdicional: 0, visible: '' });
 			handleClose();
 		} else {
 			setError('Por favor, complete todos los campos.');
@@ -122,20 +122,18 @@ const AdditionalManagement = () => {
 	const handleDelete = (id) => {
 		borrarAdicional(id, sessionStorage.getItem('token'))
 			.then((data) => {
-				console.log('Adicional eliminado:', data);
+				fetchAdicionales();
+				setError('');
 			})
 			.catch((error) => {
-				console.error('Error al eliminar el adicional:', error.message);
-				setError(error.message);
+				setError('Error al eliminar el adicional.');
 			});
-		dispatch(deleteAdicional(id));
 	};
 
 	// Filtramos adicionales solo si adicionales es un array (prevención de errores)
 	const filteredAdicionales = Array.isArray(adicionales)
 		? adicionales.filter((adicional) => {
 				return (
-					adicional.nombre.toLowerCase().includes(searchTerm.toLowerCase()) &&
 					adicional.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
 				);
 		  })
@@ -152,7 +150,6 @@ const AdditionalManagement = () => {
 				}}
 			>
 				<Grid container spacing={2} alignItems="center">
-					{/* Coloca el botón de agregar a la izquierda */}
 					<Grid item xs={12} sm={2} md={1}>
 						<Button variant="contained" color="success" onClick={() => handleOpen()}>
 							<AddIcon />
@@ -196,7 +193,7 @@ const AdditionalManagement = () => {
 								<TableRow key={adicional.id}>
 									<TableCell>{adicional.descripcion}</TableCell>
 									<TableCell>{adicional.costoAdicional}</TableCell>
-									<TableCell>{adicional.visible}</TableCell>
+									<TableCell>{adicional.visible ? 'Sí' : 'No'}</TableCell>
 									<TableCell>
 										<Button
 											variant="outlined"
@@ -247,13 +244,15 @@ const AdditionalManagement = () => {
 						fullWidth
 						sx={{ marginBottom: 2 }}
 					/>
-					Visible
-					<TextField
-						name="visible"
-						value={newAdicional.visible}
-						onChange={handleInputChange}
-						fullWidth
-						sx={{ marginBottom: 2 }}
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={newAdicional.visible}
+								onChange={(e) => setNewAdicional({ ...newAdicional, visible: e.target.checked })}
+								color="primary"
+							/>
+						}
+						label="Visible"
 					/>
 				</DialogContent>
 				<DialogActions>

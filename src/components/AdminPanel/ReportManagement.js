@@ -1,10 +1,20 @@
-import React from 'react';
-import { Box, Button, Grid } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, Grid, TextField, Typography, Paper} from '@mui/material';
 
 const ReportManagement = () => {
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [descripcion, setDescripcion] = useState('');
+    const [monto, setMonto] = useState('');
+    const [fecha, setFecha] = useState('');
+
     const descargarReportePedidos = async () => {
+        if (!startDate || !endDate) {
+            alert('Por favor, selecciona las fechas de inicio y fin.');
+            return;
+        }
         try {
-            const response = await fetch('/reporte/generarReportePedidos', {
+            const response = await fetch(`/reporte/generarReportePedidos?fechaInicio=${startDate}&fechaFin=${endDate}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -17,7 +27,7 @@ const ReportManagement = () => {
 
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'reporte_pedidos.pdf';
+            link.download = `reporte_pedidos_${startDate}_${endDate}.pdf`;
             link.click();
         } catch (error) {
             console.error('Error al descargar el reporte de pedidos:', error);
@@ -46,30 +56,129 @@ const ReportManagement = () => {
         }
     };
 
+    const descargarReporteGastos = async () => {
+        if (!startDate || !endDate) {
+            alert('Por favor, selecciona las fechas de inicio y fin.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/reporte/generarReporteGastos?fechaInicio=${startDate}&fechaFin=${endDate}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) throw new Error('Error al generar el reporte de gastos');
+
+            const data = await response.json();
+            const binaryData = Uint8Array.from(atob(data.file), (c) => c.charCodeAt(0));
+            const blob = new Blob([binaryData], { type: 'application/pdf' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `reporte_gastos_${startDate}_${endDate}.pdf`;
+            link.click();
+        } catch (error) {
+            console.error('Error al descargar el reporte de gastos:', error);
+        }
+    };
+
     return (
         <Box sx={{ marginTop: '20px' }}>
-            <Grid container spacing={4}>
-                <Grid item xs={12} sm={6}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        onClick={descargarReportePedidos}
-                    >
-                        Descargar Reporte de Pedidos
-                    </Button>
+            {/* Reporte de Pedidos */}
+            <Paper sx={{ padding: 3, marginBottom: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                Generar reporte de Pedidos
+                </Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            label="Fecha Inicio"
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            label="Fecha Fin"
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            onClick={descargarReportePedidos}
+                        >
+                            Descargar reporte de Pedidos
+                        </Button>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        fullWidth
-                        onClick={descargarReporteUsuarios}
-                    >
-                        Descargar Reporte de Usuarios
-                    </Button>
+            </Paper>
+
+            {/* Reporte de Usuarios */}
+            <Paper sx={{ padding: 3, marginBottom: 2  }}>
+                <Typography variant="h6" gutterBottom>
+                Generar reporte de Usuarios
+                </Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            onClick={descargarReporteUsuarios}
+                        >
+                            Descargar reporte de Usuarios
+                        </Button>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </Paper>
+            {/* Sección para generar reporte de gastos */}
+            <Paper sx={{ padding: 3}}>
+                <Typography variant="h6" gutterBottom>
+                    Generar reporte de Gastos
+                </Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            label="Fecha Inicio"
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            label="Fecha Fin"
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button variant="contained" color="primary" fullWidth onClick={descargarReporteGastos}>
+                            Descargar reporte de Gastos
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Paper>
         </Box>
     );
 };
