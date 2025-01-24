@@ -1,25 +1,25 @@
 let request, url, body;
 
-export const crearProducto = async (descripcion, precio, categoria_id, visible, imagen, token) => {
-	request = '/productos/create'; 
-	url = `${request}`; 
+export const crearProducto = async ({ descripcion, precio, categoria_id, visible, imagen }, token) => {
+	request = '/productos/create';
+	url = `${request}`;
 
 	body = {
-		descripcion: descripcion, 
-		precio: parseFloat(precio), 
-		categoria_id: parseInt(categoria_id), 
-		visible: visible, 
+		descripcion: descripcion,
+		precio: parseFloat(precio),
+		categoria_id: parseInt(categoria_id),
+		visible: visible,
 		imagen: imagen,
 	};
 
 	try {
 		const response = await fetch(url, {
-			method: 'POST', 
+			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json', 
-				Authorization: `Bearer ${token}`, 
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
 			},
-			body: JSON.stringify(body), 
+			body: JSON.stringify(body),
 		});
 
 		if (!response.ok) {
@@ -28,9 +28,9 @@ export const crearProducto = async (descripcion, precio, categoria_id, visible, 
 		}
 
 		const data = await response.json();
-		return data; 
+		return data;
 	} catch (error) {
 		console.error('Error al crear el producto:', error);
-		throw error; 
+		throw error;
 	}
 };

@@ -112,7 +112,7 @@ const CartPage = () => {
 	const subtotal = cartItems.reduce((acc, item) => acc + calcularSubtotalItem(item), 0);
 
 	const total = (subtotal + (costoEnvio > 0 ? costoEnvio : 0)) * (1 + (comisionMP > 0 ? comisionMP / 100 : 0));
-	
+
 	const handleIncrement = (item) => {
 		handleAddToCart(item, 1, item.adicional?.id, token, userId, item.tipo, dispatch);
 	};
@@ -277,7 +277,7 @@ const CartPage = () => {
 
 	const [metodoPago, setMetodoPago] = useState('');
 	const [mostrarModalTransferencia, setMostrarModalTransferencia] = useState(false); // Estado para mostrar el modal
-	
+
 	useEffect(() => {
 		if (metodoPago === 'mercado-pago') {
 			dispatch(setComisionMP(5.99));
@@ -286,12 +286,12 @@ const CartPage = () => {
 		}
 	}, [metodoPago]);
 
-	  const handleSeleccionMetodoPago = (metodo) => {
+	const handleSeleccionMetodoPago = (metodo) => {
 		if (direccionId && fechaSeleccionada) {
-		  setMetodoPago(metodo);
-		  setPreferenceId('');
-		  }
-	  	};
+			setMetodoPago(metodo);
+			setPreferenceId('');
+		}
+	};
 
 	const handleFinalizarCompraTransferencia = () => {
 		setMostrarModalTransferencia(true);
@@ -308,10 +308,7 @@ const CartPage = () => {
 
 						return (
 							<CartItem key={`${item.id}-${item.tipo}`}>
-								<Image
-									src={item.imageSrc || 'https://via.placeholder.com/150'}
-									alt={item.descripcion}
-								/>
+								<Image src={item.imagen || 'https://via.placeholder.com/150'} alt={item.descripcion} />
 								<Info>
 									<Name>{item.descripcion}</Name>
 									{item.adicional && (
@@ -438,7 +435,8 @@ const CartPage = () => {
 								value="mercado-pago"
 								onChange={() => {
 									handleSeleccionMetodoPago('mercado-pago');
-									handleMercadoPago();}}
+									handleMercadoPago();
+								}}
 								disabled={!direccionId || !fechaSeleccionada}
 							/>
 							<Label htmlFor="mercado-pago">
@@ -455,7 +453,7 @@ const CartPage = () => {
 								disabled={!direccionId || !fechaSeleccionada}
 							/>
 							<Label htmlFor="transferencia">Pagar por Transferencia</Label>
-							</PaymentOption>
+						</PaymentOption>
 					</PaymentSection>
 					<TransferenciaModal
 						mostrarModalTransferencia={mostrarModalTransferencia}

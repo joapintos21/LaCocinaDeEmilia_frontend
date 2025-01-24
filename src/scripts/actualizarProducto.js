@@ -2,7 +2,7 @@ import apiCliente from 'utils/apiCliente';
 
 let request, body;
 
-export const actualizarProducto = async (id, descripcion, precio, categoria_id, visible, imagen, token) => {
+export const actualizarProducto = async (id, { descripcion, precio, categoria_id, visible, imagen }, token) => {
 	request = '/productos/update';
 
 	body = {
@@ -15,7 +15,11 @@ export const actualizarProducto = async (id, descripcion, precio, categoria_id, 
 	};
 
 	try {
-		const response = await apiCliente.post(request, body);
+		const response = await apiCliente.put(request, body, {
+			headers: {
+				Authorization: `Bearer ${token}`, // Incluir el token en el header de autorización
+			},
+		});
 		return response.data; // Devuelve los datos de la respuesta
 	} catch (error) {
 		// Manejo de errores

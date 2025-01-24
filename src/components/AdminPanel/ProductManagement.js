@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import { subirImagenAFirebase } from 'scripts/firebaseUpload';
 
 const ProductManagement = () => {
 	const [error, setError] = useState('');
@@ -43,7 +44,6 @@ const ProductManagement = () => {
 		precio: '',
 		categoria: '',
 		visible: true,
-		imagen: '',
 	});
 
 	useEffect(() => {
@@ -63,14 +63,10 @@ const ProductManagement = () => {
 	const handleImageChange = (e) => {
 		const file = e.target.files[0];
 		if (file) {
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setNewProduct((prevState) => ({
-					...prevState,
-					imagen: reader.result.split(',')[1],
-				}));
-			};
-			reader.readAsDataURL(file);
+			setNewProduct((prevState) => ({
+				...prevState,
+				imagen: file,
+			}));
 		}
 	};
 
@@ -94,7 +90,6 @@ const ProductManagement = () => {
 				precio: '',
 				categoria: '',
 				visible: 'true',
-				imagen: null,
 			});
 		}
 		setOpen(true);
@@ -104,53 +99,54 @@ const ProductManagement = () => {
 		setOpen(false);
 	};
 
-	const handleSaveProduct = () => {
+	const handleSaveProduct = async () => {
 		if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
-			if (newProduct.id === null) {
-				crearProducto(
-					newProduct.descripcion,
-					newProduct.precio,
-					parseInt(newProduct.categoria.id),
-					newProduct.visible,
-					newProduct.imagen,
-					sessionStorage.getItem('token'),
-				)
-					.then((data) => {
-						if (data && data.id) {
-							fetchProductos();
-						} else {
-							setError('Error al crear el producto en la base de datos.');
-						}
-					})
-					.catch((error) => {
-						setError('Error al crear el producto:');
-					});
-			} else {
-				actualizarProducto(
-					newProduct.id,
-					newProduct.descripcion,
-					parseFloat(newProduct.precio),
-					parseInt(newProduct.categoria.id),
-					newProduct.visible,
-					newProduct.imagen,
-					sessionStorage.getItem('token'),
-				)
-					.then((data) => {
+			try {
+				let imageUrl = newProduct.imagen; // 🔹 Mantener la URL existente si no hay nueva imagen
+
+				// Si hay un nuevo archivo seleccionado, subirlo a Firebase antes de guardar el producto
+				if (
+					newProduct.imagen !== null &&
+					newProduct.imagen !== undefined &&
+					typeof newProduct.imagen !== 'string'
+				) {
+					imageUrl = await subirImagenAFirebase(newProduct.imagen);
+				}
+
+				const productoData = {
+					descripcion: newProduct.descripcion,
+					precio: newProduct.precio,
+					categoria_id: newProduct.categoria.id,
+					visible: newProduct.visible,
+					imagen: imageUrl, // Guardamos solo la URL de Firebase
+				};
+
+				if (newProduct.id === null) {
+					const productoCreado = await crearProducto(productoData, sessionStorage.getItem('token'));
+					if (productoCreado && productoCreado.id) {
 						fetchProductos();
-					})
-					.catch((error) => {
-						setError('Error al actualizar el producto:');
-					});
-				fetchProductos();
+					} else {
+						setError('Error al crear el producto en la base de datos.');
+					}
+				} else {
+					await actualizarProducto(newProduct.id, productoData, sessionStorage.getItem('token'));
+					fetchProductos();
+				}
+
+				// Resetear el formulario
+				setNewProduct({
+					descripcion: '',
+					precio: '',
+					categoria: '',
+					visible: true,
+					imagen: null,
+					imagenFile: null, // Limpiamos el archivo seleccionado
+				});
+
+				handleClose();
+			} catch (error) {
+				setError('Error al procesar el producto.');
 			}
-			setNewProduct({
-				descripcion: '',
-				precio: '',
-				categoria: '',
-				visible: 'true',
-				imagen: null,
-			});
-			handleClose();
 		} else {
 			setError('Por favor, complete todos los campos.');
 		}
