@@ -90,6 +90,14 @@ const ProductManagement = () => {
 		}
 	};
 
+	const handleDescuentoChange = (id) => {
+		if (descuentosSeleccionados.includes(id)) {
+			setDescuentosSeleccionados((prev) => prev.filter((descuentoId) => descuentoId !== id));
+		} else {
+			setDescuentosSeleccionados((prev) => [...prev, id]);
+		}
+	};
+
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setNewProduct({ ...newProduct, [name]: value });
@@ -105,6 +113,7 @@ const ProductManagement = () => {
 			setNewProduct({ ...product });
 		} else {
 			setNewProduct({
+				id: null,
 				descripcion: '',
 				precio: '',
 				categoria: { id: '' },
@@ -136,7 +145,7 @@ const ProductManagement = () => {
 	const handleSaveProduct = async () => {
 		if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
 			try {
-				let imageUrl = newProduct.imagen; // 🔹 Mantener la URL existente si no hay nueva imagen
+				let imageUrl = newProduct.imagen === null ? '' : newProduct.imagen; // 🔹 Mantener la URL existente si no hay nueva imagen
 
 				// Si hay un nuevo archivo seleccionado, subirlo a Firebase antes de guardar el producto
 				if (
@@ -200,8 +209,7 @@ const ProductManagement = () => {
 					precio: '',
 					categoria: '',
 					visible: true,
-					imagen: null,
-					imagenFile: null, // Limpiamos el archivo seleccionado
+					imagen: '', // Limpiamos el archivo seleccionado
 				});
 
 				handleClose();
