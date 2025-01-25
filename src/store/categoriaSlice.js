@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export const categorySlice = createSlice({
 	name: 'categories',
-	initialState: [], // Asegúrate de que el estado inicial sea un arreglo vacío
+	initialState: [], 
 	reducers: {
 		setCategorias: (state, action) => {
 			return action.payload;

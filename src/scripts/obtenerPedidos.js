@@ -1,3 +1,5 @@
+import { setPedidos } from '../store/pedidosSlice';
+
 export const obtenerPedidos = async (dispatch, token) => {
 	const request = `/pedidos`;
 
@@ -6,7 +8,7 @@ export const obtenerPedidos = async (dispatch, token) => {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`, 
+				Authorization: `Bearer ${token}`,
 			},
 		});
 
@@ -16,8 +18,9 @@ export const obtenerPedidos = async (dispatch, token) => {
 		}
 
 		const data = await response.json();
+		dispatch(setPedidos(data))
 		return data;
 	} catch (error) {
-		throw error; 
+		throw error;
 	}
 };
