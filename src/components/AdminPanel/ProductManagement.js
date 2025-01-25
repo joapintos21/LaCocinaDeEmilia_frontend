@@ -147,8 +147,21 @@ const ProductManagement = () => {
 				precio: '',
 				categoria: { id: '' },
 				adicionales: [],
+				descuentos: [],
 				visible: 'true',
 			});
+		}
+		if (product && Array.isArray(product.adicionales)) {
+			const idsAdicionales = product.adicionales.map((adicional) => adicional.id);
+			setAdicionalesSeleccionados(idsAdicionales);
+		} else{
+			setAdicionalesSeleccionados(null);
+		}
+		if (newProduct && Array.isArray(product.descuentos)) {
+			const idsDescuentos = product.descuentos.map((descuento) => descuento.id);
+			setDescuentosSeleccionados(idsDescuentos);
+		} else{
+			setDescuentosSeleccionados(null);
 		}
 		setOpen(true);
 	};
