@@ -5,6 +5,7 @@ import { crearProducto } from 'scripts/crearProducto';
 import { actualizarProducto } from 'scripts/actualizarProducto';
 import { borrarProducto } from 'scripts/borrarProducto';
 import { asociarProductoDescuento } from 'scripts/asociarProductoDescuento';
+import { asociarProductoAdicional } from 'scripts/asociarProductoAdicional';
 import { obtenerProductos } from 'scripts/obtenerProductosCategoria';
 import {
 	Table,
@@ -37,6 +38,9 @@ const ProductManagement = () => {
 	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const [descuentosSeleccionados, setDescuentosSeleccionados] = useState([]);
+	const [adicionalesSeleccionados, setAdicionalesSeleccionados] = useState([]);
+	/*Reutilizar codigo para seleccionar los adicionales / descuentos que tiene un producto actualmente 
+	const adicionalesSeleccionados = Array.isArray(newProduct.adicionales) ? newProduct.adicionales : []; */
 	const productos = useSelector((state) => state.productos);
 	const categorias = useSelector((state) => state.categorias);
 	const adicionales = useSelector((state) => state.gestionAdicionales || []);
@@ -75,6 +79,23 @@ const ProductManagement = () => {
 			console.log(e);
 		}
 	}, [dispatch]);
+	
+	const [searchAdicionales, setSearchAdicionales] = useState('');
+
+	const filteredAdicionales = adicionales.filter((adicional) =>
+		adicional.descripcion.toLowerCase().includes(searchAdicionales.toLowerCase()),
+	);
+
+	const filteredProducts = productos.filter((product) => {
+		const matchesSearchTerm = product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
+		const matchesCategory = selectedCategory
+			? product.categoria?.titulo?.toLowerCase().includes(selectedCategory.toLowerCase())
+			: true;
+		const matchesMinPrice = minPrice ? product.precio >= minPrice : true;
+		const matchesMaxPrice = maxPrice ? product.precio <= maxPrice : true;
+
+		return matchesSearchTerm && matchesCategory && matchesMinPrice && matchesMaxPrice;
+	});
 
 	const filteredDescuentos = descuentos.filter((descuento) =>
 		descuento.descripcion.toLowerCase().includes(searchDescuentos.toLowerCase()),
@@ -95,6 +116,14 @@ const ProductManagement = () => {
 			setDescuentosSeleccionados((prev) => prev.filter((descuentoId) => descuentoId !== id));
 		} else {
 			setDescuentosSeleccionados((prev) => [...prev, id]);
+		}
+	};
+
+	const handleAdicionalChange = (id) => {
+		if (adicionalesSeleccionados.includes(id)) {
+			setAdicionalesSeleccionados((prev) => prev.filter((adicionalId) => adicionalId !== id));
+		} else {
+			setAdicionalesSeleccionados((prev) => [...prev, id]);
 		}
 	};
 
@@ -128,7 +157,7 @@ const ProductManagement = () => {
 		setOpen(false);
 	};
 
-	const handleAdicionalChange = (id) => {
+	/*const handleAdicionalChange = (id) => {
 		if (newProduct.adicionales.includes(id)) {
 			setNewProduct((prevState) => ({
 				...prevState,
@@ -140,7 +169,7 @@ const ProductManagement = () => {
 				adicionales: [...prevState.adicionales, id],
 			}));
 		}
-	};
+	};*/
 
 	const handleSaveProduct = async () => {
 		if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
@@ -177,6 +206,16 @@ const ProductManagement = () => {
 						.then((data) => {
 							fetchProductos();
 							setError('');
+					})
+					.catch((error) => {
+						setError('Error al actualizar el producto:');
+					});
+
+				// Asociar los descuentos seleccionados
+				if(0 < descuentosSeleccionados.length){
+					const productId = newProduct.id;
+					for(var i = 0; i < descuentosSeleccionados.length; i+=1){
+						asociarProductoDescuento(descuentosSeleccionados[i], productId, sessionStorage.getItem('token')).then((data) => {
 						})
 						.catch((error) => {
 							setError('Error al actualizar el producto:');
@@ -202,7 +241,21 @@ const ProductManagement = () => {
 						fetchProductos();
 					}
 				}
-
+          
+          // Asociar los adicionales seleccionados
+				if(0 < adicionalesSeleccionados.length){
+					const productId = newProduct.id;
+					for(var i = 0; i < adicionalesSeleccionados.length; i+=1){
+						asociarProductoAdicional(adicionalesSeleccionados[i], productId, sessionStorage.getItem('token')).then((data) => {
+						})
+						.catch((error) => {
+							setError('Error al asociar el descuento al producto.');
+						});;
+					}
+					
+				}
+				fetchProductos();
+          
 				// Resetear el formulario
 				setNewProduct({
 					descripcion: '',
@@ -215,7 +268,7 @@ const ProductManagement = () => {
 				handleClose();
 			} catch (error) {
 				setError('Error al procesar el producto.');
-			}
+      }
 		} else {
 			setError('Por favor, complete todos los campos.');
 		}
@@ -232,24 +285,8 @@ const ProductManagement = () => {
 		fetchProductos();
 	};
 
-	const [searchAdicionales, setSearchAdicionales] = useState('');
 
-	const filteredAdicionales = adicionales.filter((adicional) =>
-		adicional.descripcion.toLowerCase().includes(searchAdicionales.toLowerCase()),
-	);
-
-	const filteredProducts = productos.filter((product) => {
-		const matchesSearchTerm = product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
-		const matchesCategory = selectedCategory
-			? product.categoria?.titulo?.toLowerCase().includes(selectedCategory.toLowerCase())
-			: true;
-		const matchesMinPrice = minPrice ? product.precio >= minPrice : true;
-		const matchesMaxPrice = maxPrice ? product.precio <= maxPrice : true;
-
-		return matchesSearchTerm && matchesCategory && matchesMinPrice && matchesMaxPrice;
-	});
-
-	const adicionalesSeleccionados = Array.isArray(newProduct.adicionales) ? newProduct.adicionales : [];
+	
 
 	return (
 		<div style={{ marginTop: '20px' }}>
