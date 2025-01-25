@@ -79,7 +79,7 @@ const ProductManagement = () => {
 			console.log(e);
 		}
 	}, [dispatch]);
-	
+
 	const [searchAdicionales, setSearchAdicionales] = useState('');
 
 	const filteredAdicionales = adicionales.filter((adicional) =>
@@ -157,20 +157,6 @@ const ProductManagement = () => {
 		setOpen(false);
 	};
 
-	/*const handleAdicionalChange = (id) => {
-		if (newProduct.adicionales.includes(id)) {
-			setNewProduct((prevState) => ({
-				...prevState,
-				adicionales: prevState.adicionales.filter((adicionalId) => adicionalId !== id),
-			}));
-		} else {
-			setNewProduct((prevState) => ({
-				...prevState,
-				adicionales: [...prevState.adicionales, id],
-			}));
-		}
-	};*/
-
 	const handleSaveProduct = async () => {
 		if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
 			try {
@@ -203,59 +189,49 @@ const ProductManagement = () => {
 					}
 				} else {
 					actualizarProducto(newProduct.id, productoData, sessionStorage.getItem('token'))
-						.then((data) => {
+						.then(() => {
 							fetchProductos();
 							setError('');
-					})
-					.catch((error) => {
-						setError('Error al actualizar el producto:');
-					});
+						})
+						.catch(() => {
+							setError('Error al actualizar el producto.');
+						});
+				}
 
 				// Asociar los descuentos seleccionados
-				if(0 < descuentosSeleccionados.length){
+				if (descuentosSeleccionados.length > 0) {
 					const productId = newProduct.id;
-					for(var i = 0; i < descuentosSeleccionados.length; i+=1){
-						asociarProductoDescuento(descuentosSeleccionados[i], productId, sessionStorage.getItem('token')).then((data) => {
-						})
-						.catch((error) => {
-							setError('Error al actualizar el producto:');
-						});
-
-					// Asociar los descuentos seleccionados
-					if (0 < descuentosSeleccionados.length) {
-						const productId = newProduct.id;
-						for (var i = 0; i < descuentosSeleccionados.length; i += 1) {
-							asociarProductoDescuento(
+					for (let i = 0; i < descuentosSeleccionados.length; i++) {
+						try {
+							await asociarProductoDescuento(
 								descuentosSeleccionados[i],
 								productId,
 								sessionStorage.getItem('token'),
-							)
-								.then((data) => {
-									fetchProductos();
-									setError('');
-								})
-								.catch((error) => {
-									setError('Error al asociar el descuento al producto.');
-								});
-						}
-						fetchProductos();
-					}
-				}
-          
-          // Asociar los adicionales seleccionados
-				if(0 < adicionalesSeleccionados.length){
-					const productId = newProduct.id;
-					for(var i = 0; i < adicionalesSeleccionados.length; i+=1){
-						asociarProductoAdicional(adicionalesSeleccionados[i], productId, sessionStorage.getItem('token')).then((data) => {
-						})
-						.catch((error) => {
+							);
+						} catch (error) {
 							setError('Error al asociar el descuento al producto.');
-						});;
+							break; // Salir del bucle si ocurre un error
+						}
 					}
-					
 				}
-				fetchProductos();
-          
+
+				// Asociar los adicionales seleccionados
+				if (adicionalesSeleccionados.length > 0) {
+					const productId = newProduct.id;
+					for (let i = 0; i < adicionalesSeleccionados.length; i++) {
+						try {
+							await asociarProductoAdicional(
+								adicionalesSeleccionados[i],
+								productId,
+								sessionStorage.getItem('token'),
+							);
+						} catch (error) {
+							setError('Error al asociar el adicional al producto.');
+							break; // Salir del bucle si ocurre un error
+						}
+					}
+				}
+
 				// Resetear el formulario
 				setNewProduct({
 					descripcion: '',
@@ -268,7 +244,7 @@ const ProductManagement = () => {
 				handleClose();
 			} catch (error) {
 				setError('Error al procesar el producto.');
-      }
+			}
 		} else {
 			setError('Por favor, complete todos los campos.');
 		}
@@ -284,9 +260,6 @@ const ProductManagement = () => {
 			});
 		fetchProductos();
 	};
-
-
-	
 
 	return (
 		<div style={{ marginTop: '20px' }}>
@@ -459,131 +432,123 @@ const ProductManagement = () => {
 							</option>
 						))}
 					</TextField>
-					{newProduct.id && (
-						<>
-							{/* Lista de adicionales: Solo disponible en caso de actualizar producto */}
-							Adicionales
-							<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
-								<TextField
-									variant="outlined"
-									fullWidth
-									placeholder="Buscar adicionales..."
-									onChange={(e) => setSearchAdicionales(e.target.value)}
-									value={searchAdicionales}
-									style={{ marginBottom: '10px' }}
-									InputProps={{
-										startAdornment: (
-											<InputAdornment position="start">
-												<SearchIcon />
-											</InputAdornment>
-										),
-									}}
-								/>
-								<Box
-									style={{
-										border: '1px solid #ccc',
-										borderRadius: '8px',
-										padding: '10px',
-										maxHeight: '200px',
-										overflowY: 'auto',
-										backgroundColor: '#f9f9f9',
-									}}
-								>
-									{filteredAdicionales.length > 0 ? (
-										filteredAdicionales.map((adicional) => (
-											<Box
-												key={adicional.id}
-												style={{
-													display: 'flex',
-													alignItems: 'center',
-													marginBottom: '5px',
-													padding: '5px',
-													borderBottom: '1px solid #e0e0e0',
-												}}
-											>
-												<FormControlLabel
-													control={
-														<Checkbox
-															checked={adicionalesSeleccionados.includes(adicional.id)}
-															onChange={() => handleAdicionalChange(adicional.id)}
-															color="primary"
-														/>
-													}
-													label={adicional.descripcion}
+					{/* Lista de adicionales: Solo disponible en caso de actualizar producto */}
+					Adicionales
+					<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
+						<TextField
+							variant="outlined"
+							fullWidth
+							placeholder="Buscar adicionales..."
+							onChange={(e) => setSearchAdicionales(e.target.value)}
+							value={searchAdicionales}
+							style={{ marginBottom: '10px' }}
+							InputProps={{
+								startAdornment: (
+									<InputAdornment position="start">
+										<SearchIcon />
+									</InputAdornment>
+								),
+							}}
+						/>
+						<Box
+							style={{
+								border: '1px solid #ccc',
+								borderRadius: '8px',
+								padding: '10px',
+								maxHeight: '200px',
+								overflowY: 'auto',
+								backgroundColor: '#f9f9f9',
+							}}
+						>
+							{filteredAdicionales.length > 0 ? (
+								filteredAdicionales.map((adicional) => (
+									<Box
+										key={adicional.id}
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											marginBottom: '5px',
+											padding: '5px',
+											borderBottom: '1px solid #e0e0e0',
+										}}
+									>
+										<FormControlLabel
+											control={
+												<Checkbox
+													checked={adicionalesSeleccionados.includes(adicional.id)}
+													onChange={() => handleAdicionalChange(adicional.id)}
+													color="primary"
 												/>
-											</Box>
-										))
-									) : (
-										<p style={{ textAlign: 'center', color: '#888' }}>
-											No hay adicionales disponibles.
-										</p>
-									)}
-								</Box>
-							</Box>
-							{/* Lista de descuentos: Solo disponible en caso de actualizar producto  */}
-							Descuentos
-							<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
-								<TextField
-									variant="outlined"
-									fullWidth
-									placeholder="Buscar descuentos..."
-									onChange={(e) => setSearchDescuentos(e.target.value)}
-									value={searchDescuentos}
-									style={{ marginBottom: '10px' }}
-									InputProps={{
-										startAdornment: (
-											<InputAdornment position="start">
-												<SearchIcon />
-											</InputAdornment>
-										),
-									}}
-								/>
-								<Box
-									style={{
-										border: '1px solid #ccc',
-										borderRadius: '8px',
-										padding: '10px',
-										maxHeight: '200px',
-										overflowY: 'auto',
-										backgroundColor: '#f9f9f9',
-									}}
-								>
-									{filteredDescuentos.length > 0 ? (
-										filteredDescuentos.map((descuento) => (
-											<Box
-												key={descuento.id}
-												style={{
-													display: 'flex',
-													alignItems: 'center',
-													marginBottom: '5px',
-													padding: '5px',
-													borderBottom: '1px solid #e0e0e0',
-												}}
-											>
-												<FormControlLabel
-													control={
-														<Checkbox
-															checked={descuentosSeleccionados.includes(descuento.id)}
-															onChange={() => handleDescuentoChange(descuento.id)}
-															color="primary"
-														/>
-													}
-													label={`${descuento.descripcion} - (Valor: ${mostrarValorDescuento(
-														descuento.valor,
-														descuento.tipo,
-													)})`}
+											}
+											label={adicional.descripcion}
+										/>
+									</Box>
+								))
+							) : (
+								<p style={{ textAlign: 'center', color: '#888' }}>No hay adicionales disponibles.</p>
+							)}
+						</Box>
+					</Box>
+					{/* Lista de descuentos: Solo disponible en caso de actualizar producto  */}
+					Descuentos
+					<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
+						<TextField
+							variant="outlined"
+							fullWidth
+							placeholder="Buscar descuentos..."
+							onChange={(e) => setSearchDescuentos(e.target.value)}
+							value={searchDescuentos}
+							style={{ marginBottom: '10px' }}
+							InputProps={{
+								startAdornment: (
+									<InputAdornment position="start">
+										<SearchIcon />
+									</InputAdornment>
+								),
+							}}
+						/>
+						<Box
+							style={{
+								border: '1px solid #ccc',
+								borderRadius: '8px',
+								padding: '10px',
+								maxHeight: '200px',
+								overflowY: 'auto',
+								backgroundColor: '#f9f9f9',
+							}}
+						>
+							{filteredDescuentos.length > 0 ? (
+								filteredDescuentos.map((descuento) => (
+									<Box
+										key={descuento.id}
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											marginBottom: '5px',
+											padding: '5px',
+											borderBottom: '1px solid #e0e0e0',
+										}}
+									>
+										<FormControlLabel
+											control={
+												<Checkbox
+													checked={descuentosSeleccionados.includes(descuento.id)}
+													onChange={() => handleDescuentoChange(descuento.id)}
+													color="primary"
 												/>
-											</Box>
-										))
-									) : (
-										<p style={{ textAlign: 'center', color: '#888' }}>
-											No hay descuentos disponibles.
-										</p>
-									)}
-								</Box>
-							</Box>
-						</>
-					)}
+											}
+											label={`${descuento.descripcion} - (Valor: ${mostrarValorDescuento(
+												descuento.valor,
+												descuento.tipo,
+											)})`}
+										/>
+									</Box>
+								))
+							) : (
+								<p style={{ textAlign: 'center', color: '#888' }}>No hay descuentos disponibles.</p>
+							)}
+						</Box>
+					</Box>
 					{/* Imagen */}
 					Imagen
 					<input
