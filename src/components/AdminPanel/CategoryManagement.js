@@ -23,15 +23,15 @@ import {
 	Grid,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add'; // Importamos el ícono "+" (Add)
+import AddIcon from '@mui/icons-material/Add'; 
 import obtenerCategorias from 'scripts/obtenerCategorias';
 
 const CategoryManagement = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();  
-  const categories = useSelector((state) => state.categorias); // Obtenemos las categorías desde el store
+  const categories = useSelector((state) => state.categorias); 
   const fetchCategorias = async () => {
-    await obtenerCategorias(dispatch); // Llama al script para cargar las categorías en Redux
+    await obtenerCategorias(dispatch); 
   };
   
   const [open, setOpen] = useState(false);

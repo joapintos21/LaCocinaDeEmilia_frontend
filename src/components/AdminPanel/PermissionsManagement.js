@@ -45,7 +45,7 @@ const PermissionsManagement = () => {
 		rol_id: null,
 	});
 	const [searchEndpoint, setSearchEndpoint] = useState('');
-	const [searchTipo, setSearchTipo] = useState('');
+	const [searchTipo ] = useState('');
 
 	useEffect(() => {
 		try {
@@ -135,7 +135,6 @@ const PermissionsManagement = () => {
 			.catch((error) => {
 				setError('Error al eliminar el permiso.');
 			});
-		dispatch(deletePermiso(id));
 	};
 
 	const filteredPermisos = Array.isArray(permisos)

@@ -1,7 +1,7 @@
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 
-// 🔹 Configuración de Firebase
+// Configuración de Firebase
 const firebaseConfig = {
 	apiKey: 'AIzaSyC46Bfdol9UpXiN5Brd4PGrpqiBfZscPJ8',
 	authDomain: 'stellar-fx-444302-f2.firebaseapp.com',

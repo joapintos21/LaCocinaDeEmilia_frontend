@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addDescuento, updateDescuento, deleteDescuento } from 'store/descuentoSlice'; // Asegúrate de que las acciones estén correctamente definidas en el slice
-import { crearDescuento } from 'scripts/crearDescuento'; // Función para crear descuento
-import { actualizarDescuento } from 'scripts/actualizarDescuento'; // Función para actualizar descuento
-import { borrarDescuento } from 'scripts/borrarDescuento'; // Función para eliminar descuento
+import { crearDescuento } from 'scripts/crearDescuento'; 
+import { actualizarDescuento } from 'scripts/actualizarDescuento'; 
+import { borrarDescuento } from 'scripts/borrarDescuento'; 
 import { obtenerTiposDescuento } from 'scripts/obtenerTiposDescuento';
 import {
 	Table,
@@ -155,7 +154,6 @@ const DiscountManagement = () => {
 			});
 	};
 
-	// Filtra los descuentos asegurándote de que `descuentos` es un array
 	const filteredDescuentos = Array.isArray(descuentos)
 		? descuentos.filter((descuento) => {
 				return descuento.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase());

@@ -16,12 +16,8 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	InputAdornment,
-	Box,
-	Grid,
+	Box
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
 
 const EmpresaManagement = () => {
 	const [error, setError] = useState('');

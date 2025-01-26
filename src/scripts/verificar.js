@@ -15,7 +15,6 @@ export const verificar = async (token) => {
 				'Content-Type': 'application/json',
 			},
 		});
-		// Maneja errores fuera del rango 200-299
 		if (!response.ok) {
 			const errorData = response.error;
 			throw new Error(errorData || 'Se produjo un error desconocido.');
@@ -23,6 +22,6 @@ export const verificar = async (token) => {
 		return response.json();
 	} catch (error) {
 		console.log(error);
-		throw error; // Lanza el error para que sea capturado en el evento
+		throw error; 
 	}
 };

@@ -130,7 +130,6 @@ const AdditionalManagement = () => {
 			});
 	};
 
-	// Filtramos adicionales solo si adicionales es un array (prevención de errores)
 	const filteredAdicionales = Array.isArray(adicionales)
 		? adicionales.filter((adicional) => {
 				return (

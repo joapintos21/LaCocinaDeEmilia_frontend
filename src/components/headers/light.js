@@ -103,11 +103,10 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 
 	const defaultLinks = [
 		<NavLinks key={1}>
-			{userInfo && userInfo.rol === 'Administrador' && <NavLink href="/paneladministrador">Panel</NavLink>}
-			<NavLink href="/panelcocineras">Cocineras</NavLink>
-			<NavLink href="/panelcadetes">Cadetes</NavLink>
+			{userInfo && userInfo.rol === 'Administrador' && <NavLink href="/paneladministrador">Administrar</NavLink>}
+			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cocinero')  && <NavLink href="/panelcocineras">Cocineras</NavLink>}
+			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cadete') && <NavLink href="/panelcadetes">Cadetes</NavLink>}
 			<NavLink href="/nosotros">Nosotros</NavLink>
-			<NavLink href="/pricing">Pricing</NavLink>
 			<NavLink href="/contacto">Contactenos</NavLink>
 			<NavLink href="/productos">Productos</NavLink>
 			<IconButton onClick={handleCartOpen}>

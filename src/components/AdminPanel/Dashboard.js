@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Grid, Card, CardContent, Typography, CardActions, Button } from '@mui/material';
+import { Grid, Card, CardContent, Typography } from '@mui/material';
 import { Bar, Line } from 'react-chartjs-2';
 import {
 	Chart as ChartJS,
@@ -15,18 +15,16 @@ import {
 } from 'chart.js';
 
 import obtenerDatosDashboard from 'scripts/obtenerDatosDashboard';
-import { dashboardSlice } from 'store/dashboardSlice';
 
-// Registrar los componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement);
 
 const Dashboard = () => {
-	// Opciones para desactivar la leyenda interactiva
+	// Opcion para desactivar el boton de filtrado en las graficas
 	const options = {
 		responsive: true,
 		plugins: {
 			legend: {
-				display: false, // Desactiva la leyenda
+				display: false, 
 			},
 		},
 	};
@@ -60,23 +58,19 @@ const Dashboard = () => {
 	// Datos para el gráfico de ventas (semanas)
 
 	function obtenerNumeroDeSemanas() {
-		// Función para calcular el número de semanas en el mes actual
 		const fecha = new Date();
-		const mes = fecha.getMonth(); // Obtiene el mes actual (0 a 11)
-		const primerDiaDelMes = new Date(fecha.getFullYear(), mes, 1); // Primer día del mes
-		const ultimoDiaDelMes = new Date(fecha.getFullYear(), mes + 1, 0); // Último día del mes
+		const mes = fecha.getMonth(); 
+		const primerDiaDelMes = new Date(fecha.getFullYear(), mes, 1); 
+		const ultimoDiaDelMes = new Date(fecha.getFullYear(), mes + 1, 0); 
 
-		// Calculamos el número de días del mes
 		const diasDelMes = (ultimoDiaDelMes - primerDiaDelMes) / (1000 * 3600 * 24) + 1;
 
-		// Calculamos el número de semanas (dividimos los días entre 7)
 		const numeroDeSemanas = Math.ceil(diasDelMes / 7);
 
 		return numeroDeSemanas;
 	}
 
 	function generarEtiquetasDeSemanas() {
-		// Generar las etiquetas de semanas dependiendo del número de semanas del mes
 		const semanas = obtenerNumeroDeSemanas();
 		const etiquetas = [];
 
@@ -86,10 +80,9 @@ const Dashboard = () => {
 
 		return etiquetas;
 	}
-
-	// Datos para el gráfico de ventas (semanas)
+	
 	const salesDataWeek = {
-		labels: generarEtiquetasDeSemanas(), // Se ajusta dinámicamente
+		labels: generarEtiquetasDeSemanas(), 
 		datasets: [
 			{
 				label: 'Ventas del Mes',

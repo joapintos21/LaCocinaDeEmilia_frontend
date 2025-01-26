@@ -17,7 +17,6 @@ fetch(url, {
 	},
 })
 	.then((response) => {
-		// Errores fuera del rango 200-299
 		if (!response.ok) {
 			throw new Error('Se produjo un error con la solicitud: ' + response.statusText);
 		}

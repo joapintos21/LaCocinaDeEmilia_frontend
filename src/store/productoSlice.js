@@ -7,12 +7,12 @@ const productoSlice = createSlice({
 		setProductos: (state, action) => {
 			return action.payload.map((producto) => ({
 				...producto,
-				imagen: producto.imagen || null, // 🔥 Guardamos solo la URL
+				imagen: producto.imagen || null, // Guardamos solo la URL
 			}));
 		},
 		addProduct: (state, action) => {
 			const producto = action.payload;
-			producto.imagen = producto.imagen || null; // 🔹 Guardamos solo la URL de Firebase
+			producto.imagen = producto.imagen || null; // Guardamos solo la URL de Firebase
 			state.push(producto);
 		},
 		updateProduct: (state, action) => {
@@ -20,7 +20,7 @@ const productoSlice = createSlice({
 			if (index !== -1) {
 				state[index] = {
 					...action.payload,
-					imagen: action.payload.imagen || null, // 🔹 Usamos la URL en lugar de Base64
+					imagen: action.payload.imagen || null, // Usamos la URL en lugar de Base64
 				};
 			}
 		},
