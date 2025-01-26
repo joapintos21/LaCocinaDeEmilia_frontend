@@ -36,21 +36,18 @@ const Textarea = styled(Input).attrs({ as: 'textarea' })`
 const SubmitButton = tw(PrimaryButtonBase)`inline-block mt-8`;
 
 export default ({
-	subheading = 'Contact Us',
+	subheading = 'Contáctanos',
 	heading = (
 		<>
-			Feel free to <span tw="text-primary-500">get in touch</span>
-			<wbr /> with us.
+			No dudes en <span tw="text-primary-500">ponerte en contacto</span>
+			<wbr /> con nosotros.
 		</>
 	),
-	description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-	submitButtonText = 'Send',
+	submitButtonText = 'Enviar',
 	formAction = '#',
 	formMethod = 'get',
-	textOnLeft = true,
+	textOnLeft = true
 }) => {
-	// The textOnLeft boolean prop can be used to display either the text on left or right side of the image.
-
 	return (
 		<Container>
 			<TwoColumn>
@@ -61,12 +58,11 @@ export default ({
 					<TextContent>
 						{subheading && <Subheading>{subheading}</Subheading>}
 						<Heading>{heading}</Heading>
-						{description && <Description>{description}</Description>}
 						<Form action={formAction} method={formMethod}>
-							<Input type="email" name="email" placeholder="Your Email Address" />
-							<Input type="text" name="name" placeholder="Full Name" />
-							<Input type="text" name="subject" placeholder="Subject" />
-							<Textarea name="message" placeholder="Your Message Here" />
+							<Input type="email" name="email" placeholder="Correo" />
+							<Input type="text" name="name" placeholder="Nombre completo" />
+							<Input type="text" name="subject" placeholder="Asunto" />
+							<Textarea name="message" placeholder="Mensaje" />
 							<SubmitButton type="submit">{submitButtonText}</SubmitButton>
 						</Form>
 					</TextContent>

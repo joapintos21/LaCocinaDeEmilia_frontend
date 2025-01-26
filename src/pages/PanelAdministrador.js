@@ -12,6 +12,7 @@ import PermissionsManagement from 'components/AdminPanel/PermissionsManagement';
 import AdditionalManagement from 'components/AdminPanel/AdditionalManagement';
 import GastosManagement from 'components/AdminPanel/GastosManagement';
 import ReportManagement from 'components/AdminPanel/ReportManagement';
+import EmpresaManagement from 'components/AdminPanel/EmpresaManagement';
 import Header from 'components/headers/light.js';
 import { Container, ContentWithPaddingXl } from 'components/misc/Layouts';
 import tw from 'twin.macro';
@@ -98,6 +99,7 @@ export default () => {
 		{ title: 'Permisos', component: <PermissionsManagement /> },
 		{ title: 'Gastos', component: <GastosManagement /> },
 		{ title: 'Reportes', component: <ReportManagement /> },
+		{ title: 'Empresa', component: <EmpresaManagement /> },
 	];
 
 	return (
