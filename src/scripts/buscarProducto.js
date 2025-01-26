@@ -1,4 +1,3 @@
-// buscarProducto.js
 export const buscarProducto = async (textoBusqueda) => {
 	const request = `/productos/buscar?query=${encodeURIComponent(textoBusqueda)}`;
 
@@ -15,7 +14,7 @@ export const buscarProducto = async (textoBusqueda) => {
 		}
 
 		const data = await response.json();
-		return data; // Devuelve los productos encontrados
+		return data; 
 	} catch (error) {
 		console.error('Error al buscar productos:', error);
 		throw error;

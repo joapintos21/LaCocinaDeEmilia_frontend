@@ -1,12 +1,7 @@
-// Ruta: src/scripts/agregarProductoCarrito.js
 import { toast } from 'react-toastify';
-import apiClient from '../utils/apiCliente'; // Asegúrate de que la ruta sea correcta
+import apiClient from '../utils/apiCliente';
 
 export const agregarProductoACarrito = async (clienteId, productoId, cantidad, selectedAdicional, token) => {
-	// if (!clienteId) {
-	// 	throw new Error('Debe iniciar sesión para poder agregar productos.');
-	// }
-
 	const body = {
 		userId: clienteId,
 		productoId: productoId,
@@ -15,17 +10,14 @@ export const agregarProductoACarrito = async (clienteId, productoId, cantidad, s
 	};
 
 	try {
-		// Realiza la solicitud POST usando el apiCliente
 		const response = await apiClient.post('/carrito/agregarProductoACarrito', body, {
 			headers: {
-				Authorization: `Bearer ${token}`, // Incluir el token en el header de autorización
+				Authorization: `Bearer ${token}`,
 			},
 		});
 
-		// Devuelve los datos de la respuesta
 		return response.data;
 	} catch (error) {
-		// Manejo de errores
 		if (error.response) {
 			if (error.response.status === 401) {
 				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {

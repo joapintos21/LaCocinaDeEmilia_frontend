@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addProduct, updateProduct, deleteProduct } from 'store/productoSlice';
 import { crearProducto } from 'scripts/crearProducto';
 import { actualizarProducto } from 'scripts/actualizarProducto';
 import { borrarProducto } from 'scripts/borrarProducto';
@@ -35,12 +34,10 @@ import { obtenerDescuentos } from 'scripts/obtenerDescuentos';
 import { mostrarValorDescuento } from 'utils/descuentosUtils';
 
 const ProductManagement = () => {
-	const [error, setError] = useState('');
+	const [ setError] = useState('');
 	const dispatch = useDispatch();
 	const [descuentosSeleccionados, setDescuentosSeleccionados] = useState([]);
 	const [adicionalesSeleccionados, setAdicionalesSeleccionados] = useState([]);
-	/*Reutilizar codigo para seleccionar los adicionales / descuentos que tiene un producto actualmente 
-	const adicionalesSeleccionados = Array.isArray(newProduct.adicionales) ? newProduct.adicionales : []; */
 	const productos = useSelector((state) => state.productos);
 	const categorias = useSelector((state) => state.categorias);
 	const adicionales = useSelector((state) => state.gestionAdicionales || []);
@@ -173,7 +170,7 @@ const ProductManagement = () => {
 	const handleSaveProduct = async () => {
 		if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
 			try {
-				let imageUrl = newProduct.imagen === null ? '' : newProduct.imagen; // 🔹 Mantener la URL existente si no hay nueva imagen
+				let imageUrl = newProduct.imagen === null ? '' : newProduct.imagen; //Mantener la URL existente si no hay nueva imagen
 
 				// Si hay un nuevo archivo seleccionado, subirlo a Firebase antes de guardar el producto
 				if (
@@ -189,7 +186,7 @@ const ProductManagement = () => {
 					precio: newProduct.precio,
 					categoria_id: newProduct.categoria.id,
 					visible: newProduct.visible,
-					imagen: imageUrl, // Guardamos solo la URL de Firebase
+					imagen: imageUrl, 
 				};
 
 				if (newProduct.id === null) {
@@ -251,7 +248,7 @@ const ProductManagement = () => {
 					precio: '',
 					categoria: '',
 					visible: true,
-					imagen: '', // Limpiamos el archivo seleccionado
+					imagen: '', 
 				});
 
 				handleClose();
@@ -567,7 +564,7 @@ const ProductManagement = () => {
 					<input
 						type="file"
 						accept="image/*"
-						onChange={handleImageChange} // Evento para manejar cambios
+						onChange={handleImageChange} 
 						style={{ marginBottom: '10px', display: 'block' }}
 					/>
 					{/* Visible */}

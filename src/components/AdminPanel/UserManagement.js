@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addUsuario, updateUsuario, deleteUsuario } from 'store/usuariosSlice'; // Asegúrate de que las acciones estén correctamente definidas en el slice
 import { crearUsuario } from 'scripts/crearUsuario';
 import { actualizarUsuario } from 'scripts/actualizarUsuario';
 import { borrarUsuario } from 'scripts/borrarUsuario';
@@ -26,19 +25,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { obtenerUsuarios } from 'scripts/obtenerUsuarios';
 import { obtenerRolesUsuario } from 'scripts/obtenerRolesUsuario';
-
-function capitalizeFirstLetter(str) {
-	if (typeof str !== 'string' || str.length === 0) {
-		return '';
-	}
-	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
-function esSoloNumerico(cadena) {
-	// La expresión regular permite un "+" al inicio, seguido solo de dígitos
-	const patron = /^\+?[0-9]+$/;
-	return patron.test(cadena);
-}
+import { capitalizeFirstLetter, esSoloNumerico } from 'utils/userUtils';
 
 const UserManagement = () => {
 	const [error, setError] = useState('');
@@ -188,7 +175,6 @@ const UserManagement = () => {
 			.catch((error) => {
 				setError("Error al eliminar el usuario.");
 			});
-		dispatch(deleteUsuario(id));
 	};
 
 	const filteredUsuarios = Array.isArray(usuarios)

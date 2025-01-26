@@ -3,7 +3,7 @@ import axios from 'axios';
 // Crea una instancia de Axios
 
 const apiCliente = axios.create({
-	baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080', // URL base de tu backend
+	baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080', 
 
 	timeout: 20000, // Tiempo de espera máximo
 });

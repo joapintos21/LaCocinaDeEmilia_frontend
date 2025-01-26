@@ -4,9 +4,6 @@ import { Box, Button, Grid, TextField, Typography, Paper} from '@mui/material';
 const ReportManagement = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [descripcion, setDescripcion] = useState('');
-    const [monto, setMonto] = useState('');
-    const [fecha, setFecha] = useState('');
 
     const descargarReportePedidos = async () => {
         if (!startDate || !endDate) {
