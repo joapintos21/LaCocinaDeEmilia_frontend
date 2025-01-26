@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { finalizarPedido } from 'scripts/finalizarPedido';
 import { limpiarCarrito } from 'store/carritoSlice';
+import { obtenerEmpresa } from '../../scripts/obtenerEmpresa';
+import { useDispatch, useSelector } from 'react-redux';
 
 const TransferenciaModal = ({
 	mostrarModalTransferencia,
@@ -36,6 +38,19 @@ const TransferenciaModal = ({
 		setMostrarEstadoModal(false);
 	};
 
+	const fetchEmpresa = async () => {
+		try {
+			await obtenerEmpresa(dispatch, sessionStorage.getItem('token'));
+		} catch (e) {
+			console.log(e);
+		}
+	};
+	useEffect(() => {
+		fetchEmpresa();
+	}, []);
+
+	const empresa = useSelector((state) => state.empresa || {});
+
 	return (
 		<div style={{ zIndex: '1000' }}>
 			{/* Modal de Transferencia */}
@@ -61,9 +76,7 @@ const TransferenciaModal = ({
 			>
 				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 					<h3>Datos para la Transferencia</h3>
-					<p>Banco: Banco de Ejemplo</p>
-					<p>Número de cuenta: 123-456-789</p>
-					<p>CBU: 000123456789</p>
+					<p>{empresa.descripcion_transferencia}</p>
 					<button
 						onClick={handleTransferencia}
 						style={{

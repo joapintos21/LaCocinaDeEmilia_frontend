@@ -16,6 +16,7 @@ import gestionPermisosSlice from './gestionPermisosSlice';
 import pedidosSlice from './pedidosSlice';
 import gestionAdicionalesSlice from './gestionAdicionalesSlice'
 import dashboardSlice from './dashboardSlice'
+import empresaSlice from './empresaSlice'
 
 // Configuración de persistencia para el estado de la aplicación
 const persistConfig = {
@@ -39,7 +40,8 @@ const rootReducer = combineReducers({
     gestionPermisos : gestionPermisosSlice,
     pedidos : pedidosSlice,
     gestionAdicionales : gestionAdicionalesSlice,
-    dashboard : dashboardSlice
+    dashboard : dashboardSlice,
+    empresa : empresaSlice
 });
 
 // Aplica persistencia al rootReducer
