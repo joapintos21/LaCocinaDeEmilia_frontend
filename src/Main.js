@@ -3,7 +3,7 @@ import tw from 'twin.macro';
 import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
 
 import Features from 'components/features/ThreeColSimple.js';
-import MainFeature from 'components/features/TwoColWithButton.js';
+import MainFeature from 'components/features/Recetarios';
 import Footer from 'components/footers/FiveColumnWithInputForm.js';
 import TabCategoryGrid from 'components/cards/TabCategoryGrid';
 import { useSelector } from 'react-redux';
