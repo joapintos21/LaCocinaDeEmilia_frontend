@@ -20,8 +20,8 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H IP-del-VPS >> ~/.ssh/known_hosts
+        ssh-keyscan -H 154.12.229.92 >> ~/.ssh/known_hosts
 
     - name: Ejecutar script de despliegue del frontend
       run: |
-        ssh -i ~/.ssh/id_rsa usuario@IP-del-VPS 'bash ~/deploy-frontend.sh'
+        ssh -i ~/.ssh/id_rsa root@154.12.229.92 'bash ~/deploy-frontend.sh'
