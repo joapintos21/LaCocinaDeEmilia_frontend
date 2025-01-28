@@ -102,6 +102,7 @@ import RestaurantLandingPage from "Main.js";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "pages/Login";
+import Signup from "pages/Signup";
 
 export default function App() {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
@@ -113,6 +114,7 @@ export default function App() {
       <GlobalStyles />
       <Router>
         <Routes>
+          <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<RestaurantLandingPage />} />
         </Routes>
