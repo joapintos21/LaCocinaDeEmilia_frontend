@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Probar conexión SSH
-      run: ssh -i ~/.ssh/id_rsa usuario@IP-del-VPS "echo 'Conexión exitosa'"
+      run: ssh -i ~/.ssh/id_rsa root@154.12.229.92 "echo 'Conexión exitosa'"
     
     - name: Checkout code
       uses: actions/checkout@v3
