@@ -1,27 +1,34 @@
 ﻿name: Deploy Frontend to VPS
 
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
 
-    - name: Configurar acceso SSH
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
-      run: |
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 154.12.229.92 >> ~/.ssh/known_hosts
+            - name: Configurar acceso SSH
+              env:
+                  SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+                  eval "$(ssh-agent -s)"
+                  ssh-add ~/.ssh/id_rsa
+                  ssh-keyscan -t rsa 154.12.229.92 >> ~/.ssh/known_hosts
 
-    - name: Ejecutar script de despliegue del frontend
-      run: |
-        ssh -i ~/.ssh/id_rsa root@154.12.229.92 'bash ~/deploy-frontend.sh'
+            - name: Start SSH Agent
+              run: |
+                  eval "$(ssh-agent -s)"
+                  ssh-add ~/.ssh/id_rsa
+
+            - name: Ejecutar script de despliegue del frontend
+              run: |
+                  ssh -i ~/.ssh/id_rsa root@154.12.229.92 'bash ~/deploy-frontend.sh'
