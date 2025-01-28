@@ -1,105 +1,89 @@
-import React from "react";
-import AnimationRevealPage from "helpers/AnimationRevealPage.js";
-import tw from "twin.macro";
-import { css } from "styled-components/macro"; //eslint-disable-line
-import Header from "components/headers/light.js";
-import Footer from "components/footers/FiveColumnWithInputForm.js";
-import ContactUsForm from "components/forms/TwoColContactUsWithIllustrationFullForm.js";
-import ContactDetails from "components/cards/ThreeColContactDetails.js";
+import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
+import tw from 'twin.macro';
+import styled from 'styled-components';
+import Header from 'components/headers/light.js';
+import Footer from 'components/footers/FiveColumnWithInputForm.js';
+import ContactUsForm from 'components/forms/TwoColContactUsWithIllustrationFullForm.js';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { obtenerEmpresa } from '../scripts/obtenerEmpresa';
 
-const Address = tw.span`leading-relaxed`;
-const AddressLine = tw.span`block`;
-const Email = tw.span`text-sm mt-6 block text-gray-500`;
-const Phone = tw.span`text-sm mt-0 block text-gray-500`;
+const ContactSection = tw.div`py-8 px-4 bg-gray-100 text-gray-900`;
+const ContactContainer = tw.div`max-w-screen-xl mx-auto`;
+const Title = tw.h2`text-2xl font-bold text-center mb-8`;
+const InfoGrid = styled.div`
+	${tw`flex flex-wrap justify-center gap-8`}
+`;
+const InfoCard = styled.div`
+	${tw`p-4 bg-white rounded-lg shadow-lg flex flex-col items-center text-center`}
+	h3 {
+		${tw`text-lg font-semibold mt-4`}
+	}
+	p {
+		${tw`text-sm mt-2 text-gray-600`}
+	}
+`;
+const IconWrapper = tw.div`p-4 bg-primary-500 text-white rounded-full`;
 
 export default () => {
-  return (
-    <AnimationRevealPage>
-      <Header />
-      <ContactUsForm />
-      <ContactDetails
-        cards={[
-          {
-            title: "New York",
-            description: (
-              <>
-                <Address>
-                  <AddressLine>40 Gates Court</AddressLine>
-                  <AddressLine>Endicott, NY 13760</AddressLine>
-                </Address>
-                <Email>contact@treact.com</Email>
-                <Phone>+1 (203) 991-6988</Phone>
-              </>
-            )
-          },
-          {
-            title: "Illinois",
-            description: (
-              <>
-                <Address>
-                  <AddressLine>602 Annadale Drive</AddressLine>
-                  <AddressLine>Dekalb, IL 60115</AddressLine>
-                </Address>
-                <Email>contact@treact.com</Email>
-                <Phone>+1 (203) 991-6988</Phone>
-              </>
-            )
-          },
-          {
-            title: "California",
-            description: (
-              <>
-                <Address>
-                  <AddressLine>96 NE. Delaware Lane</AddressLine>
-                  <AddressLine>Sacramento, CA 95820</AddressLine>
-                </Address>
-                <Email>contact@treact.com</Email>
-                <Phone>+1 (203) 991-6988</Phone>
-              </>
-            )
-          },
-          {
-            title: "Tennessee",
-            description: (
-              <>
-                <Address>
-                  <AddressLine>74 Peachtree Ave.</AddressLine>
-                  <AddressLine>Dyersburg, TN 38024</AddressLine>
-                </Address>
-                <Email>contact@treact.com</Email>
-                <Phone>+1 (203) 991-6988</Phone>
-              </>
-            )
-          },
-          {
-            title: "New Jersey",
-            description: (
-              <>
-                <Address>
-                  <AddressLine>8355 Summer Street</AddressLine>
-                  <AddressLine>Manchester, NJ 08759</AddressLine>
-                </Address>
-                <Email>contact@treact.com</Email>
-                <Phone>+1 (203) 991-6988</Phone>
-              </>
-            )
-          },
-          {
-            title: "Ohio",
-            description: (
-              <>
-                <Address>
-                  <AddressLine>7713 Snake Hill Ave.</AddressLine>
-                  <AddressLine>Piqua, OH 45356</AddressLine>
-                </Address>
-                <Email>contact@treact.com</Email>
-                <Phone>+1 (203) 991-6988</Phone>
-              </>
-            )
-          }
-        ]}
-      />
-      <Footer />
-    </AnimationRevealPage>
-  );
+	const HighlightedText = tw.span`bg-[#99cdb6] text-gray-100 px-4 transform -skew-x-12 inline-block`;
+	const dispatch = useDispatch();
+	const fetchEmpresa = async () => {
+		try {
+			await obtenerEmpresa(dispatch, sessionStorage.getItem('token'));
+		} catch (e) {
+			console.log(e);
+		}
+	};
+	useEffect(() => {
+		fetchEmpresa();
+	}, []);
+	const empresa = useSelector((state) => state.empresa || {});
+
+	return (
+		<AnimationRevealPage>
+			<ContactSection>
+				<ContactContainer>
+					<Title><HighlightedText> Datos de Contacto </HighlightedText></Title>
+					<InfoGrid>
+						{empresa.direccion && empresa.direccion.trim() !== '' ? (
+							<InfoCard>
+								<IconWrapper>
+									<span role="img" aria-label="address">
+										📍
+									</span>
+								</IconWrapper>
+								<h3>Dirección</h3>
+								<p>{empresa.direccion}</p>
+							</InfoCard>
+						) : null}
+						{empresa.correo && empresa.correo.trim() !== '' ? (
+							<InfoCard>
+								<IconWrapper>
+									<span role="img" aria-label="email">
+										✉️
+									</span>
+								</IconWrapper>
+								<h3>Correo Electrónico</h3>
+								<p>{empresa.correo}</p>
+							</InfoCard>
+						) : null}
+						{empresa.telefono && empresa.telefono.trim() !== '' ? (
+							<InfoCard>
+								<IconWrapper>
+									<span role="img" aria-label="phone">
+										📞
+									</span>
+								</IconWrapper>
+								<h3>Teléfono</h3>
+								<p>{empresa.telefono}</p>
+							</InfoCard>
+						) : null}
+					</InfoGrid>
+				</ContactContainer>
+			</ContactSection>
+			<ContactUsForm />
+			<Footer />
+		</AnimationRevealPage>
+	);
 };

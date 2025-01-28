@@ -1,39 +1,21 @@
-let server, request, queryParams, url;
+import apiClient from '../utils/apiCliente'; 
 
-export const iniciarSesion = (emailInput, passwordInput) => {
-  server = "http://localhost:8080";
+export const iniciarSesion = async (emailInput, passwordInput) => {
+	try {
+		const response = await apiClient.post('/login/iniciarSesion', {
+			email: emailInput,
+			password: passwordInput,
+		});
 
-  request = "/login/iniciarSesion";
-
-  queryParams = new URLSearchParams({
-    email: emailInput,
-    password: passwordInput,
-  }).toString();
-
-  url = `${server}${request}?${queryParams}`;
-
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      // Errores fuera del rango 200-299
-      if (!response.ok) {
-        throw new Error(
-          "Se produjo un error con la solicitud: " + response.statusText
-        );
-      }
-      return response.json();
-    })
-    .then((data) => {
-      //console.log(data);
-      return data;
-    })
-    .catch((error) => {
-      //console.error(error);
-      return error;
-    });
-    return null;
+		return response.data;
+	} catch (error) {
+		if (error.response) {
+			const errorData = error.response.data;
+			throw new Error(errorData.error || 'Se produjo un error desconocido.');
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
+	}
 };
