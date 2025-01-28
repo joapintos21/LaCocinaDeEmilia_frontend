@@ -1,0 +1,27 @@
+﻿name: Deploy Frontend to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configurar acceso SSH
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H IP-del-VPS >> ~/.ssh/known_hosts
+
+    - name: Ejecutar script de despliegue del frontend
+      run: |
+        ssh -i ~/.ssh/id_rsa usuario@IP-del-VPS 'bash ~/deploy-frontend.sh'
