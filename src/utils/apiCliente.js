@@ -1,30 +1,26 @@
 import axios from 'axios';
 
 // Crea una instancia de Axios
-
 const apiCliente = axios.create({
-	baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080', 
+	baseURL: '/api',
 
 	timeout: 20000, // Tiempo de espera máximo
 });
 
-// Interceptor de solicitudes para agregar el token
-
+// Interceptor de solicitudes para agregar el token solo si está en los headers
 apiCliente.interceptors.request.use(
 	(config) => {
-		const token = sessionStorage.getItem('token');
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
+		// Verifica si ya se pasó un token en los headers manualmente
+		if (!config.headers.Authorization) {
+			// Si no hay token en la petición, no hace nada
+			return config;
 		}
 		return config;
 	},
-	(error) => {
-		return Promise.reject(error);
-	},
+	(error) => Promise.reject(error),
 );
 
 // Interceptor de respuestas para manejar errores globales
-
 apiCliente.interceptors.response.use(
 	(response) => {
 		return response;
@@ -40,7 +36,6 @@ apiCliente.interceptors.response.use(
 			}
 
 			// Manejo de otros errores globales
-
 			if (status === 403) {
 				alert('No tienes permiso para realizar esta acción.');
 			} else if (status === 500) {
@@ -48,7 +43,6 @@ apiCliente.interceptors.response.use(
 			}
 		} else {
 			// Error de red (sin respuesta del servidor)
-
 			alert('Error de red. Por favor, verifica tu conexión a internet.');
 		}
 

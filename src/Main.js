@@ -51,9 +51,6 @@ export default () => {
 		fetchMedia();
 	}, []);
 
-	if (error) {
-		return <div className="text-red-500 text-center mt-4">{error}</div>;
-	}
 	// Transforma las categorías al formato requerido para `TabCategoryGrid`
 	useEffect(() => {
 		if (categoriasRedux && categoriasRedux.length > 0) {
@@ -71,6 +68,7 @@ export default () => {
 
 	return (
 		<AnimationRevealPage>
+			{error && <div className="text-red-500 text-center mt-4">{error}</div>}
 			<CarruselContainer>
 				<SwiperStyled
 					modules={[Navigation, Pagination, Autoplay]}
