@@ -11,7 +11,7 @@ export const verificar = async (token) => {
 	try {
 		const response = await apiClient.get(url);
 
-		return response.json();
+		return response.data;
 	} catch (error) {
 		if (error.response) {
 			if (error.response.status === 401) {
