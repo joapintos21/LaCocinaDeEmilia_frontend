@@ -1,37 +1,39 @@
-let request, url, body;
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
 export const crearDescuento = async (tipoId, valor, fechaInicio, fechaFin, descripcion, token) => {
-	request = '/descuentos/create';
-	url = `${request}`;
+	const body = {
+		tipo_id: parseInt(tipoId),
+		valor: parseFloat(valor),
+		fechainicio: fechaInicio,
+		fechafin: fechaFin,
+		descripcion: descripcion,
+	};
 
-  body = {
-    tipo_id : parseInt(tipoId), 
-    valor : parseFloat(valor),
-    fechainicio : fechaInicio,
-    fechafin : fechaFin,
-    descripcion : descripcion
-  };
+	try {
+		const response = await apiClient.post('/descuentos/create', body, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': `Bearer ${token}` 
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Se produjo un error desconocido.");
-    }
-
-    const data = await response.json();
-    return data; 
-
-  } catch (error) {
-    console.error(error);
-    throw error; 
-  }
+		return response.data;
+	} catch (error) {
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
+	}
 };

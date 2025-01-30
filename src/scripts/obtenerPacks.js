@@ -15,9 +15,10 @@ export const obtenerPacks = async (dispatch) => {
 						window.location.href = '/login';
 					},
 				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
 			}
-			const errorData = error.response.data;
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
 		} else if (error.request) {
 			throw new Error('No se pudo establecer conexión con el servidor.');
 		} else {

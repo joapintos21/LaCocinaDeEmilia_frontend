@@ -17,7 +17,9 @@ apiCliente.interceptors.request.use(
 		}
 		return config;
 	},
-	(error) => Promise.reject(error),
+	(error) => {
+		return Promise.reject(error);
+	},
 );
 
 // Interceptor de respuestas para manejar errores globales
@@ -38,6 +40,8 @@ apiCliente.interceptors.response.use(
 			// Manejo de otros errores globales
 			if (status === 403) {
 				alert('No tienes permiso para realizar esta acción.');
+			} else if (status === 400) {
+				alert('Error en la solicitud. Por favor, verifica los datos ingresados.');
 			} else if (status === 500) {
 				alert('Ocurrió un error en el servidor. Intenta nuevamente más tarde.');
 			}

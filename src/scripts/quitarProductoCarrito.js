@@ -1,10 +1,8 @@
-let request, url, body;
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
 export const quitarProductoCarrito = async (clienteId, productoId, cantidad, adicionalId, token) => {
-	request = '/carrito/quitarProductoCarrito';
-	url = `${request}`;
-
-	body = {
+	const body = {
 		userId: clienteId,
 		productoId: productoId,
 		cantidad: cantidad,
@@ -12,25 +10,29 @@ export const quitarProductoCarrito = async (clienteId, productoId, cantidad, adi
 	};
 
 	try {
-		const response = await fetch(url, {
-			method: 'POST',
+		const response = await apiClient.post('/carrito/quitarProductoCarrito', body, {
 			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`, 
+				Authorization: `Bearer ${token}`,
 			},
-			body: JSON.stringify(body),
 		});
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		const data = await response.json();
-
-		return data; 
+		return response.data;
 	} catch (error) {
-		console.error(error);
-		throw error; 
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };

@@ -25,9 +25,10 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { obtenerCategorias } from 'scripts/obtenerCategorias';
+import { toast } from 'react-toastify';
+import CustomDialog from 'helpers/Dialog';
 
 const CategoryManagement = () => {
-	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const categories = useSelector((state) => state.categorias);
 	const fetchCategorias = async () => {
@@ -38,6 +39,31 @@ const CategoryManagement = () => {
 	const [newCategory, setNewCategory] = useState({ id: null, titulo: '', descripcion: '' });
 	const [searchTerm, setSearchTerm] = useState('');
 	const [searchDescription, setSearchDescription] = useState('');
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [id, setId] = useState(null);
+
+	const handleOpenDialog = (id) => {
+		setId(id);
+		setDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setId(null);
+		setDialogOpen(false);
+	};
+
+	const handleConfirmDialog = () => {
+		borrarCategoria(id, sessionStorage.getItem('token'))
+			.then((data) => {
+				toast.success('Categoría eliminada correctamente.');
+				fetchCategorias();
+			})
+			.catch((error) => {
+				toast.error('Error al eliminar la categoria.');
+			});
+		setDialogOpen(false);
+	};
+
 	useEffect(() => {
 		try {
 			fetchCategorias();
@@ -45,6 +71,7 @@ const CategoryManagement = () => {
 			console.log(e);
 		}
 	}, []);
+
 	const handleOpen = (category = null) => {
 		if (category) {
 			setNewCategory({ ...category });
@@ -68,11 +95,11 @@ const CategoryManagement = () => {
 			if (newCategory.id === null) {
 				crearCategoria(newCategory.titulo, newCategory.descripcion, sessionStorage.getItem('token'))
 					.then((data) => {
+						toast.success('Categoría creada correctamente.');
 						fetchCategorias();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al crear la categoria.');
+						toast.error('Error al crear la categoria.');
 					});
 			} else {
 				actualizarCategoria(
@@ -82,29 +109,18 @@ const CategoryManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
+						toast.success('Categoría actualizada correctamente.');
 						fetchCategorias();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al actualizar la categoria.');
+						toast.error('Error al actualizar la categoria.');
 					});
 			}
 			setNewCategory({ titulo: '', descripcion: '' });
 			handleClose();
 		} else {
-			setError('Por favor, complete todos los campos.');
+			toast.error('Por favor, complete todos los campos.');
 		}
-	};
-
-	const handleDelete = (id) => {
-		borrarCategoria(id, sessionStorage.getItem('token'))
-			.then((data) => {
-				fetchCategorias();
-				setError('');
-			})
-			.catch((error) => {
-				setError('Error al eliminar la categoria.');
-			});
 	};
 
 	const filteredCategories = categories.filter((category) => {
@@ -192,7 +208,7 @@ const CategoryManagement = () => {
 										<Button
 											variant="outlined"
 											color="secondary"
-											onClick={() => handleDelete(category.id)}
+											onClick={() => handleOpenDialog(category.id)}
 										>
 											Eliminar
 										</Button>
@@ -240,9 +256,13 @@ const CategoryManagement = () => {
 					</Button>
 				</DialogActions>
 			</Dialog>
-
-			{/* Mostrar errores */}
-			{error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+			<CustomDialog
+				open={dialogOpen}
+				title="Confirmar eliminación"
+				content="¿Está seguro de que desea eliminar esta categoría?"
+				onClose={handleCloseDialog}
+				onConfirm={handleConfirmDialog}
+			/>
 		</div>
 	);
 };

@@ -13,6 +13,10 @@ module.exports = function (app) {
 		'/api/adicionales',
 		'/api/descuentos',
 		'/api/permisos',
+		'/api/empresa',
+		'/api/gastos',
+		'/api/dashboard',
+		'/api/direcciones',
 	];
 
 	apiPaths.forEach((path) => {

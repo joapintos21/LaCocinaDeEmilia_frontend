@@ -1,26 +1,27 @@
-export const obtenerAdicionales = async (productoId, dispatch, token) => {
-	let url = `/productos/listarAdicionales?producto_id=${productoId}`;
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
+export const obtenerAdicionales = async (productoId) => {
 	try {
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		});
+		const response = await apiClient.get(`/productos/listarAdicionales?producto_id=${productoId}`);
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		const data = await response.json();
-		return data; 
+		return response.data;
 	} catch (error) {
-		console.error(error);
-		throw error; 
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };
-
-export default obtenerAdicionales;

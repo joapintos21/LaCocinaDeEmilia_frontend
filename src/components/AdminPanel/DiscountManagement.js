@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { crearDescuento } from 'scripts/crearDescuento'; 
-import { actualizarDescuento } from 'scripts/actualizarDescuento'; 
-import { borrarDescuento } from 'scripts/borrarDescuento'; 
+import { crearDescuento } from 'scripts/crearDescuento';
+import { actualizarDescuento } from 'scripts/actualizarDescuento';
+import { borrarDescuento } from 'scripts/borrarDescuento';
 import { obtenerTiposDescuento } from 'scripts/obtenerTiposDescuento';
 import {
 	Table,
@@ -26,9 +26,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { obtenerDescuentos } from 'scripts/obtenerDescuentos';
 import { mostrarValorDescuento } from 'utils/descuentosUtils';
+import { toast } from 'react-toastify';
+import CustomDialog from 'helpers/Dialog';
 
 const DiscountManagement = () => {
-	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const fetchDescuentos = async () => {
 		await obtenerDescuentos(dispatch, sessionStorage.getItem('token'));
@@ -105,11 +106,11 @@ const DiscountManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
+						toast.success('Descuento creado correctamente.');
 						fetchDescuentos();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al crear el descuento.');
+						toast.error('Error al crear el descuento.');
 					});
 			} else {
 				actualizarDescuento(
@@ -122,11 +123,11 @@ const DiscountManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
+						toast.success('Descuento actualizado correctamente.');
 						fetchDescuentos();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al actualizar el descuento.');
+						toast.error('Error al actualizar el descuento.');
 					});
 			}
 
@@ -139,19 +140,33 @@ const DiscountManagement = () => {
 			});
 			handleClose();
 		} else {
-			setError('Por favor, complete todos los campos.');
+			toast.error('Por favor, complete todos los campos.');
 		}
 	};
 
-	const handleDelete = (id) => {
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [id, setId] = useState(null);
+
+	const handleOpenDialog = (id) => {
+		setId(id);
+		setDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setId(null);
+		setDialogOpen(false);
+	};
+
+	const handleConfirmDialog = () => {
 		borrarDescuento(id, sessionStorage.getItem('token'))
 			.then((data) => {
+				toast.success('Descuento eliminado correctamente.');
 				fetchDescuentos();
-				setError('');
 			})
 			.catch((error) => {
-				setError('Error al eliminar el descuento.');
+				toast.error('Error al eliminar el descuento.');
 			});
+		setDialogOpen(false);
 	};
 
 	const filteredDescuentos = Array.isArray(descuentos)
@@ -230,7 +245,7 @@ const DiscountManagement = () => {
 										<Button
 											variant="outlined"
 											color="secondary"
-											onClick={() => handleDelete(descuento.id)}
+											onClick={() => handleOpenDialog(descuento.id)}
 										>
 											Eliminar
 										</Button>
@@ -317,9 +332,13 @@ const DiscountManagement = () => {
 					</Button>
 				</DialogActions>
 			</Dialog>
-
-			{/* Mostrar errores */}
-			{error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+			<CustomDialog
+				open={dialogOpen}
+				title="Confirmar eliminación"
+				content="¿Está seguro de que desea eliminar este descuento?"
+				onClose={handleCloseDialog}
+				onConfirm={handleConfirmDialog}
+			/>
 		</div>
 	);
 };

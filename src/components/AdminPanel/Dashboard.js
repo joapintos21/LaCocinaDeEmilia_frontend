@@ -14,7 +14,7 @@ import {
 	LineElement,
 } from 'chart.js';
 
-import obtenerDatosDashboard from 'scripts/obtenerDatosDashboard';
+import { obtenerDatosDashboard } from 'scripts/obtenerDatosDashboard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement);
 
@@ -24,7 +24,7 @@ const Dashboard = () => {
 		responsive: true,
 		plugins: {
 			legend: {
-				display: false, 
+				display: false,
 			},
 		},
 	};
@@ -59,9 +59,9 @@ const Dashboard = () => {
 
 	function obtenerNumeroDeSemanas() {
 		const fecha = new Date();
-		const mes = fecha.getMonth(); 
-		const primerDiaDelMes = new Date(fecha.getFullYear(), mes, 1); 
-		const ultimoDiaDelMes = new Date(fecha.getFullYear(), mes + 1, 0); 
+		const mes = fecha.getMonth();
+		const primerDiaDelMes = new Date(fecha.getFullYear(), mes, 1);
+		const ultimoDiaDelMes = new Date(fecha.getFullYear(), mes + 1, 0);
 
 		const diasDelMes = (ultimoDiaDelMes - primerDiaDelMes) / (1000 * 3600 * 24) + 1;
 
@@ -80,9 +80,9 @@ const Dashboard = () => {
 
 		return etiquetas;
 	}
-	
+
 	const salesDataWeek = {
-		labels: generarEtiquetasDeSemanas(), 
+		labels: generarEtiquetasDeSemanas(),
 		datasets: [
 			{
 				label: 'Ventas del Mes',
@@ -135,7 +135,7 @@ const Dashboard = () => {
 						<Typography variant="h3" color="text.secondary">
 							{datosDashboard.totalPedidosPorMes}
 						</Typography>
-						<Bar data={salesDataMonth} options={options}/>
+						<Bar data={salesDataMonth} options={options} />
 					</CardContent>
 				</Card>
 			</Grid>

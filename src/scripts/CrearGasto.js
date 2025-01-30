@@ -1,34 +1,37 @@
-let request, url, body;
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
 export const crearGasto = async (descripcion, monto, fecha, token) => {
-    request = '/gastos/registrarGasto';
-    url = `${request}`;
+	const body = {
+		descripcion,
+		monto: parseFloat(monto),
+		fecha,
+	};
 
-    body = {
-        descripcion,
-        monto: parseFloat(monto),
-        fecha,
-    };
+	try {
+		const response = await apiClient.post('/gastos/registrarGasto', body, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Se produjo un error al registrar el gasto.');
-        }
-
-        const data = await response.json();
-        return data; 
-    } catch (error) {
-        console.error('Error al registrar el gasto:', error);
-        throw error; 
-    }
+		return response.data;
+	} catch (error) {
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
+	}
 };

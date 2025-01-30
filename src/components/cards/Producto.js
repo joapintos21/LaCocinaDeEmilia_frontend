@@ -7,7 +7,7 @@ import { handleAddToCart } from 'utils/carritoUtils';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { toast } from 'react-toastify';
-import obtenerAdicionales from 'scripts/obtenerAdicionales';
+import { obtenerAdicionales } from 'scripts/obtenerAdicionales';
 
 const Content = tw.div`flex flex-col lg:flex-row items-center`;
 const ImageContainer = tw.div`flex-shrink-0 w-full lg:w-1/2 rounded-lg overflow-hidden shadow-lg`;
@@ -83,7 +83,7 @@ const Producto = ({ producto }) => {
 	useEffect(() => {
 		const fetchAdicionales = async () => {
 			try {
-				obtenerAdicionales(producto.id, dispatch, token).then((data) => {
+				obtenerAdicionales(producto.id).then((data) => {
 					if (data.length === 0) {
 						setSelectedAdicional(0);
 					}
