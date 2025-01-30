@@ -1,23 +1,29 @@
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
+
 export const obtenerUltimosGastos = async (token) => {
-    const url = '/gastos/obtenerUltimosGastos';
+	try {
+		const response = await apiClient.get('/gastos/obtenerUltimosGastos', {
+			headers: { Authorization: `Bearer ${token}` },
+		});
 
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al obtener los últimos gastos.');
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error al obtener los últimos gastos:', error);
-        throw error;
-    }
+		return response.data;
+	} catch (error) {
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
+	}
 };

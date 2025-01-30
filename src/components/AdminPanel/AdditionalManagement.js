@@ -27,9 +27,10 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { obtenerTodosAdicionales } from 'scripts/obtenerTodosAdicionales';
+import { toast } from 'react-toastify';
+import CustomDialog from 'helpers/Dialog';
 
 const AdditionalManagement = () => {
-	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const fetchAdicionales = async () => {
 		await obtenerTodosAdicionales(dispatch, sessionStorage.getItem('token'));
@@ -80,7 +81,6 @@ const AdditionalManagement = () => {
 	const handleSaveAdicional = () => {
 		if (newAdicional.descripcion && newAdicional.costoAdicional && newAdicional.visible != null) {
 			if (newAdicional.id === null) {
-				const adicionalToAdd = { ...newAdicional };
 				crearAdicional(
 					newAdicional.descripcion,
 					newAdicional.costoAdicional,
@@ -88,11 +88,11 @@ const AdditionalManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
+						toast.success('Adicional creado correctamente.');
 						fetchAdicionales();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al crear el adicional.');
+						toast.error('Error al crear el adicional.');
 					});
 				fetchAdicionales();
 			} else {
@@ -104,37 +104,49 @@ const AdditionalManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
+						toast.success('Adicional actualizado correctamente.');
 						fetchAdicionales();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al actualizar el adicional.');
+						toast.error('Error al actualizar el adicional.');
 					});
 			}
 
 			setNewAdicional({ descripcion: '', costoAdicional: 0, visible: '' });
 			handleClose();
 		} else {
-			setError('Por favor, complete todos los campos.');
+			toast.error('Por favor, complete todos los campos.');
 		}
 	};
 
-	const handleDelete = (id) => {
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [id, setId] = useState(null);
+
+	const handleOpenDialog = (id) => {
+		setId(id);
+		setDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setId(null);
+		setDialogOpen(false);
+	};
+
+	const handleConfirmDialog = () => {
 		borrarAdicional(id, sessionStorage.getItem('token'))
 			.then((data) => {
+				toast.success('Adicional eliminado correctamente.');
 				fetchAdicionales();
-				setError('');
 			})
 			.catch((error) => {
-				setError('Error al eliminar el adicional.');
+				toast.error('Error al eliminar el adicional.');
 			});
+		setDialogOpen(false);
 	};
 
 	const filteredAdicionales = Array.isArray(adicionales)
 		? adicionales.filter((adicional) => {
-				return (
-					adicional.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase())
-				);
+				return adicional.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase());
 		  })
 		: [];
 
@@ -205,7 +217,7 @@ const AdditionalManagement = () => {
 										<Button
 											variant="outlined"
 											color="secondary"
-											onClick={() => handleDelete(adicional.id)}
+											onClick={() => handleOpenDialog(adicional.id)}
 										>
 											Eliminar
 										</Button>
@@ -263,9 +275,13 @@ const AdditionalManagement = () => {
 					</Button>
 				</DialogActions>
 			</Dialog>
-
-			{/* Mostrar errores */}
-			{error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+			<CustomDialog
+				open={dialogOpen}
+				title="Confirmar eliminación"
+				content="¿Está seguro de que desea eliminar este adicional?"
+				onClose={handleCloseDialog}
+				onConfirm={handleConfirmDialog}
+			/>
 		</div>
 	);
 };

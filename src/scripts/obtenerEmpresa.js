@@ -1,28 +1,28 @@
-import { setEmpresa } from '../store/empresaSlice';
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
+import { setEmpresa } from 'store/empresaSlice';
 
 export const obtenerEmpresa = async (dispatch, token) => {
-	let url = '/empresa';
-
 	try {
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		});
+		const response = await apiClient.get('/empresa');
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		const data = await response.json();
-		dispatch(setEmpresa(data));
+		dispatch(setEmpresa(response.data));
 	} catch (error) {
-		console.error(error);
-		throw error;
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };
-
-export default obtenerEmpresa;

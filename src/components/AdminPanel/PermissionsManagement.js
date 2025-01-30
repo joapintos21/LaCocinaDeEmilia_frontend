@@ -26,9 +26,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { obtenerPermisos } from 'scripts/obtenerPermisos';
 import { obtenerRolesUsuario } from 'scripts/obtenerRolesUsuario';
+import CustomDialog from 'helpers/Dialog';
+import { toast } from 'react-toastify';
 
 const PermissionsManagement = () => {
-	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const fetchPermisos = async () => {
 		await obtenerPermisos(dispatch, sessionStorage.getItem('token'));
@@ -45,7 +46,7 @@ const PermissionsManagement = () => {
 		rol_id: null,
 	});
 	const [searchEndpoint, setSearchEndpoint] = useState('');
-	const [searchTipo ] = useState('');
+	const [searchTipo] = useState('');
 
 	useEffect(() => {
 		try {
@@ -70,7 +71,6 @@ const PermissionsManagement = () => {
 		} else {
 			setNewPermiso({ id: null, endpoint: '', tipo: '', rol_id: '' });
 		}
-		setError('');
 		setOpen(true);
 	};
 
@@ -93,12 +93,12 @@ const PermissionsManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
+						toast.success('Permiso creado correctamente.');
 						fetchPermisos();
 						fetchRolesUsuario();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al crear el permiso.');
+						toast.error('Error al crear el permiso.');
 					});
 			} else {
 				actualizarPermiso(
@@ -109,32 +109,47 @@ const PermissionsManagement = () => {
 					sessionStorage.getItem('token'),
 				)
 					.then((data) => {
+						toast.success('Permiso actualizado correctamente.');
 						fetchPermisos();
 						fetchRolesUsuario();
-						setError('');
 					})
 					.catch((error) => {
-						setError('Error al actualizar el permiso.');
+						toast.error('Error al actualizar el permiso.');
 					});
 			}
 
 			setNewPermiso({ endpoint: '', tipo: '', rol_id: '' });
 			handleClose();
 		} else {
-			setError('Por favor, complete todos los campos.');
+			toast.error('Por favor, complete todos los campos.');
 		}
 	};
 
-	const handleDelete = (id) => {
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [id, setId] = useState(null);
+
+	const handleOpenDialog = (id) => {
+		setId(id);
+		setDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setId(null);
+		setDialogOpen(false);
+	};
+
+	const handleConfirmDialog = () => {
 		borrarPermiso(id, sessionStorage.getItem('token'))
 			.then((data) => {
+				toast.success('Permiso eliminado correctamente.');
 				fetchPermisos();
 				fetchRolesUsuario();
-				setError('');
 			})
 			.catch((error) => {
-				setError('Error al eliminar el permiso.');
+				toast.error('Error al eliminar el permiso.');
 			});
+		setId(null);
+		setDialogOpen(false);
 	};
 
 	const filteredPermisos = Array.isArray(permisos)
@@ -210,7 +225,7 @@ const PermissionsManagement = () => {
 										<Button
 											variant="outlined"
 											color="secondary"
-											onClick={() => handleDelete(permiso.id)}
+											onClick={() => handleOpenDialog(permiso.id)}
 										>
 											Eliminar
 										</Button>
@@ -235,7 +250,7 @@ const PermissionsManagement = () => {
 					<TextField
 						name="endpoint"
 						variant="outlined"
-						value={newPermiso.endpoint!=null ? newPermiso.endpoint.toLowerCase() : newPermiso.endpoint}
+						value={newPermiso.endpoint != null ? newPermiso.endpoint.toLowerCase() : newPermiso.endpoint}
 						onChange={handleInputChange}
 						fullWidth
 						select
@@ -305,8 +320,13 @@ const PermissionsManagement = () => {
 				</DialogActions>
 			</Dialog>
 
-			{/* Mostrar errores */}
-			{error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+			<CustomDialog
+				open={dialogOpen}
+				title="Confirmar eliminación"
+				content="¿Está seguro de que desea eliminar este permiso?"
+				onClose={handleCloseDialog}
+				onConfirm={handleConfirmDialog}
+			/>
 		</div>
 	);
 };

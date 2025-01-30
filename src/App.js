@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; 
+import 'react-toastify/dist/ReactToastify.css';
 import GlobalStyles from 'styles/GlobalStyles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import RestaurantLandingPage from 'Main.js';
@@ -18,7 +18,7 @@ import PanelAdministrador from 'pages/PanelAdministrador';
 import PaginaProducto from 'pages/PaginaProducto';
 import Carrito from 'pages/Carrito';
 import PaginaPack from 'pages/PaginaPack';
-import obtenerCategorias from 'scripts/obtenerCategorias';
+import { obtenerCategorias } from 'scripts/obtenerCategorias';
 import { useDispatch, useSelector } from 'react-redux';
 import { obtenerPacks } from 'scripts/obtenerPacks';
 import { obtenerPedidoEnProgreso } from 'scripts/obtenerPedidoEnProgreso';
@@ -49,7 +49,7 @@ export default function App() {
 	useEffect(() => {
 		try {
 			const fetchCategorias = async () => {
-				await obtenerCategorias(dispatch); 
+				await obtenerCategorias(dispatch);
 			};
 			fetchCategorias();
 
@@ -63,7 +63,7 @@ export default function App() {
 					await obtenerPedidoEnProgreso(user.id, token, dispatch).catch((e) => {
 						console.log('Error en el Obtener Pedido:' + e);
 						dispatch(limpiarCarrito());
-					}); 
+					});
 				};
 				fetchPedido();
 			} else {
@@ -86,7 +86,7 @@ export default function App() {
 				pauseOnFocusLoss
 				draggable
 				pauseOnHover
-				theme="light" 
+				theme="light"
 			/>
 			<GlobalStyles />
 			<ThemeProvider theme={theme}>

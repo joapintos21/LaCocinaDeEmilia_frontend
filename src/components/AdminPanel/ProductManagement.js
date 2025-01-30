@@ -32,9 +32,10 @@ import { subirImagenAFirebase } from 'scripts/firebaseUpload';
 import { obtenerTodosAdicionales } from 'scripts/obtenerTodosAdicionales';
 import { obtenerDescuentos } from 'scripts/obtenerDescuentos';
 import { mostrarValorDescuento } from 'utils/descuentosUtils';
+import { toast } from 'react-toastify';
+import CustomDialog from 'helpers/Dialog';
 
 const ProductManagement = () => {
-	const [ setError] = useState('');
 	const dispatch = useDispatch();
 	const [descuentosSeleccionados, setDescuentosSeleccionados] = useState([]);
 	const [adicionalesSeleccionados, setAdicionalesSeleccionados] = useState([]);
@@ -151,20 +152,45 @@ const ProductManagement = () => {
 		if (product && Array.isArray(product.adicionales)) {
 			const idsAdicionales = product.adicionales.map((adicional) => adicional.id);
 			setAdicionalesSeleccionados(idsAdicionales);
-		} else{
-			setAdicionalesSeleccionados(null);
+		} else {
+			setAdicionalesSeleccionados([]);
 		}
-		if (newProduct && Array.isArray(product.descuentos)) {
-			const idsDescuentos = product.descuentos.map((descuento) => descuento.id);
+		if (product && Array.isArray(product.descuentos)) {
+			const idsDescuentos = product.descuentos.map((descuento) => descuento.descuento_id);
 			setDescuentosSeleccionados(idsDescuentos);
-		} else{
-			setDescuentosSeleccionados(null);
+		} else {
+			setDescuentosSeleccionados([]);
 		}
 		setOpen(true);
 	};
 
 	const handleClose = () => {
 		setOpen(false);
+	};
+
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [id, setId] = useState(null);
+
+	const handleOpenDialog = (id) => {
+		setId(id);
+		setDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setId(null);
+		setDialogOpen(false);
+	};
+
+	const handleConfirmDialog = () => {
+		borrarProducto(id, sessionStorage.getItem('token'))
+			.then((data) => {
+				toast.success('Producto eliminado correctamente.');
+				fetchProductos();
+			})
+			.catch((error) => {
+				toast.error('Error al eliminar el producto.');
+			});
+		setDialogOpen(false);
 	};
 
 	const handleSaveProduct = async () => {
@@ -186,25 +212,25 @@ const ProductManagement = () => {
 					precio: newProduct.precio,
 					categoria_id: newProduct.categoria.id,
 					visible: newProduct.visible,
-					imagen: imageUrl, 
+					imagen: imageUrl,
 				};
 
 				if (newProduct.id === null) {
 					const productoCreado = await crearProducto(productoData, sessionStorage.getItem('token'));
 					if (productoCreado && productoCreado.id) {
 						fetchProductos();
-						setError('');
+						toast.success('Producto creado.');
 					} else {
-						setError('Error al crear el producto en la base de datos.');
+						toast.error('Error al crear el producto en la base de datos.');
 					}
 				} else {
 					actualizarProducto(newProduct.id, productoData, sessionStorage.getItem('token'))
 						.then(() => {
+							toast.success('Producto actualizado.');
 							fetchProductos();
-							setError('');
 						})
 						.catch(() => {
-							setError('Error al actualizar el producto.');
+							toast.error('Error al actualizar el producto.');
 						});
 				}
 
@@ -218,8 +244,9 @@ const ProductManagement = () => {
 								productId,
 								sessionStorage.getItem('token'),
 							);
+							toast.success('Descuento asociado al producto.');
 						} catch (error) {
-							setError('Error al asociar el descuento al producto.');
+							toast.error('Error al asociar el descuento al producto.');
 							break; // Salir del bucle si ocurre un error
 						}
 					}
@@ -235,8 +262,9 @@ const ProductManagement = () => {
 								productId,
 								sessionStorage.getItem('token'),
 							);
+							toast.success('Adicional asociado al producto.');
 						} catch (error) {
-							setError('Error al asociar el adicional al producto.');
+							toast.error('Error al asociar el adicional al producto.');
 							break; // Salir del bucle si ocurre un error
 						}
 					}
@@ -248,27 +276,16 @@ const ProductManagement = () => {
 					precio: '',
 					categoria: '',
 					visible: true,
-					imagen: '', 
+					imagen: '',
 				});
 
 				handleClose();
 			} catch (error) {
-				setError('Error al procesar el producto.');
+				toast.error('Error al procesar el producto.');
 			}
 		} else {
-			setError('Por favor, complete todos los campos.');
+			toast.error('Por favor, complete todos los campos.');
 		}
-	};
-
-	const handleDelete = (id) => {
-		borrarProducto(id, sessionStorage.getItem('token'))
-			.then((data) => {
-				setError('');
-			})
-			.catch((error) => {
-				setError('Error al eliminar el producto:');
-			});
-		fetchProductos();
 	};
 
 	return (
@@ -378,7 +395,7 @@ const ProductManagement = () => {
 										<Button
 											variant="outlined"
 											color="secondary"
-											onClick={() => handleDelete(product.id)}
+											onClick={() => handleOpenDialog(product.id)}
 										>
 											Eliminar
 										</Button>
@@ -564,7 +581,7 @@ const ProductManagement = () => {
 					<input
 						type="file"
 						accept="image/*"
-						onChange={handleImageChange} 
+						onChange={handleImageChange}
 						style={{ marginBottom: '10px', display: 'block' }}
 					/>
 					{/* Visible */}
@@ -588,6 +605,13 @@ const ProductManagement = () => {
 					</Button>
 				</DialogActions>
 			</Dialog>
+			<CustomDialog
+				open={dialogOpen}
+				title="Confirmar eliminación"
+				content="¿Está seguro de que desea eliminar este producto?"
+				onClose={handleCloseDialog}
+				onConfirm={handleConfirmDialog}
+			/>
 		</div>
 	);
 };

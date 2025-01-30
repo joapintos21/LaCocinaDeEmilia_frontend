@@ -1,34 +1,37 @@
-let request, url, body;
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
 export const crearPermiso = async (endpoint, tipo, rolId, token) => {
-	request = '/permisos/create';
-	url = `${request}`;
-  
-  body = {
-    endpoint: endpoint,
-    tipo: tipo,
-    rol_id : parseInt(rolId)
-  };
+	const body = {
+		endpoint: endpoint,
+		tipo: tipo,
+		rol_id: parseInt(rolId),
+	};
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(body)
-    });
+	try {
+		const response = await apiClient.post('/permisos/create', body, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		const data = await response.json();
-		return data; 
+		return response.data;
 	} catch (error) {
-		console.error(error);
-		throw error; 
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };

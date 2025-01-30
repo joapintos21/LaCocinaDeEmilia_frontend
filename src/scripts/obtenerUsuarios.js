@@ -1,27 +1,30 @@
 import { setUsuarios } from '../store/usuariosSlice';
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
-export const obtenerUsuarios  = async (dispatch, token) => {
-  let url = "/usuarios";
+export const obtenerUsuarios = async (dispatch, token) => {
+	try {
+		const response = await apiClient.get('/usuarios', {
+			headers: { Authorization: `Bearer ${token}` },
+		});
 
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Se produjo un error desconocido.");
-    }
-
-    const data = await response.json();
-    dispatch(setUsuarios(data)); 
-  } catch (error) {
-    console.error(error);
-    throw error; 
-  }
+		dispatch(setUsuarios(response.data));
+	} catch (error) {
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
+	}
 };
-export default obtenerUsuarios;
