@@ -13,15 +13,13 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
-import tw from 'twin.macro';
+import { useNavigate } from 'react-router-dom'; 
 import { obtenerPedidos } from 'scripts/obtenerPedidos';
 
 const OrderManagement = () => {
-	const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
-	const [searchTerm, setSearchTerm] = useState('');
+	const [searchTerm ] = useState('');
 	const dispatch = useDispatch();
-	const navigate = useNavigate(); // Crear una instancia de navigate
+	const navigate = useNavigate(); 
 
 	// Fetch de datos (pedidos)
 	const fetchPedidos = async () => {
@@ -42,9 +40,8 @@ const OrderManagement = () => {
 		(order.customerName ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
 	);
 
-	// Función para redirigir al usuario
 	const handleAddClick = () => {
-		navigate('/crear-pedido-manual'); // Ruta a la que deseas redirigir
+		navigate('/crear-pedido-manual'); 
 	};
 
 	return (

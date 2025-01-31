@@ -1,24 +1,31 @@
-export const borrarProducto = async (id, token) => {
-	const url = `/productos/delete/${id}`; // URL del endpoint
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
+export const borrarProducto = async (id, token) => {
 	try {
-		const response = await fetch(url, {
-			method: 'DELETE',
+		const response = await apiClient.delete(`/productos/delete/${id}`, {
 			headers: {
-				Authorization: `Bearer ${token}`, // Incluir el token en el header de autorización
+				Authorization: `Bearer ${token}`,
 			},
 		});
 
-		// Si la respuesta no es exitosa (fuera de la gama 200-299)
-		if (!response.ok) {
-			const errorData = await response.json(); // Extraer datos del error
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		// Si la respuesta es exitosa y no tiene cuerpo, devolver mensaje de éxito
-		return { message: 'Producto eliminado exitosamente' };
+		return response.data;
 	} catch (error) {
-		console.error(error);
-		throw error; // Lanza el error para que lo maneje el llamador
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };

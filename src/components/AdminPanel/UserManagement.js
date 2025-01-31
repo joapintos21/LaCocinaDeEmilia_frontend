@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addUsuario, updateUsuario, deleteUsuario } from 'store/usuariosSlice'; // Asegúrate de que las acciones estén correctamente definidas en el slice
 import { crearUsuario } from 'scripts/crearUsuario';
 import { actualizarUsuario } from 'scripts/actualizarUsuario';
 import { borrarUsuario } from 'scripts/borrarUsuario';
@@ -26,22 +25,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { obtenerUsuarios } from 'scripts/obtenerUsuarios';
 import { obtenerRolesUsuario } from 'scripts/obtenerRolesUsuario';
-
-function capitalizeFirstLetter(str) {
-	if (typeof str !== 'string' || str.length === 0) {
-		return '';
-	}
-	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
-function esSoloNumerico(cadena) {
-	// La expresión regular permite un "+" al inicio, seguido solo de dígitos
-	const patron = /^\+?[0-9]+$/;
-	return patron.test(cadena);
-}
+import { capitalizeFirstLetter, esSoloNumerico } from 'utils/userUtils';
+import { toast } from 'react-toastify';
+import CustomDialog from 'helpers/Dialog';
 
 const UserManagement = () => {
-	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const fetchUsuarios = async () => {
 		await obtenerUsuarios(dispatch, sessionStorage.getItem('token'));
@@ -73,7 +61,6 @@ const UserManagement = () => {
 		} catch (e) {
 			console.log(e);
 		}
-		setError('');
 	}, [dispatch]);
 
 	const handleOpen = (usuario = null) => {
@@ -121,20 +108,20 @@ const UserManagement = () => {
 						sessionStorage.getItem('token'),
 					)
 						.then((data) => {
-							setError("Usuario agregado:");
+							toast.success('Usuario creado con éxito.');
 							fetchUsuarios();
 							fetchRolesUsuario();
 						})
 						.catch((error) => {
-							setError("Error al crear el usuario.");
+							toast.error('Error al crear el usuario.');
 						});
 					fetchUsuarios();
 					fetchRolesUsuario();
 				} else {
-					setError('El numero de telefono debe ser numerico.');
+					toast.error('El numero de telefono debe ser numerico.');
 				}
 			} else {
-				setError('Por favor, complete todos los campos.');
+				toast.error('Por favor, complete todos los campos.');
 			}
 		} else {
 			if (newUsuario.nombre && newUsuario.telefono && newUsuario.email && newUsuario.rol && newUsuario.status) {
@@ -149,20 +136,20 @@ const UserManagement = () => {
 						sessionStorage.getItem('token'),
 					)
 						.then((data) => {
+							toast.success('Usuario actualizado con éxito.');
 							fetchUsuarios();
 							fetchRolesUsuario();
-							setError("Usuario actualizado");
 						})
 						.catch((error) => {
-							setError("Error al actualizar el usuario.");
+							toast.error('Error al actualizar el usuario.');
 						});
 					fetchUsuarios();
 					fetchRolesUsuario();
 				} else {
-					setError('El numero de telefono debe ser numerico.');
+					toast.error('El numero de telefono debe ser numerico.');
 				}
 			} else {
-				setError('Por favor, complete todos los campos.');
+				toast.error('Por favor, complete todos los campos.');
 			}
 		}
 
@@ -178,17 +165,31 @@ const UserManagement = () => {
 		handleClose();
 	};
 
-	const handleDelete = (id) => {
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [id, setId] = useState(null);
+
+	const handleOpenDialog = (id) => {
+		setId(id);
+		setDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setId(null);
+		setDialogOpen(false);
+	};
+
+	const handleConfirmDialog = async () => {
 		borrarUsuario(id, sessionStorage.getItem('token'))
 			.then((data) => {
+				toast.success('Usuario eliminado con éxito.');
 				fetchUsuarios();
 				fetchRolesUsuario();
-				setError("Usuario eliminado");
 			})
 			.catch((error) => {
-				setError("Error al eliminar el usuario.");
+				toast.error('Error al eliminar el usuario.');
 			});
-		dispatch(deleteUsuario(id));
+		setId(null);
+		setDialogOpen(false);
 	};
 
 	const filteredUsuarios = Array.isArray(usuarios)
@@ -293,7 +294,7 @@ const UserManagement = () => {
 										<Button
 											variant="outlined"
 											color="secondary"
-											onClick={() => handleDelete(usuario.id)}
+											onClick={() => handleOpenDialog(usuario.id)}
 										>
 											Eliminar
 										</Button>
@@ -415,9 +416,13 @@ const UserManagement = () => {
 					</Button>
 				</DialogActions>
 			</Dialog>
-
-			{/* Mostrar errores */}
-			{error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+			<CustomDialog
+				open={dialogOpen}
+				title="Confirmar eliminación"
+				content="¿Está seguro de que desea eliminar este usuario?"
+				onClose={handleCloseDialog}
+				onConfirm={handleConfirmDialog}
+			/>
 		</div>
 	);
 };

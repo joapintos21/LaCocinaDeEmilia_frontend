@@ -1,0 +1,37 @@
+﻿name: Deploy Frontend to VPS
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Configurar acceso SSH
+              env:
+                  SSH_PRIVATE_KEY: ${{ secrets.VPS_PRIVATE_KEY }}
+              run: |
+                  mkdir -p ~/.ssh
+                  echo -e "${SSH_PRIVATE_KEY}" | tr -d '\r' > ~/.ssh/id_ed25519
+                  chmod 600 ~/.ssh/id_ed25519
+                  eval "$(ssh-agent -s)"
+                  ssh-add ~/.ssh/id_ed25519
+                  ssh-keyscan -H 154.12.229.92 >> ~/.ssh/known_hosts
+
+            - name: Debug SSH Key
+              run: |
+                  ls -lah ~/.ssh
+                  [[ -f ~/.ssh/id_ed25519 ]] && echo "✅ SSH key exists!" || echo "❌ SSH key is missing!"
+                  cat ~/.ssh/id_ed25519 | head -n 5
+
+            - name: Test SSH Connection
+              run: ssh -i ~/.ssh/id_ed25519 root@154.12.229.92 "echo 'Conexión exitosa'"
+
+            - name: Ejecutar script de despliegue del frontend
+              run: ssh -i ~/.ssh/id_ed25519 root@154.12.229.92 'bash ~/deploy-frontend.sh'

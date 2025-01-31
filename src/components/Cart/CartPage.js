@@ -19,6 +19,9 @@ import { format } from 'date-fns';
 // Importar el locale en español desde date-fns
 import { registerLocale } from 'react-datepicker';
 import es from 'date-fns/locale/es'; // Español
+import { obtenerDireccionesUsuario } from 'scripts/obtenerDireccionesUsuario';
+import { toast } from 'react-toastify';
+import { obtenerCostoEnvio } from 'scripts/obtenerCostoEnvio';
 registerLocale('es', es);
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto mt-8`;
@@ -134,52 +137,36 @@ const CartPage = () => {
 
 	const seleccionarDireccion = async (id) => {
 		dispatch(setDireccion(id));
-		try {
-			const response = await fetch(
-				'/direcciones/calcularCostoEnvio?direccion_id=' + id + '&pedido_id=' + pedidoId,
-				{
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`,
-					},
-				},
-			);
-
-			const data = await response.json();
-			if (data && data.costoEnvio) {
-				dispatch(setCostoEnvio(data.costoEnvio));
-			} else {
-				alert('Error al obtener el costo de envio.');
-				console.log(data);
-			}
-		} catch (error) {
-			console.error('Error:', error);
-			alert('Ocurrió un error al obtener el costo de envio.');
-		}
+		obtenerCostoEnvio(id, pedidoId, token)
+			.then((data) => {
+				if (data && data.costoEnvio) {
+					toast.success('Costo de envío actualizado.');
+					dispatch(setCostoEnvio(data.costoEnvio));
+				} else {
+					toast.error('Error al obtener el costo de envio.');
+					console.log(data);
+				}
+			})
+			.catch((e) => {
+				toast.error('Error al obtener el costo de envio:', e);
+			});
 	};
 
 	const fetchDirecciones = async () => {
 		try {
-			const response = await fetch(`/direcciones?cliente_id=${userId}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-			if (response.ok) {
-				const data = await response.json();
-				setDirecciones(data);
-
-				const direccionDefault = data.find((direccion) => direccion.predeterminado);
-				console.log(direccionId);
-				if (direccionDefault && direccionId === '') {
-					seleccionarDireccion(direccionDefault.id);
-				}
-			} else {
-				console.error('Error al obtener las direcciones:', response.statusText);
-			}
+			obtenerDireccionesUsuario(userId, token)
+				.then((data) => {
+					setDirecciones(data);
+					const direccionDefault = data.find((direccion) => direccion.predeterminado);
+					if (direccionDefault && direccionId === '') {
+						seleccionarDireccion(direccionDefault.id);
+					}
+				})
+				.catch((e) => {
+					toast.error('Error al obtener las direcciones:' + e);
+				});
 		} catch (error) {
-			console.error('Error al obtener las direcciones:', error);
+			toast.error('Error al obtener las direcciones:', error);
 		} finally {
 			setIsLoadingDirecciones(false);
 		}

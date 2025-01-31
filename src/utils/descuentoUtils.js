@@ -1,5 +1,3 @@
-// src/utils/descuentoUtils.js
-
 /**
  * Calcula el precio con descuento aplicando una lista de descuentos.
  *

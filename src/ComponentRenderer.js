@@ -49,7 +49,7 @@ import ThreePlansWithHalfPrimaryBackgroundPricing from 'components/pricing/Three
 import ThreePlansPricing from 'components/pricing/ThreePlans.js';
 
 import ThreeColWithSideImageFeatures from 'components/features/ThreeColWithSideImage.js';
-import TwoColWithButtonFeatures from 'components/features/TwoColWithButton.js';
+import TwoColWithButtonFeatures from 'components/features/Nosotros.js';
 import ThreeColSimpleFeatures from 'components/features/ThreeColSimple.js';
 import ThreeColWithSideImageWithPrimaryBackgroundFeatures from 'components/features/ThreeColWithSideImageWithPrimaryBackground.js';
 import TwoColVerticalWithButtonFeatures from 'components/features/TwoColWithTwoFeaturesAndButtons.js';
@@ -90,7 +90,6 @@ import TwoColContactUsFullForm from 'components/forms/TwoColContactUsWithIllustr
 
 import GetStartedCTA from 'components/cta/GetStarted.js';
 import GetStartedLightCTA from 'components/cta/GetStartedLight.js';
-//import DownloadAppCTA from 'components/cta/DownloadApp.js';
 
 import SimpleFiveColumnFooter from 'components/footers/SimpleFiveColumn.js';
 import FiveColumnWithInputFormFooter from 'components/footers/FiveColumnWithInputForm.js';
@@ -461,12 +460,7 @@ export const components = {
 					name: 'Get Started Light',
 					component: GetStartedLightCTA,
 					url: '/components/blocks/CTA/GetStartedLight',
-				},
-				/*DownloadApp: {
-					name: 'Download App',
-					component: DownloadAppCTA,
-					url: '/components/blocks/CTA/DownloadApp',
-				},*/
+				}
 			},
 		},
 

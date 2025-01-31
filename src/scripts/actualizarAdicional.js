@@ -1,8 +1,7 @@
-export const actualizarAdicional = async (id, descripcion, costoAdicional, visible, token) => {
-	// Usar el ID directamente en la URL del endpoint
-	const url = `/adicionales/update/${id}`; // Asumiendo que el servidor espera el ID en la URL
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
 
-	// Crear el objeto de datos que se enviará en el cuerpo de la solicitud
+export const actualizarAdicional = async (id, descripcion, costoAdicional, visible, token) => {
 	const body = {
 		descripcion: descripcion,
 		costoAdicional: parseFloat(costoAdicional),
@@ -10,27 +9,29 @@ export const actualizarAdicional = async (id, descripcion, costoAdicional, visib
 	};
 
 	try {
-		// Hacer la solicitud PUT
-		const response = await fetch(url, {
-			method: 'PUT', // Método PUT
+		const response = await apiClient.put(`/adicionales/update/${id}`, body, {
 			headers: {
-				'Content-Type': 'application/json', // El contenido es JSON
-				Authorization: `Bearer ${token}`, // Incluir el token en el header de autorización
+				Authorization: `Bearer ${token}`,
 			},
-			body: JSON.stringify(body), // Convertimos el body a JSON
 		});
 
-		// Manejar errores fuera del rango 200-299
-		if (!response.ok) {
-			const errorData = await response.json(); // Extraer datos del error
-			throw new Error(errorData.error || 'Se produjo un error desconocido.');
-		}
-
-		// Obtener y retornar los datos de la respuesta
-		const data = await response.json();
-		return data;
+		return response.data;
 	} catch (error) {
-		console.error(error);
-		throw error; // Lanza el error para que lo maneje el llamador
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };

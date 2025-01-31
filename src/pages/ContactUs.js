@@ -26,6 +26,7 @@ const InfoCard = styled.div`
 const IconWrapper = tw.div`p-4 bg-primary-500 text-white rounded-full`;
 
 export default () => {
+	const HighlightedText = tw.span`bg-[#99cdb6] text-gray-100 px-4 transform -skew-x-12 inline-block`;
 	const dispatch = useDispatch();
 	const fetchEmpresa = async () => {
 		try {
@@ -43,7 +44,7 @@ export default () => {
 		<AnimationRevealPage>
 			<ContactSection>
 				<ContactContainer>
-					<Title>Datos de Contacto</Title>
+					<Title><HighlightedText> Datos de Contacto </HighlightedText></Title>
 					<InfoGrid>
 						{empresa.direccion && empresa.direccion.trim() !== '' ? (
 							<InfoCard>

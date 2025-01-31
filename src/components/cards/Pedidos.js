@@ -3,6 +3,7 @@ import tw from 'twin.macro';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { obtenerPedidosUsuario } from 'scripts/obtenerPedidosUsuario';
+import { toast } from 'react-toastify';
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto`;
 const Title = tw.h2`text-2xl font-bold mb-6 text-center`;
@@ -70,9 +71,13 @@ const PedidosPage = () => {
 	// Cargar productos y packs desde Redux
 	useEffect(() => {
 		const fetchPedidos = async () => {
-			await obtenerPedidosUsuario(user.id, token).then((data) => {
-				setPedidos(data);
-			});
+			await obtenerPedidosUsuario(user.id, token)
+				.then((data) => {
+					setPedidos(data);
+				})
+				.catch((error) => {
+					toast.error(error.message);
+				});
 		};
 		fetchPedidos();
 	}, []);
