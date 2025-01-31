@@ -1,34 +1,40 @@
 import React, { useState } from 'react';
 import { Box, Button, Grid, TextField, Typography, Paper} from '@mui/material';
+import { generarReportePedidos } from 'scripts/generarReportePedidos';
+import { generarReporteUsuarios } from 'scripts/generarReporteUsuarios';
+import { generarReporteGastos } from 'scripts/generarReporteGastos';
 
 const ReportManagement = () => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [descripcion, setDescripcion] = useState('');
-    const [monto, setMonto] = useState('');
-    const [fecha, setFecha] = useState('');
+    const [startDatePedidos, setStartDatePedidos] = useState('');
+    const [endDatePedidos, setEndDatePedidos] = useState('');
+    const [hasAttemptedSubmitPedidos, setHasAttemptedSubmitPedidos] = useState(false);
+    const [startDateGastos, setStartDateGastos] = useState('');
+    const [endDateGastos, setEndDateGastos] = useState('');
+    const [hasAttemptedSubmitGastos, setHasAttemptedSubmitGastos] = useState(false);
+
+    const validarFechasPedidos = () => {
+        return (
+            startDatePedidos &&
+            endDatePedidos &&
+            new Date(startDatePedidos) <= new Date(endDatePedidos)
+        );
+    };
+
+    const validarFechasGastos = () => {
+        return (
+            startDateGastos &&
+            endDateGastos &&
+            new Date(startDateGastos) <= new Date(endDateGastos)
+        );
+    };
 
     const descargarReportePedidos = async () => {
-        if (!startDate || !endDate) {
-            alert('Por favor, selecciona las fechas de inicio y fin.');
+        setHasAttemptedSubmitPedidos(true);
+        if (!validarFechasPedidos()) {
             return;
         }
         try {
-            const response = await fetch(`/reporte/generarReportePedidos?fechaInicio=${startDate}&fechaFin=${endDate}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            if (!response.ok) throw new Error('Error al generar el reporte de pedidos');
-
-            const data = await response.json();
-            const binaryData = Uint8Array.from(atob(data.file), (c) => c.charCodeAt(0));
-            const blob = new Blob([binaryData], { type: 'application/pdf' });
-
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `reporte_pedidos_${startDate}_${endDate}.pdf`;
-            link.click();
+            await generarReportePedidos(startDatePedidos, endDatePedidos);
         } catch (error) {
             console.error('Error al descargar el reporte de pedidos:', error);
         }
@@ -36,48 +42,19 @@ const ReportManagement = () => {
 
     const descargarReporteUsuarios = async () => {
         try {
-            const response = await fetch('/reporte/generarReporteUsuarios', {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            if (!response.ok) throw new Error('Error al generar el reporte de usuarios');
-
-            const data = await response.json();
-            const binaryData = Uint8Array.from(atob(data.file), (c) => c.charCodeAt(0));
-            const blob = new Blob([binaryData], { type: 'application/pdf' });
-
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'reporte_usuarios.pdf';
-            link.click();
+            await generarReporteUsuarios();
         } catch (error) {
             console.error('Error al descargar el reporte de usuarios:', error);
         }
     };
 
     const descargarReporteGastos = async () => {
-        if (!startDate || !endDate) {
-            alert('Por favor, selecciona las fechas de inicio y fin.');
+        setHasAttemptedSubmitGastos(true);
+        if (!validarFechasGastos()) {
             return;
         }
-
         try {
-            const response = await fetch(`/reporte/generarReporteGastos?fechaInicio=${startDate}&fechaFin=${endDate}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            if (!response.ok) throw new Error('Error al generar el reporte de gastos');
-
-            const data = await response.json();
-            const binaryData = Uint8Array.from(atob(data.file), (c) => c.charCodeAt(0));
-            const blob = new Blob([binaryData], { type: 'application/pdf' });
-
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `reporte_gastos_${startDate}_${endDate}.pdf`;
-            link.click();
+            await generarReporteGastos(startDateGastos, endDateGastos);
         } catch (error) {
             console.error('Error al descargar el reporte de gastos:', error);
         }
@@ -95,11 +72,17 @@ const ReportManagement = () => {
                         <TextField
                             label="Fecha Inicio"
                             type="date"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
+                            value={startDatePedidos}
+                            onChange={(e) => setStartDatePedidos(e.target.value)}
+                            error={hasAttemptedSubmitPedidos && (!startDatePedidos || new Date(startDatePedidos) > new Date(endDatePedidos))}
+                            helperText={
+                                hasAttemptedSubmitPedidos && !startDatePedidos
+                                    ? 'La fecha de inicio es obligatoria.'
+                                    : hasAttemptedSubmitPedidos && new Date(startDatePedidos) > new Date(endDatePedidos)
+                                    ? 'La fecha de inicio no puede ser posterior a la fecha de fin.'
+                                    : ''
+                            }
+                            InputLabelProps={{ shrink: true }}
                             fullWidth
                         />
                     </Grid>
@@ -107,11 +90,15 @@ const ReportManagement = () => {
                         <TextField
                             label="Fecha Fin"
                             type="date"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
+                            value={endDatePedidos}
+                            onChange={(e) => setEndDatePedidos(e.target.value)}
+                            error={hasAttemptedSubmitPedidos && (!endDatePedidos || new Date(startDatePedidos) > new Date(endDatePedidos))}
+                            helperText={
+                                hasAttemptedSubmitPedidos && !endDatePedidos
+                                    ? 'La fecha de fin es obligatoria.'
+                                    : ''
+                            }
+                            InputLabelProps={{ shrink: true }}
                             fullWidth
                         />
                     </Grid>
@@ -156,8 +143,16 @@ const ReportManagement = () => {
                         <TextField
                             label="Fecha Inicio"
                             type="date"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
+                            value={startDateGastos}
+                            onChange={(e) => setStartDateGastos(e.target.value)}
+                            error={hasAttemptedSubmitGastos && (!startDateGastos || new Date(startDateGastos) > new Date(endDateGastos))}
+                            helperText={
+                                hasAttemptedSubmitGastos && !startDateGastos
+                                    ? 'La fecha de inicio es obligatoria.'
+                                    : hasAttemptedSubmitGastos && new Date(startDateGastos) > new Date(endDateGastos)
+                                    ? 'La fecha de inicio no puede ser posterior a la fecha de fin.'
+                                    : ''
+                            }
                             InputLabelProps={{ shrink: true }}
                             fullWidth
                         />
@@ -166,8 +161,14 @@ const ReportManagement = () => {
                         <TextField
                             label="Fecha Fin"
                             type="date"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
+                            value={endDateGastos}
+                            onChange={(e) => setEndDateGastos(e.target.value)}
+                            error={hasAttemptedSubmitGastos && (!endDateGastos || new Date(startDateGastos) > new Date(endDateGastos))}
+                            helperText={
+                                hasAttemptedSubmitGastos && !endDateGastos
+                                    ? 'La fecha de fin es obligatoria.'
+                                    : ''
+                            }
                             InputLabelProps={{ shrink: true }}
                             fullWidth
                         />
