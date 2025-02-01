@@ -1,20 +1,32 @@
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
+
 export const marcarPedidoComoEntregado = async (pedidoId, token) => {
     try {
-        const response = await fetch('/pedidos/marcarComoEntregado', {
-            method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ pedido_id: pedidoId }),
-        });
+        const response = await apiClient.put('/pedidos/marcarComoEntregado', 
+            { pedido_id: pedidoId },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        if (!response.ok) {
-            throw new Error('No se pudo marcar el pedido como entregado.');
+        toast.success('Pedido marcado como entregado.');
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            if (error.response.status === 401) {
+                toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+                    onClose: () => {
+                        window.location.href = '/login';
+                    },
+                });
+            } else {
+                toast.error(error.response.data.error || 'No se pudo marcar el pedido como entregado.');
+            }
+        } else if (error.request) {
+            toast.error('No se pudo establecer conexión con el servidor.');
+        } else {
+            toast.error('Error al realizar la solicitud.');
         }
 
-        return response.json();
-    } catch (error) {
         console.error('Error al marcar pedido como entregado:', error);
         throw error;
     }
