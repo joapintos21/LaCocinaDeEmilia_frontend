@@ -1,15 +1,32 @@
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
+
 export const reasignarPedido = async (pedidoId, userId, token) => {
     try {
-        const response = await fetch('/pedidos/reasignarPedido', {
-            method: 'PUT',
-            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pedido_id: pedidoId, userId }),
-        });
+        const response = await apiClient.put('/pedidos/reasignarPedido', 
+            { pedido_id: pedidoId, userId },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        if (!response.ok) throw new Error('Error al reasignar el pedido');
-
-        return true;
+        toast.success('Pedido reasignado correctamente.');
+        return response.data;
     } catch (error) {
+        if (error.response) {
+            if (error.response.status === 401) {
+                toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+                    onClose: () => {
+                        window.location.href = '/login';
+                    },
+                });
+            } else {
+                toast.error(error.response.data.error || 'Error al reasignar el pedido.');
+            }
+        } else if (error.request) {
+            toast.error('No se pudo establecer conexión con el servidor.');
+        } else {
+            toast.error('Error al realizar la solicitud.');
+        }
+
         console.error('Error al reasignar pedido:', error);
         throw error;
     }
