@@ -17,7 +17,7 @@ import {
 	DialogContent,
 	DialogTitle,
 } from '@mui/material';
-import { crearGasto } from 'scripts/crearGasto';
+import { crearGasto } from 'scripts/CrearGasto';
 import { obtenerUltimosGastos } from 'scripts/obtenerUltimosGastos';
 import { actualizarGasto } from 'scripts/actualizarGasto';
 import { borrarGasto } from 'scripts/borrarGasto';
