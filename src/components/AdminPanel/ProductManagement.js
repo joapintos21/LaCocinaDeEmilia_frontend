@@ -425,6 +425,9 @@ const ProductManagement = () => {
 						value={newProduct.descripcion}
 						onChange={handleInputChange}
 						fullWidth
+						multiline
+						rows={4}
+						maxRows={10} // Permite expansión hasta 10 líneas
 						style={{ marginBottom: '10px' }}
 					/>
 					{/* Precio */}

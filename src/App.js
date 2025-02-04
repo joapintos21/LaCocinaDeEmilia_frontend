@@ -11,8 +11,6 @@ import SignUp from 'pages/Signup';
 import VerificarCuenta from 'pages/VerificarCuenta';
 import AboutUs from 'pages/AboutUs';
 import ContactUs from 'pages/ContactUs';
-import Pricing from 'pages/Pricing';
-import BlogIndex from 'pages/BlogIndex';
 import Productos from 'pages/Productos';
 import PanelAdministrador from 'pages/PanelAdministrador';
 import PaginaProducto from 'pages/PaginaProducto';
@@ -30,6 +28,7 @@ import PanelCadetes from 'pages/PanelCadete';
 import RecuperarPassword from 'pages/RecuperarPassword';
 import ResetearPassword from 'pages/ResetearPassword';
 import CrearPedidoManual from 'pages/CrearPedidoManual';
+import Envios from 'pages/Envios';
 
 const theme = createTheme({
 	palette: {
@@ -100,8 +99,7 @@ export default function App() {
 						<Route path="/verificar" element={<VerificarCuenta />} />
 						<Route path="/nosotros" element={<AboutUs />} />
 						<Route path="/contacto" element={<ContactUs />} />
-						<Route path="/pricing" element={<Pricing />} />
-						<Route path="/blog" element={<BlogIndex />} />
+						<Route path="/envios" element={<Envios />} />
 						<Route path="/productos" element={<Productos />} />
 						<Route path="/producto/:id" element={<PaginaProducto />} />
 						<Route path="/pack/:id" element={<PaginaPack />} />
