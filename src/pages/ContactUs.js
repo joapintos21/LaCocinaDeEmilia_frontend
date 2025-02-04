@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Footer from 'components/footers/FiveColumnWithInputForm.js';
 import ContactUsForm from 'components/forms/TwoColContactUsWithIllustrationFullForm.js';
 import React, { useEffect } from 'react';
+import FAQ from 'components/faqs/SingleCol.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { obtenerEmpresa } from '../scripts/obtenerEmpresa';
 
@@ -85,8 +86,9 @@ export default () => {
 					</ContactContainer>
 				</ContactSection>
 			)}
-
+			
 			<ContactUsForm />
+			<FAQ />
 			<Footer />
 		</AnimationRevealPage>
 	);
