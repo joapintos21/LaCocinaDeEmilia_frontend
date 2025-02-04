@@ -1,32 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from 'components/headers/light.js';
-import { obtenerPedidos } from 'scripts/obtenerPedidos';
 import { crearDireccion } from 'scripts/crearDireccion';
-import { decrementarCantidad, quitarItem, setComisionMP, setCostoEnvio, setDireccion } from 'store/carritoSlice';
+import { setCostoEnvio, setDireccion } from 'store/carritoSlice';
 import tw from 'twin.macro';
 import styled from 'styled-components';
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	Button,
-	Paper,
 	TextField,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogTitle,
-	MenuItem,
-	Select,
-	FormControl,
-	InputLabel,
 	Box,
-	Grid,
-	InputAdornment,
 } from '@mui/material';
 import DireccionesModal from '../components/Cart/DireccionesModal';
 import TransferenciaModal from '../components/Cart/TransferenciaModal';
@@ -35,12 +16,6 @@ import CheckoutProButton from '../components/Cart/CheckoutProMP';
 import Spinner from '../components/Spinner';
 
 export default () => {
-	const DiscountInfo = tw.p`text-sm text-green-600`;
-	const CartItem = tw.div`flex flex-col sm:flex-row items-center bg-white w-full rounded-lg p-4 shadow mb-4`;
-	const Info = tw.div`flex-1`;
-	const Actions = tw.div`flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0`;
-	const Quantity = tw.div`flex items-center space-x-2`;
-	const StyledButton = tw.button`px-2 py-1 bg-gray-200 rounded hover:bg-gray-300`;
 	const PaymentSection = tw.div`mb-4 p-6 bg-gray-100 rounded-lg shadow-md`;
 	const PaymentOption = tw.div`flex items-center mb-4`;
 	const Label = tw.label`ml-2 text-gray-700`;
@@ -51,18 +26,12 @@ export default () => {
 		${tw`mt-4`}
 	`;
 	const Content = tw.div`flex flex-col w-full`;
-	const ContentSection = tw.div`flex flex-col w-full items-center`;
 	const AddressSection = tw.div`mt-6 w-full bg-gray-100 p-4 rounded-lg shadow-md`;
 	const AddressItem = tw.div`flex justify-between items-center border-b pb-2 mb-2`;
 	const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 mt-32`;
 	const dispatch = useDispatch();
-	const fetchPedidos = async () => {
-		await obtenerPedidos(dispatch, sessionStorage.getItem('token'));
-	};
 	const token = sessionStorage.getItem('token');
-	const user = useSelector((state) => state.usuario); // ID del cliente desde el store
-	const [open, setOpen] = useState(false);
-	const [isEditing, setIsEditing] = useState(false);
+	const user = useSelector((state) => state.usuario);
 	const [direcciones, setDirecciones] = useState([]);
 	const [mostrarModalDirecciones, setMostrarModalDirecciones] = useState(false);
 	const [isLoadingDirecciones, setIsLoadingDirecciones] = useState(true);
@@ -75,7 +44,6 @@ export default () => {
 		cliente_id: '',
 	});
 	const cartItems = useSelector((state) => state.carrito.items);
-	const [searchTerm, setSearchTerm] = useState('');
 	const costoEnvio = useSelector((state) => state.carrito.costoEnvio);
 	const comisionMP = useSelector((state) => state.carrito.comisionMP);
 	const direccionId = useSelector((state) => state.carrito.direccionId);
@@ -87,16 +55,11 @@ export default () => {
 		userId = user.userInfo.id;
 	}
 	const subtotal = cartItems.reduce((acc, item) => acc + calcularSubtotalItem(item), 0);
-	const [isOpenAgendar, setIsOpenAgendar] = useState(false);
-	const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
-	const [fechasOcupadas, setFechasOcupadas] = useState([]);
-	const [fechaFormateada, setFechaFormateada] = useState(null);
+	const [fechaSeleccionada ] = useState(new Date());
+	const [fechaFormateada ] = useState(null);
 	const productosRedux = useSelector((state) => state.productos);
 		const packsRedux = useSelector((state) => state.packs);
-		// Get cart items
-			
-		
-		// Function to get discounts based on item type
+ 
 		const obtenerDescuentos = (item) => {
 			if (item.tipo === 'producto') {
 				const producto = productosRedux.find((prod) => prod.id === item.id);
@@ -185,57 +148,13 @@ export default () => {
 		}
 	};
 
-	const handleClose = () => setOpen(false);
-
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setCurrentOrder({ ...currentOrder, [name]: value });
 	};
-	const handleSaveOrder = () => {
-		if (
-			currentOrder.estado &&
-			currentOrder.total &&
-			currentOrder.fechaCreacion &&
-			currentOrder.id &&
-			currentOrder.cliente_id
-		) {
-			/*if (currentOrder.id === null) {
-					const pedidoToAdd = { ...currentOrder };
 	
-					crearPedido(, sessionStorage.getItem('token'))
-						.then((data) => {
-							console.log('Pedido agregado:', data);
-							fetchPedidos();
-						})
-						.catch((error) => {
-							console.error('Error al crear el pedido:', error.message);
-							setError(error.message);
-						});
-				} else {
-					crearPedido(
-						,
-						sessionStorage.getItem('token'),
-					)
-						.then((data) => {
-							console.log('Pedido actualizado:', data);
-							fetchPedidos();
-						})
-						.catch((error) => {
-							console.error('Error al actualizar el pedido:', error.message);
-							setError(error.message);
-						});
-				}
-		  setCurrentOrder({ endpoint: '', tipo: '', rol_id: '' });
-		  */
-
-			fetchPedidos();
-			handleClose();
-		} else {
-			alert('Por favor, complete todos los campos.');
-		}
-	};
 	const handleMercadoPago = async () => {
-		setIsLoading(true); // Mostrar loader mientras se genera la preferencia
+		setIsLoading(true); 
 		const BASE_URL = process.env.REACT_APP_URL || 'http://localhost:3000';
 		const backUrls = {
 			success: `${BASE_URL}/carrito`,
@@ -267,12 +186,12 @@ export default () => {
 			console.error('Error:', error);
 			alert('Ocurrió un error al procesar el pago.');
 		} finally {
-			setIsLoading(false); // Ocultar loader una vez que se complete la solicitud
+			setIsLoading(false); 
 		}
 	};
 
 	const [metodoPago, setMetodoPago] = useState('');
-	const [mostrarModalTransferencia, setMostrarModalTransferencia] = useState(false); // Estado para mostrar el modal
+	const [mostrarModalTransferencia, setMostrarModalTransferencia] = useState(false); 
 
 	const handleSeleccionMetodoPago = (metodo) => {
 		if (direccionId && fechaSeleccionada) {

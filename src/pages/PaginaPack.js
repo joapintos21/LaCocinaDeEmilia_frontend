@@ -5,7 +5,6 @@ import Header from 'components/headers/light.js';
 import { Container, ContentWithPaddingXl } from 'components/misc/Layouts';
 import Footer from 'components/footers/FiveColumnWithInputForm.js';
 import AnimationRevealPage from 'helpers/AnimationRevealPage';
-import tw from 'twin.macro';
 import Pack from 'components/cards/Pack';
 
 const PaginaPack = () => {

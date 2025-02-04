@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Producto from 'components/cards/Producto';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import Header from 'components/headers/light.js';
 import { Container, ContentWithPaddingXl } from 'components/misc/Layouts';
 import Footer from 'components/footers/FiveColumnWithInputForm.js';
 import AnimationRevealPage from 'helpers/AnimationRevealPage';
-import tw from 'twin.macro';
 
 const PaginaProducto = () => {
 	const { id } = useParams();
