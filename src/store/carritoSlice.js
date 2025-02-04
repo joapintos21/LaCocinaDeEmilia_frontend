@@ -6,8 +6,10 @@ const initialState = {
 	precioTotal: 0,
 	costoEnvio: 0,
 	comisionMP: 0,
-	direccionId: '',
+	direccionId: 0,
 	pedidoId: '',
+	deliveryMethod: '',
+	notas: '',
 };
 
 const carritoSlice = createSlice({
@@ -80,7 +82,7 @@ const carritoSlice = createSlice({
 			// Si el carrito queda vacío, limpiar pedidoId y direccionId
 			if (state.cantidadProductos < 1) {
 				state.pedidoId = '';
-				state.direccionId = '';
+				state.direccionId = 0;
 			}
 		},
 
@@ -135,7 +137,7 @@ const carritoSlice = createSlice({
 
 			if (state.cantidadProductos < 1) {
 				state.pedidoId = '';
-				state.direccionId = '';
+				state.direccionId = 0;
 			}
 		},
 
@@ -145,7 +147,8 @@ const carritoSlice = createSlice({
 			state.precioTotal = 0;
 			state.costoEnvio = 0;
 			state.pedidoId = '';
-			state.direccionId = '';
+			state.direccionId = 0;
+			state.notas = '';
 		},
 
 		setCostoEnvio: (state, action) => {
@@ -191,6 +194,14 @@ const carritoSlice = createSlice({
 		setDireccion: (state, action) => {
 			state.direccionId = action.payload;
 		},
+
+		setDeliveryMethod: (state, action) => {
+			state.deliveryMethod = action.payload;
+		},
+
+		setNotas: (state, action) => {
+			state.notas = action.payload;
+		},
 	},
 });
 
@@ -204,6 +215,8 @@ export const {
 	setCostoEnvio,
 	setComisionMP,
 	setDireccion,
+	setDeliveryMethod,
+	setNotas,
 } = carritoSlice.actions;
 
 export default carritoSlice.reducer;

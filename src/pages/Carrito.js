@@ -1,7 +1,7 @@
 import React from 'react';
 import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
 import Footer from 'components/footers/FiveColumnWithInputForm.js';
-import Carrito from 'components/Cart/CartPage';
+import Carrito from 'components/Cart/newCart/CartPage';
 import { Container, ContentWithPaddingXl } from 'components/misc/Layouts';
 
 export default () => {
