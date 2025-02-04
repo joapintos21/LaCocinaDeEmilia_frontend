@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GlobalStyles from 'styles/GlobalStyles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -49,12 +49,16 @@ export default function App() {
 	useEffect(() => {
 		try {
 			const fetchCategorias = async () => {
-				await obtenerCategorias(dispatch);
+				await obtenerCategorias(dispatch).catch((e) => {
+					toast.error('Error en el Obtener Categorias');
+				});
 			};
 			fetchCategorias();
 
 			const fetchPacks = async () => {
-				await obtenerPacks(dispatch);
+				await obtenerPacks(dispatch).catch((e) => {
+					toast.error('Error en el Obtener Packs');
+				});
 			};
 			fetchPacks();
 
@@ -71,6 +75,7 @@ export default function App() {
 			}
 		} catch (e) {
 			console.log(e);
+			toast.error('Error al cargar la página. Por favor, recargue la página.');
 		}
 	}, [dispatch, user, token]);
 
