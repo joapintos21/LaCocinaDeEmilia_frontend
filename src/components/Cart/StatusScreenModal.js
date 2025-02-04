@@ -12,6 +12,8 @@ const CheckoutStatusModal = ({
 	pedidoId,
 	direccionId,
 	fechaEnvio,
+	deliveryMethod,
+	notas,
 	dispatch,
 }) => {
 	const [pagoVerificado, setPagoVerificado] = useState(false);
@@ -19,7 +21,7 @@ const CheckoutStatusModal = ({
 	useEffect(() => {
 		try {
 			if (payment != null) {
-				finalizarPedido(pedidoId, 2, payment, direccionId, fechaEnvio, token)
+				finalizarPedido(pedidoId, 2, payment, direccionId, fechaEnvio, deliveryMethod, notas, token)
 					.then((data) => {
 						setPagoVerificado(true);
 					})

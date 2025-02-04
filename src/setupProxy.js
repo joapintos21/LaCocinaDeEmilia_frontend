@@ -17,6 +17,8 @@ module.exports = function (app) {
 		'/api/gastos',
 		'/api/dashboard',
 		'/api/direcciones',
+		'/api/pagos',
+		'/api/reporte',
 	];
 
 	apiPaths.forEach((path) => {

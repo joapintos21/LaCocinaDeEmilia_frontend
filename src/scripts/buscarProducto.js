@@ -1,22 +1,27 @@
+import { toast } from 'react-toastify';
+import apiClient from '../utils/apiCliente';
+
 export const buscarProducto = async (textoBusqueda) => {
-	const request = `/productos/buscar?query=${encodeURIComponent(textoBusqueda)}`;
-
 	try {
-		const response = await fetch(request, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
+		const response = await apiClient.get(`/productos/buscar?query=${encodeURIComponent(textoBusqueda)}`);
 
-		if (!response.ok) {
-			throw new Error('Error en la búsqueda de productos');
-		}
-
-		const data = await response.json();
-		return data; 
+		return response.data;
 	} catch (error) {
-		console.error('Error al buscar productos:', error);
-		throw error;
+		if (error.response) {
+			if (error.response.status === 401) {
+				toast.info('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', {
+					onClose: () => {
+						window.location.href = '/login';
+					},
+				});
+			} else {
+				const errorData = error.response.data;
+				throw new Error(errorData.error || 'Se produjo un error desconocido.');
+			}
+		} else if (error.request) {
+			throw new Error('No se pudo establecer conexión con el servidor.');
+		} else {
+			throw new Error('Error al realizar la solicitud.');
+		}
 	}
 };

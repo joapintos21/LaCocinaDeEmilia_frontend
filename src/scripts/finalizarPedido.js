@@ -1,13 +1,24 @@
 import { toast } from 'react-toastify';
 import apiClient from '../utils/apiCliente';
 
-export const finalizarPedido = async (pedidoId, metodoPagoId, paymentId, direccionId, fechaEnvio, token) => {
+export const finalizarPedido = async (
+	pedidoId,
+	metodoPagoId,
+	paymentId,
+	direccionId,
+	fechaEnvio,
+	deliveryMethod,
+	notas,
+	token,
+) => {
 	const body = {
 		pedido_id: pedidoId,
 		metodo_pago_id: metodoPagoId,
 		payment_id: paymentId,
 		direccion_id: direccionId,
 		fecha_envio: fechaEnvio,
+		delivery_method: deliveryMethod,
+		notas: notas,
 	};
 
 	try {
