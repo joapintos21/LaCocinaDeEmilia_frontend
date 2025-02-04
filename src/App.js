@@ -29,6 +29,7 @@ import RecuperarPassword from 'pages/RecuperarPassword';
 import ResetearPassword from 'pages/ResetearPassword';
 import CrearPedidoManual from 'pages/CrearPedidoManual';
 import Envios from 'pages/Envios';
+import WhatsAppButton from "./components/Widget/WhatsAppButton";
 
 const theme = createTheme({
 	palette: {
@@ -87,6 +88,7 @@ export default function App() {
 				pauseOnHover
 				theme="light"
 			/>
+			<WhatsAppButton />
 			<GlobalStyles />
 			<ThemeProvider theme={theme}>
 				<Router>
