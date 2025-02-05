@@ -39,15 +39,15 @@ apiCliente.interceptors.response.use(
 
 			// Manejo de otros errores globales
 			if (status === 403) {
-				alert('No tienes permiso para realizar esta acción.');
+				throw new Error('No tienes permiso para realizar esta acción.');
 			} else if (status === 400) {
-				alert('Error en la solicitud. Por favor, verifica los datos ingresados.');
+				throw new Error('Error en la solicitud. Por favor, verifica los datos ingresados.');
 			} else if (status === 500) {
-				alert('Ocurrió un error en el servidor. Intenta nuevamente más tarde.');
+				throw new Error('Ocurrió un error en el servidor. Intenta nuevamente más tarde.');
 			}
 		} else {
 			// Error de red (sin respuesta del servidor)
-			alert('Error de red. Por favor, verifica tu conexión a internet.');
+			throw new Error('Error de red. Por favor, verifica tu conexión a internet.');
 		}
 
 		return Promise.reject(error); // Rechaza el error para manejarlo localmente si es necesario
