@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { useTheme } from '@mui/material/styles';
 import Menu from '@mui/material/Menu';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -8,41 +9,13 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Divider from '@mui/material/Divider';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
-const useStyles = makeStyles((theme) => ({
-	cartPanel: {
-		minWidth: 300,
-	},
-	cartWrap: {
-		maxHeight: 400,
-		overflowY: 'auto',
-	},
-	itemText: {
-		marginLeft: theme.spacing(2),
-	},
-	adicionalText: {
-		fontStyle: 'italic',
-		color: theme.palette.text.secondary,
-	},
-	totalPrice: {
-		fontWeight: 'bold',
-	},
-	button: {
-		marginTop: theme.spacing(1),
-	},
-	empty: {
-		textAlign: 'center',
-		padding: theme.spacing(2),
-	},
-}));
-
 const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout }) => {
-	const classes = useStyles();
+	const theme = useTheme(); // ✅ Usa el theme correctamente
 
 	const getCartItem = (dataArray) =>
 		dataArray.map((item, index) => (
@@ -59,13 +32,16 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 									Cantidad: {item.cantidad} Item - ${item.precioTotal}
 								</span>
 								{item.adicional && (
-									<Typography variant="body2" className={classes.adicionalText}>
+									<Typography
+										variant="body2"
+										sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
+									>
 										Adicional: {item.adicional.descripcion} (+${item.adicional.costoAdicional})
 									</Typography>
 								)}
 							</>
 						}
-						className={classes.itemText}
+						sx={{ marginLeft: theme.spacing(2) }}
 					/>
 					<ListItemSecondaryAction>
 						<IconButton aria-label="Delete" onClick={() => removeItem(item)}>
@@ -93,7 +69,7 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 			}}
 			open={Boolean(anchorEl)}
 			onClose={close}
-			className={classes.cartPanel}
+			sx={{ minWidth: 300 }} // ✅ Corrige el error de estilos
 		>
 			<List
 				component="ul"
@@ -102,17 +78,17 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 						<ShoppingCartIcon /> Total: {dataCart.length} productos en el carrito
 					</ListSubheader>
 				}
-				className={classes.cartWrap}
+				sx={{ maxHeight: 400, overflowY: 'auto' }} // ✅ Se usa `sx` en lugar de clases obsoletas
 			>
 				{dataCart.length < 1 ? (
-					<div className={classes.empty}>
+					<div style={{ textAlign: 'center', padding: theme.spacing(2) }}>
 						<Typography variant="subtitle1">Carrito vacío</Typography>
 						<Typography variant="caption">Tus productos aparecerán aquí</Typography>
 					</div>
 				) : (
 					<Fragment>
 						{getCartItem(dataCart)}
-						<ListItem className={classes.totalPrice}>
+						<ListItem sx={{ fontWeight: 'bold' }}>
 							<Typography variant="subtitle1">
 								Total: <span>${totalPrice}</span>
 							</Typography>
@@ -121,7 +97,7 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 							<Divider />
 						</li>
 						<ListItem>
-							<Button fullWidth className={classes.button} onClick={checkout} color="secondary">
+							<Button fullWidth sx={{ marginTop: theme.spacing(1) }} onClick={checkout} color="secondary">
 								Checkout
 							</Button>
 						</ListItem>

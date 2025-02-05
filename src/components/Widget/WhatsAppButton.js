@@ -26,7 +26,7 @@ const WhatsAppButton = () => {
 
 	return (
 		<>
-			{userInfo && (
+			{!userInfo && (
 				<FloatingButton
 					href="https://api.whatsapp.com/send/?phone=59898576439&type=phone_number&app_absent=0"
 					target="_blank"
