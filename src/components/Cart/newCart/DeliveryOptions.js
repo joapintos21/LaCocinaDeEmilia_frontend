@@ -15,7 +15,6 @@ const DeliveryOptions = ({ setStep }) => {
 	useEffect(() => {
 		dispatch(setDireccion(0));
 		dispatch(setCostoEnvio(0));
-		dispatch(setDeliveryMethod(''));
 	}, [dispatch]);
 
 	const handleSelection = (method) => {
