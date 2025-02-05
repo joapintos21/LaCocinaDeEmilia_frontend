@@ -22,7 +22,14 @@ const Cart = ({ anchorEl, close, dataCart = [], removeItem, totalPrice, checkout
 			<Fragment key={index.toString()}>
 				<ListItem>
 					<figure>
-						<img src={item.thumbnail} alt="thumb" style={{ width: 50, height: 50 }} />
+						<img
+							src={
+								item.imagen ||
+								'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80'
+							}
+							alt="thumb"
+							style={{ width: 50, height: 50 }}
+						/>
 					</figure>
 					<ListItemText
 						primary={item.descripcion}

@@ -31,7 +31,13 @@ const CartItem = ({
 
 	return (
 		<CartItemContainer>
-			<Image src={item.imagen || 'https://via.placeholder.com/150'} alt={item.descripcion} />
+			<Image
+				src={
+					item.imagen ||
+					'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80'
+				}
+				alt={item.descripcion}
+			/>
 			<Info>
 				<Name>{item.descripcion}</Name>
 				{item.adicional && (
