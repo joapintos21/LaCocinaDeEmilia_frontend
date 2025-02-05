@@ -7,7 +7,7 @@ import tw from 'twin.macro';
 export default () => {
 	const Title = tw.h2`text-2xl font-bold text-left mb-8`;
 
-	const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
+	const [setDireccionSeleccionada] = useState(null);
 	const handleDireccionSeleccionada = ({ direccion, coordenadas }) => {
 		setDireccionSeleccionada({ direccion, coordenadas });
 	};

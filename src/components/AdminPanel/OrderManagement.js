@@ -17,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 import { obtenerPedidos } from 'scripts/obtenerPedidos';
 
 const OrderManagement = () => {
-	const [searchTerm ] = useState('');
 	const dispatch = useDispatch();
 	const navigate = useNavigate(); 
 
@@ -34,11 +33,7 @@ const OrderManagement = () => {
 		}
 	}, [dispatch]);
 
-	const orders = useSelector((state) => state.pedidos || []);
-
-	const filteredOrders = orders.filter((order) =>
-		(order.customerName ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
-	);
+	const orders = useSelector((state) => state.pedidos.pedidos || []);
 
 	const handleAddClick = () => {
 		navigate('/crear-pedido-manual'); 
@@ -62,21 +57,23 @@ const OrderManagement = () => {
 				<Table>
 					<TableHead sx={{ position: 'sticky', top: 0, backgroundColor: '#FFFFFF' }}>
 						<TableRow>
+							<TableCell>Numero de pedido</TableCell>
 							<TableCell>Estado</TableCell>
 							<TableCell>Total</TableCell>
+							<TableCell>Cocinera asignada</TableCell>
 							<TableCell>Fecha de creacion</TableCell>
-							<TableCell>Id</TableCell>
-							<TableCell>Id cliente</TableCell>
+							<TableCell>Identificador de cliente</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{filteredOrders.length > 0 ? (
-							filteredOrders.map((order) => (
+						{orders.length > 0 ? (
+							orders.map((order) => (
 								<TableRow key={order.id}>
+									<TableCell>{order.id}</TableCell>
 									<TableCell>{order.estado}</TableCell>
 									<TableCell>${order.total?.toFixed(2) || '0.00'}</TableCell>
+									<TableCell>{order.cocinera_asignada}</TableCell>
 									<TableCell>{order.fechaCreacion}</TableCell>
-									<TableCell>{order.id}</TableCell>
 									<TableCell>{order.cliente_id}</TableCell>
 								</TableRow>
 							))
