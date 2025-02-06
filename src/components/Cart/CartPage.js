@@ -226,8 +226,8 @@ const CartPage = () => {
 	};
 
 	const handleMercadoPago = async () => {
-		setIsLoading(true); // Mostrar loader mientras se genera la preferencia
-		const BASE_URL = process.env.REACT_APP_URL || 'http://localhost:3000';
+		setIsLoading(true); // Mostrar loader mientras se genera la preferenciascripts/crearGasto
+		const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 		const backUrls = {
 			success: `${BASE_URL}/carrito`,
 			pending: `${BASE_URL}/carrito`,
