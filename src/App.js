@@ -30,6 +30,7 @@ import PanelCadetes from 'pages/PanelCadete';
 import RecuperarPassword from 'pages/RecuperarPassword';
 import ResetearPassword from 'pages/ResetearPassword';
 import CrearPedidoManual from 'pages/CrearPedidoManual';
+import Perfil from 'pages/Perfil';
 
 const theme = createTheme({
 	palette: {
@@ -111,6 +112,7 @@ export default function App() {
 						<Route path="/panelcocineras" element={<PanelCocineras />} />
 						<Route path="/panelcadetes" element={<PanelCadetes />} />
 						<Route path="/crear-pedido-manual" element={<CrearPedidoManual />} />
+						<Route path="/perfil" element={<Perfil />} />
 						<Route path="/" element={<RestaurantLandingPage />} />
 					</Routes>
 				</Router>
