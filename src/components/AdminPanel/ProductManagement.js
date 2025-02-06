@@ -34,6 +34,8 @@ import { obtenerDescuentos } from 'scripts/obtenerDescuentos';
 import { mostrarValorDescuento } from 'utils/descuentosUtils';
 import { toast } from 'react-toastify';
 import CustomDialog from 'helpers/Dialog';
+import { quitarProductoDescuento } from 'scripts/quitarProductoDescuento';
+import { quitarProductoAdicional } from 'scripts/quitarProductoAdicional';
 
 const ProductManagement = () => {
 	const dispatch = useDispatch();
@@ -234,21 +236,61 @@ const ProductManagement = () => {
 						});
 				}
 
+				// Remove discounts that are not selected anymore
+				const descuentosARemover = newProduct.descuentos.filter(
+					(descuento) => !descuentosSeleccionados.includes(descuento.descuento_id),
+				);
+				for (let i = 0; i < descuentosARemover.length; i++) {
+					try {
+						await quitarProductoDescuento(
+							descuentosARemover[i].descuento_id,
+							newProduct.id,
+							sessionStorage.getItem('token'),
+						);
+						toast.success('Descuento removido del producto.');
+					} catch (error) {
+						toast.error('Error al remover el descuento del producto.');
+						break; // Exit the loop if an error occurs
+					}
+				}
+
 				// Asociar los descuentos seleccionados
 				if (descuentosSeleccionados.length > 0) {
 					const productId = newProduct.id;
 					for (let i = 0; i < descuentosSeleccionados.length; i++) {
 						try {
-							await asociarProductoDescuento(
+							asociarProductoDescuento(
 								descuentosSeleccionados[i],
 								productId,
 								sessionStorage.getItem('token'),
-							);
-							toast.success('Descuento asociado al producto.');
+							)
+								.then(() => {
+									toast.success('Descuento asociado al producto.');
+								})
+								.catch((error) => {
+									console.log('Error al asociar el descuento al producto.' + error.message);
+								});
 						} catch (error) {
-							toast.error('Error al asociar el descuento al producto.');
+							console.log('Error al asociar el descuento al producto.' + error.message);
 							break; // Salir del bucle si ocurre un error
 						}
+					}
+				}
+
+				const adicionalesARemover = newProduct.adicionales.filter(
+					(adicional) => !adicionalesSeleccionados.includes(adicional.id),
+				);
+				for (let i = 0; i < adicionalesARemover.length; i++) {
+					try {
+						await quitarProductoAdicional(
+							adicionalesARemover[i].id,
+							newProduct.id,
+							sessionStorage.getItem('token'),
+						);
+						toast.success('Adicional removido del producto.');
+					} catch (error) {
+						toast.error('Error al remover el adicional del producto.');
+						break; // Exit the loop if an error occurs
 					}
 				}
 
@@ -425,6 +467,9 @@ const ProductManagement = () => {
 						value={newProduct.descripcion}
 						onChange={handleInputChange}
 						fullWidth
+						multiline
+						rows={4}
+						maxRows={10} // Permite expansión hasta 10 líneas
 						style={{ marginBottom: '10px' }}
 					/>
 					{/* Precio */}

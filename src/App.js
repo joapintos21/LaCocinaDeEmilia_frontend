@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GlobalStyles from 'styles/GlobalStyles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -11,8 +11,6 @@ import SignUp from 'pages/Signup';
 import VerificarCuenta from 'pages/VerificarCuenta';
 import AboutUs from 'pages/AboutUs';
 import ContactUs from 'pages/ContactUs';
-import Pricing from 'pages/Pricing';
-import BlogIndex from 'pages/BlogIndex';
 import Productos from 'pages/Productos';
 import PanelAdministrador from 'pages/PanelAdministrador';
 import PaginaProducto from 'pages/PaginaProducto';
@@ -31,6 +29,8 @@ import RecuperarPassword from 'pages/RecuperarPassword';
 import ResetearPassword from 'pages/ResetearPassword';
 import CrearPedidoManual from 'pages/CrearPedidoManual';
 import Perfil from 'pages/Perfil';
+import Envios from 'pages/Envios';
+import WhatsAppButton from "./components/Widget/WhatsAppButton";
 
 const theme = createTheme({
 	palette: {
@@ -50,12 +50,16 @@ export default function App() {
 	useEffect(() => {
 		try {
 			const fetchCategorias = async () => {
-				await obtenerCategorias(dispatch);
+				await obtenerCategorias(dispatch).catch((e) => {
+					toast.error('Error en el Obtener Categorias');
+				});
 			};
 			fetchCategorias();
 
 			const fetchPacks = async () => {
-				await obtenerPacks(dispatch);
+				await obtenerPacks(dispatch).catch((e) => {
+					toast.error('Error en el Obtener Packs');
+				});
 			};
 			fetchPacks();
 
@@ -72,6 +76,7 @@ export default function App() {
 			}
 		} catch (e) {
 			console.log(e);
+			toast.error('Error al cargar la página. Por favor, recargue la página.');
 		}
 	}, [dispatch, user, token]);
 
@@ -89,6 +94,7 @@ export default function App() {
 				pauseOnHover
 				theme="light"
 			/>
+			<WhatsAppButton />
 			<GlobalStyles />
 			<ThemeProvider theme={theme}>
 				<Router>
@@ -101,8 +107,7 @@ export default function App() {
 						<Route path="/verificar" element={<VerificarCuenta />} />
 						<Route path="/nosotros" element={<AboutUs />} />
 						<Route path="/contacto" element={<ContactUs />} />
-						<Route path="/pricing" element={<Pricing />} />
-						<Route path="/blog" element={<BlogIndex />} />
+						<Route path="/envios" element={<Envios />} />
 						<Route path="/productos" element={<Productos />} />
 						<Route path="/producto/:id" element={<PaginaProducto />} />
 						<Route path="/pack/:id" element={<PaginaPack />} />

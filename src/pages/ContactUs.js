@@ -1,10 +1,10 @@
 import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
 import tw from 'twin.macro';
 import styled from 'styled-components';
-import Header from 'components/headers/light.js';
 import Footer from 'components/footers/FiveColumnWithInputForm.js';
 import ContactUsForm from 'components/forms/TwoColContactUsWithIllustrationFullForm.js';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import FAQ from 'components/faqs/SingleCol.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { obtenerEmpresa } from '../scripts/obtenerEmpresa';
 
@@ -42,47 +42,53 @@ export default () => {
 
 	return (
 		<AnimationRevealPage>
-			<ContactSection>
-				<ContactContainer>
-					<Title><HighlightedText> Datos de Contacto </HighlightedText></Title>
-					<InfoGrid>
-						{empresa.direccion && empresa.direccion.trim() !== '' ? (
-							<InfoCard>
-								<IconWrapper>
-									<span role="img" aria-label="address">
-										📍
-									</span>
-								</IconWrapper>
-								<h3>Dirección</h3>
-								<p>{empresa.direccion}</p>
-							</InfoCard>
-						) : null}
-						{empresa.correo && empresa.correo.trim() !== '' ? (
-							<InfoCard>
-								<IconWrapper>
-									<span role="img" aria-label="email">
-										✉️
-									</span>
-								</IconWrapper>
-								<h3>Correo Electrónico</h3>
-								<p>{empresa.correo}</p>
-							</InfoCard>
-						) : null}
-						{empresa.telefono && empresa.telefono.trim() !== '' ? (
-							<InfoCard>
-								<IconWrapper>
-									<span role="img" aria-label="phone">
-										📞
-									</span>
-								</IconWrapper>
-								<h3>Teléfono</h3>
-								<p>{empresa.telefono}</p>
-							</InfoCard>
-						) : null}
-					</InfoGrid>
-				</ContactContainer>
-			</ContactSection>
+			{empresa && (empresa.direccion?.trim() || empresa.correo?.trim() || empresa.telefono?.trim()) && (
+				<ContactSection>
+					<ContactContainer>
+						<Title>
+							<HighlightedText> Datos de Contacto </HighlightedText>
+						</Title>
+						<InfoGrid>
+							{empresa.direccion?.trim() && (
+								<InfoCard>
+									<IconWrapper>
+										<span role="img" aria-label="address">
+											📍
+										</span>
+									</IconWrapper>
+									<h3>Dirección</h3>
+									<p>{empresa.direccion}</p>
+								</InfoCard>
+							)}
+							{empresa.correo?.trim() && (
+								<InfoCard>
+									<IconWrapper>
+										<span role="img" aria-label="email">
+											✉️
+										</span>
+									</IconWrapper>
+									<h3>Correo Electrónico</h3>
+									<p>{empresa.correo}</p>
+								</InfoCard>
+							)}
+							{empresa.telefono?.trim() && (
+								<InfoCard>
+									<IconWrapper>
+										<span role="img" aria-label="phone">
+											📞
+										</span>
+									</IconWrapper>
+									<h3>Teléfono</h3>
+									<p>{empresa.telefono}</p>
+								</InfoCard>
+							)}
+						</InfoGrid>
+					</ContactContainer>
+				</ContactSection>
+			)}
+			
 			<ContactUsForm />
+			<FAQ />
 			<Footer />
 		</AnimationRevealPage>
 	);

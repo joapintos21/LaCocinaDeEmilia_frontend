@@ -176,7 +176,7 @@ const geoJsonData = {
 	],
 };
 
-const MapComponent = ({ onDireccionSeleccionada }) => {
+const MapComponent = ({ onDireccionSeleccionada, setOpcional }) => {
 	const { isLoaded } = useJsApiLoader({
 		googleMapsApiKey: 'AIzaSyDz0f2_Bz_B-86V7SvOL0hX5AoFR3fe5cM',
 		libraries: ['places'],
@@ -236,7 +236,7 @@ const MapComponent = ({ onDireccionSeleccionada }) => {
 			const place = autocomplete.getPlace();
 			const location = place.geometry.location;
 
-			const nuevaDireccion = place.formatted_address;
+			const nuevaDireccion = place.formatted_address.split(',')[0];
 			const coordenadas = {
 				lat: location.lat(),
 				lng: location.lng(),
@@ -264,7 +264,7 @@ const MapComponent = ({ onDireccionSeleccionada }) => {
 			<Autocomplete onLoad={onLoadAutocomplete} onPlaceChanged={onPlaceChanged}>
 				<input
 					type="text"
-					placeholder="Buscar dirección"
+					placeholder="Ingresar calle y numero de puerta"
 					style={{
 						width: '100%',
 						padding: '10px',
@@ -274,6 +274,18 @@ const MapComponent = ({ onDireccionSeleccionada }) => {
 					}}
 				/>
 			</Autocomplete>
+			<input
+				type="text"
+				placeholder="(Opcional) Ingresar numero de apartameto, piso."
+				onChange={(e) => setOpcional(e.target.value)}
+				style={{
+					width: '100%',
+					padding: '10px',
+					marginBottom: '10px',
+					border: '1px solid #ccc',
+					borderRadius: '4px',
+				}}
+			/>
 			<GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12} onLoad={onLoad}>
 				{markerPosition && <Marker position={markerPosition} />}
 			</GoogleMap>

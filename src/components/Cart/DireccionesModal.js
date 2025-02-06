@@ -7,6 +7,7 @@ const DireccionesModal = ({ userId, mostrarModalDirecciones, setMostrarModalDire
 	const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
 	const [titulo, setTitulo] = useState('');
 	const [predeterminado, setPredeterminado] = useState(false);
+	const [opcional, setOpcional] = useState('');
 	const Titulo = tw.h2`text-lg font-bold`;
 
 	const handleDireccionSeleccionada = ({ direccion, coordenadas }) => {
@@ -21,7 +22,7 @@ const DireccionesModal = ({ userId, mostrarModalDirecciones, setMostrarModalDire
 				predeterminado,
 				latitud: direccionSeleccionada.coordenadas.lat,
 				longitud: direccionSeleccionada.coordenadas.lng,
-				direccion: direccionSeleccionada.direccion,
+				direccion: direccionSeleccionada.direccion + (opcional ? ', ' + opcional : ''),
 			};
 
 			console.log('Dirección a guardar:', nuevaDireccion);
@@ -95,7 +96,7 @@ const DireccionesModal = ({ userId, mostrarModalDirecciones, setMostrarModalDire
 						Marcar como predeterminada
 					</label>
 				</div>
-				<MapComponent onDireccionSeleccionada={handleDireccionSeleccionada} />
+				<MapComponent onDireccionSeleccionada={handleDireccionSeleccionada} setOpcional={setOpcional} />
 				<button
 					onClick={handleConfirmar}
 					style={{

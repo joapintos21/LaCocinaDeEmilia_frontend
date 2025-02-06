@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { obtenerProductos } from 'scripts/obtenerProductosCategoria';
 import { buscarProducto } from 'scripts/buscarProducto';
+import { toast } from 'react-toastify';
 
 const HeaderRow = tw.div`flex justify-between items-center flex-col xl:flex-row`;
 const Header = tw(SectionHeading)``;
@@ -88,7 +89,9 @@ export default () => {
 	// Cargar productos y packs desde Redux
 	useEffect(() => {
 		const fetchProductos = async () => {
-			await obtenerProductos(dispatch);
+			await obtenerProductos(dispatch).catch((e) => {
+				toast.error('Error en el Obtener Productos');
+			});
 		};
 		fetchProductos();
 	}, [dispatch]);

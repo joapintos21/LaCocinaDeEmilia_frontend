@@ -234,7 +234,7 @@ const CartPage = () => {
 			failure: `${BASE_URL}/carrito`,
 		};
 		try {
-			const response = await fetch('/pagos/crearPreferencia', {
+			const response = await fetch('http://localhost:8080/pagos/crearPreferencia', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -244,6 +244,7 @@ const CartPage = () => {
 					pedido_id: pedidoId,
 					direccion_id: direccionId,
 					fecha_envio: fechaFormateada,
+					delivery_method: 'delivery',
 					backUrls: backUrls,
 				}),
 			});

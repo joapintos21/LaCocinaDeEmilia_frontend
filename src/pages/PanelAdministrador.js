@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import AnimationRevealPage from 'helpers/AnimationRevealPage.js';
+import React, { useState } from 'react';
 import { Box, Grid, Paper, Typography, Drawer, List, ListItem, ListItemText } from '@mui/material';
 import Dashboard from 'components/AdminPanel/Dashboard';
 import ProductManagement from 'components/AdminPanel/ProductManagement';
@@ -14,79 +12,11 @@ import GastosManagement from 'components/AdminPanel/GastosManagement';
 import ReportManagement from 'components/AdminPanel/ReportManagement';
 import EmpresaManagement from 'components/AdminPanel/EmpresaManagement';
 import Header from 'components/headers/light.js';
-import { Container, ContentWithPaddingXl } from 'components/misc/Layouts';
 import tw from 'twin.macro';
 const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 overflow-hidden mt-32`;
 
 export default () => {
-	const dispatch = useDispatch();
 	const [activeModule, setActiveModule] = useState('Dashboard');
-
-	const descargarPDF = async () => {
-		try {
-			const response = await fetch('/reporte/generarReportePedidos', {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-
-			if (!response.ok) {
-				throw new Error('Error al generar el reporte');
-			}
-
-			const data = await response.json();
-			const base64Data = data.file;
-
-			const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-			const blob = new Blob([binaryData], { type: 'application/pdf' });
-
-			const fileName = 'reporte.pdf';
-			const link = document.createElement('a');
-			link.href = URL.createObjectURL(blob);
-			link.download = fileName;
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(link.href);
-		} catch (error) {
-			console.error('Error al descargar el PDF:', error);
-			alert('No se pudo descargar el reporte');
-		}
-	};
-
-	const descargarReporteUsuarios = async () => {
-		try {
-			const response = await fetch('/reporte/generarReporteUsuarios', {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-
-			if (!response.ok) {
-				throw new Error('Error al generar el reporte de usuarios');
-			}
-
-			const data = await response.json();
-			const base64Data = data.file;
-
-			const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-			const blob = new Blob([binaryData], { type: 'application/pdf' });
-
-			const fileName = 'reporte_usuarios.pdf';
-			const link = document.createElement('a');
-			link.href = URL.createObjectURL(blob);
-			link.download = fileName;
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(link.href);
-		} catch (error) {
-			console.error('Error al descargar el PDF:', error);
-			alert('No se pudo descargar el reporte de usuarios');
-		}
-	};
 
 	const modules = [
 		{ title: 'Dashboard', component: <Dashboard /> },
