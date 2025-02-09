@@ -41,8 +41,9 @@ export default () => {
 	useEffect(() => {
 		const fetchMedia = async () => {
 			try {
-				const data = await obtenerIGMedia();
-				setMedia(data);
+				obtenerIGMedia()
+					.then((data) => setMedia(data))
+					.catch((err) => setError(err.message));
 			} catch (err) {
 				setError('No se pudo cargar el contenido. Intenta nuevamente más tarde.');
 			}

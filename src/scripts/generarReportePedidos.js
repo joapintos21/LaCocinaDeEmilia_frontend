@@ -1,12 +1,13 @@
 import { toast } from 'react-toastify';
 import apiClient from '../utils/apiCliente';
 
-export const generarReportePedidos = async (startDatePedidos, endDatePedidos, token) => {
+export const generarReportePedidos = async (startDatePedidos, endDatePedidos, formato = 'pdf', token) => {
     try {
         const response = await apiClient.get('/reporte/generarReportePedidos', {
             params: { 
                 fechaInicio: startDatePedidos, 
-                fechaFin: endDatePedidos 
+                fechaFin: endDatePedidos,
+                formato
             },
             headers: { 
                 Authorization: `Bearer ${token}`
@@ -23,15 +24,18 @@ export const generarReportePedidos = async (startDatePedidos, endDatePedidos, to
         }
 
         const binaryData = Uint8Array.from(atob(base64File), (c) => c.charCodeAt(0));
-        const blob = new Blob([binaryData], { type: 'application/pdf' });
+        const fileType = formato === 'excel' || formato === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'application/pdf';
+        const fileExtension = formato === 'excel' || formato === 'xlsx' ? 'xlsx' : 'pdf';
+
+        const blob = new Blob([binaryData], { type: fileType });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `reporte_pedidos_${startDatePedidos}_${endDatePedidos}.pdf`;
+        link.download = `reporte_pedidos_${startDatePedidos}_${endDatePedidos}.${fileExtension}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        toast.success('Reporte de pedidos descargado correctamente.');
+        toast.success(`Reporte de pedidos descargado correctamente en formato ${formato.toUpperCase()}.`);
     } catch (error) {
         if (error.response) {
             if (error.response.status === 401) {
@@ -41,13 +45,13 @@ export const generarReportePedidos = async (startDatePedidos, endDatePedidos, to
                     },
                 });
             } else {
-                toast.error(error.response.data.error || 'Error al generar el reporte de pedidos.');
+                toast.error(error.response.data.error || `Error al generar el reporte de pedidos en formato ${formato.toUpperCase()}.`);
             }
         } else if (error.request) {
             toast.error('No se pudo establecer conexión con el servidor.');
         } else {
             toast.error('Error al realizar la solicitud.');
         }
-        console.error('Error al descargar el reporte de pedidos:', error);
+        console.error(`Error al descargar el reporte de pedidos (${formato}):`, error);
     }
 };

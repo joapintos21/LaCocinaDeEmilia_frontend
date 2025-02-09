@@ -15,15 +15,15 @@ import { quitarItem } from 'store/carritoSlice';
 import { useNavigate } from 'react-router-dom';
 import UserDropdown from './usuarioLogueado.js';
 import { handleQuitarDeCarrito } from 'utils/carritoUtils.js';
-import broadcastService from 'utils/broadcastService.js';
+import broadcastService from 'utils/broadcastService';
 
 const Header = tw.header`
-	fixed top-0 left-0 w-full z-50 bg-white shadow-md
+	fixed top-0 left-0 w-full z-50 bg-[#99cdb6] shadow-md
 	flex justify-between items-center pl-10 pr-10 pt-2 pb-2
 `;
 
 export const NavLinks = tw.div`inline-block`;
-export const NavLink = tw.a`
+export const NavLink = tw.a`text-white
   text-lg my-2 lg:text-sm lg:mx-6 lg:my-0
   font-semibold tracking-wide transition duration-300
   pb-1 border-b-2 border-transparent hover:border-primary-500 hocus:text-primary-500
@@ -80,19 +80,24 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 
 	useEffect(() => {
 		if (broadcastService.channel) {
-			// Escucha los mensajes del canal
 			broadcastService.onMessage((data) => {
 				if (data.type === 'TOKEN_ACTUALIZADO') {
 					sessionStorage.setItem('token', data.token);
-					console.log('Token sincronizado:', data.token);
+					console.log('Token sincronizado en otra pestaña:', data.token);
+				}
+				if (data.type === 'SOLICITAR_TOKEN') {
+					const token = sessionStorage.getItem('token');
+					if (token) {
+						broadcastService.sendMessage({ type: 'TOKEN_ACTUALIZADO', token });
+					}
 				}
 			});
-		}
 
-		// Limpieza al desmontar el componente
-		return () => {
-			broadcastService.closeChannel();
-		};
+			// Si esta pestaña no tiene token, solicita el token a otras pestañas
+			if (!sessionStorage.getItem('token')) {
+				broadcastService.sendMessage({ type: 'SOLICITAR_TOKEN' });
+			}
+		}
 	}, []);
 
 	const defaultLogoLink = (
@@ -104,15 +109,19 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 	const defaultLinks = [
 		<NavLinks key={1}>
 			{userInfo && userInfo.rol === 'Administrador' && <NavLink href="/paneladministrador">Administrar</NavLink>}
-			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cocinero')  && <NavLink href="/panelcocineras">Cocineras</NavLink>}
-			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cadete') && <NavLink href="/panelcadetes">Cadetes</NavLink>}
+			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cocinero') && (
+				<NavLink href="/panelcocineras">Cocineras</NavLink>
+			)}
+			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cadete') && (
+				<NavLink href="/panelcadetes">Cadetes</NavLink>
+			)}
 			<NavLink href="/productos">Productos</NavLink>
 			<NavLink href="/nosotros">Nosotros</NavLink>
 			<NavLink href="/envios">Envios</NavLink>
 			<NavLink href="/contacto">Contacto</NavLink>
-			
+
 			<IconButton onClick={handleCartOpen}>
-				<ShoppingCartIcon />
+				<ShoppingCartIcon style={{ color: 'white' }} />
 			</IconButton>
 			{userInfo ? (
 				<>{userInfo && <UserDropdown userName={userInfo.nombre} />}</>

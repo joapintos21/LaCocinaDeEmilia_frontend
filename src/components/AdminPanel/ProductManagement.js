@@ -51,6 +51,7 @@ const ProductManagement = () => {
 	const [maxPrice, setMaxPrice] = useState('');
 	const [searchDescuentos, setSearchDescuentos] = useState('');
 	const [open, setOpen] = useState(false);
+	const [descuentoCategoria, setDescuentoCategoria] = useState(null);
 	const [newProduct, setNewProduct] = useState({
 		id: null,
 		descripcion: '',
@@ -101,6 +102,8 @@ const ProductManagement = () => {
 		descuento.descripcion.toLowerCase().includes(searchDescuentos.toLowerCase()),
 	);
 
+	const filteredDescuentoCategoria = descuentos.filter((descuento) => descuento.id === descuentoCategoria);
+
 	const handleImageChange = (e) => {
 		const file = e.target.files[0];
 		if (file) {
@@ -134,6 +137,17 @@ const ProductManagement = () => {
 
 	const handleCategoryChange = (e) => {
 		const selectedCategory = categorias.find((categoria) => categoria.id === parseInt(e.target.value));
+		if (selectedCategory.descuentos.length > 0 && selectedCategory.descuentos[0].referencia === 'categoria') {
+			setDescuentosSeleccionados([selectedCategory.descuentos[0].descuento_id]);
+			setDescuentoCategoria(selectedCategory.descuentos[0].descuento_id);
+		} else {
+			setDescuentosSeleccionados(
+				newProduct.descuentos
+					.filter((desc) => desc.referencia === 'producto')
+					.map((descuento) => descuento.descuento_id),
+			);
+			setDescuentoCategoria(null);
+		}
 		setNewProduct({ ...newProduct, categoria: selectedCategory });
 	};
 
@@ -157,11 +171,15 @@ const ProductManagement = () => {
 		} else {
 			setAdicionalesSeleccionados([]);
 		}
-		if (product && Array.isArray(product.descuentos)) {
-			const idsDescuentos = product.descuentos.map((descuento) => descuento.descuento_id);
-			setDescuentosSeleccionados(idsDescuentos);
+		if (product && product.descuentos.length > 0 && product.descuentos[0].referencia === 'categoria') {
+			setDescuentoCategoria(product.descuentos[0].descuento_id);
 		} else {
-			setDescuentosSeleccionados([]);
+			if (product && Array.isArray(product.descuentos)) {
+				const idsDescuentos = product.descuentos.map((descuento) => descuento.descuento_id);
+				setDescuentosSeleccionados(idsDescuentos);
+			} else {
+				setDescuentosSeleccionados([]);
+			}
 		}
 		setOpen(true);
 	};
@@ -199,7 +217,7 @@ const ProductManagement = () => {
 		if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
 			try {
 				let imageUrl = newProduct.imagen === null ? '' : newProduct.imagen; //Mantener la URL existente si no hay nueva imagen
-
+				let productId = newProduct.id;
 				// Si hay un nuevo archivo seleccionado, subirlo a Firebase antes de guardar el producto
 				if (
 					newProduct.imagen !== null &&
@@ -221,6 +239,7 @@ const ProductManagement = () => {
 					const productoCreado = await crearProducto(productoData, sessionStorage.getItem('token'));
 					if (productoCreado && productoCreado.id) {
 						fetchProductos();
+						productId = productoCreado.id;
 						toast.success('Producto creado.');
 					} else {
 						toast.error('Error al crear el producto en la base de datos.');
@@ -235,11 +254,40 @@ const ProductManagement = () => {
 							toast.error('Error al actualizar el producto.');
 						});
 				}
+				let descuentosARemover = [];
+				if (descuentoCategoria) {
+					descuentosARemover = newProduct.descuentos.filter((desc) => desc.referencia === 'producto');
+				} else {
+					// Asociar los descuentos seleccionados
+					if (descuentosSeleccionados.length > 0) {
+						const productId = newProduct.id;
+						for (let i = 0; i < descuentosSeleccionados.length; i++) {
+							try {
+								asociarProductoDescuento(
+									descuentosSeleccionados[i],
+									productId,
+									sessionStorage.getItem('token'),
+								)
+									.then(() => {
+										toast.success('Descuento asociado al producto.');
+									})
+									.catch((error) => {
+										console.log('Error al asociar el descuento al producto.' + error.message);
+									});
+							} catch (error) {
+								console.log('Error al asociar el descuento al producto.' + error.message);
+								break; // Salir del bucle si ocurre un error
+							}
+						}
+					}
+					// Remove discounts that are not selected anymore
+					descuentosARemover = newProduct.descuentos.filter(
+						(descuento) =>
+							!descuentosSeleccionados.includes(descuento.descuento_id) &&
+							descuento.referencia === 'producto',
+					);
+				}
 
-				// Remove discounts that are not selected anymore
-				const descuentosARemover = newProduct.descuentos.filter(
-					(descuento) => !descuentosSeleccionados.includes(descuento.descuento_id),
-				);
 				for (let i = 0; i < descuentosARemover.length; i++) {
 					try {
 						await quitarProductoDescuento(
@@ -251,29 +299,6 @@ const ProductManagement = () => {
 					} catch (error) {
 						toast.error('Error al remover el descuento del producto.');
 						break; // Exit the loop if an error occurs
-					}
-				}
-
-				// Asociar los descuentos seleccionados
-				if (descuentosSeleccionados.length > 0) {
-					const productId = newProduct.id;
-					for (let i = 0; i < descuentosSeleccionados.length; i++) {
-						try {
-							asociarProductoDescuento(
-								descuentosSeleccionados[i],
-								productId,
-								sessionStorage.getItem('token'),
-							)
-								.then(() => {
-									toast.success('Descuento asociado al producto.');
-								})
-								.catch((error) => {
-									console.log('Error al asociar el descuento al producto.' + error.message);
-								});
-						} catch (error) {
-							console.log('Error al asociar el descuento al producto.' + error.message);
-							break; // Salir del bucle si ocurre un error
-						}
 					}
 				}
 
@@ -293,14 +318,16 @@ const ProductManagement = () => {
 						break; // Exit the loop if an error occurs
 					}
 				}
-
+				const adicionalesProducto = newProduct.adicionales.map((adicional) => adicional.id);
+				const adicionalesACrear = adicionalesSeleccionados.filter(
+					(adicionalId) => !adicionalesProducto.includes(adicionalId),
+				);
 				// Asociar los adicionales seleccionados
-				if (adicionalesSeleccionados.length > 0) {
-					const productId = newProduct.id;
-					for (let i = 0; i < adicionalesSeleccionados.length; i++) {
+				if (adicionalesACrear.length > 0) {
+					for (let i = 0; i < adicionalesACrear.length; i++) {
 						try {
 							await asociarProductoAdicional(
-								adicionalesSeleccionados[i],
+								adicionalesACrear[i],
 								productId,
 								sessionStorage.getItem('token'),
 							);
@@ -563,22 +590,7 @@ const ProductManagement = () => {
 					</Box>
 					{/* Lista de descuentos: Solo disponible en caso de actualizar producto  */}
 					Descuentos
-					<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
-						<TextField
-							variant="outlined"
-							fullWidth
-							placeholder="Buscar descuentos..."
-							onChange={(e) => setSearchDescuentos(e.target.value)}
-							value={searchDescuentos}
-							style={{ marginBottom: '10px' }}
-							InputProps={{
-								startAdornment: (
-									<InputAdornment position="start">
-										<SearchIcon />
-									</InputAdornment>
-								),
-							}}
-						/>
+					{descuentoCategoria ? (
 						<Box
 							style={{
 								border: '1px solid #ccc',
@@ -589,8 +601,8 @@ const ProductManagement = () => {
 								backgroundColor: '#f9f9f9',
 							}}
 						>
-							{filteredDescuentos.length > 0 ? (
-								filteredDescuentos.map((descuento) => (
+							{filteredDescuentoCategoria.length > 0 ? (
+								filteredDescuentoCategoria.map((descuento) => (
 									<Box
 										key={descuento.id}
 										style={{
@@ -604,15 +616,16 @@ const ProductManagement = () => {
 										<FormControlLabel
 											control={
 												<Checkbox
-													checked={descuentosSeleccionados.includes(descuento.id)}
+													checked={true}
 													onChange={() => handleDescuentoChange(descuento.id)}
 													color="primary"
+													disabled={true}
 												/>
 											}
 											label={`${descuento.descripcion} - (Valor: ${mostrarValorDescuento(
 												descuento.valor,
 												descuento.tipo,
-											)})`}
+											)}) - CATEGORIA`}
 										/>
 									</Box>
 								))
@@ -620,7 +633,66 @@ const ProductManagement = () => {
 								<p style={{ textAlign: 'center', color: '#888' }}>No hay descuentos disponibles.</p>
 							)}
 						</Box>
-					</Box>
+					) : (
+						<Box style={{ marginTop: '10px', marginBottom: '10px' }}>
+							<TextField
+								variant="outlined"
+								fullWidth
+								placeholder="Buscar descuentos..."
+								onChange={(e) => setSearchDescuentos(e.target.value)}
+								value={searchDescuentos}
+								style={{ marginBottom: '10px' }}
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<SearchIcon />
+										</InputAdornment>
+									),
+								}}
+							/>
+							<Box
+								style={{
+									border: '1px solid #ccc',
+									borderRadius: '8px',
+									padding: '10px',
+									maxHeight: '200px',
+									overflowY: 'auto',
+									backgroundColor: '#f9f9f9',
+								}}
+							>
+								{filteredDescuentos.length > 0 ? (
+									filteredDescuentos.map((descuento) => (
+										<Box
+											key={descuento.id}
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												marginBottom: '5px',
+												padding: '5px',
+												borderBottom: '1px solid #e0e0e0',
+											}}
+										>
+											<FormControlLabel
+												control={
+													<Checkbox
+														checked={descuentosSeleccionados.includes(descuento.id)}
+														onChange={() => handleDescuentoChange(descuento.id)}
+														color="primary"
+													/>
+												}
+												label={`${descuento.descripcion} - (Valor: ${mostrarValorDescuento(
+													descuento.valor,
+													descuento.tipo,
+												)})`}
+											/>
+										</Box>
+									))
+								) : (
+									<p style={{ textAlign: 'center', color: '#888' }}>No hay descuentos disponibles.</p>
+								)}
+							</Box>
+						</Box>
+					)}
 					{/* Imagen */}
 					Imagen
 					<input
