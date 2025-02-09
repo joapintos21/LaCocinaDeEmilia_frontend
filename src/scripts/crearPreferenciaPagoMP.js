@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify';
 import apiClient from '../utils/apiCliente';
 
-export const crearPreferencia = async (pedidoId, direccionId, fechaFormateada, deliveryMethod, token) => {
+export const crearPreferencia = async (pedidoId, direccionId, fechaFormateada, deliveryMethod, cuponId, token) => {
 	const BASE_URL = process.env.REACT_APP_URL || 'http://localhost:3000';
 
 	const body = {
@@ -9,6 +9,7 @@ export const crearPreferencia = async (pedidoId, direccionId, fechaFormateada, d
 		direccion_id: direccionId,
 		fecha_envio: fechaFormateada,
 		delivery_method: deliveryMethod,
+		cupon: cuponId,
 		backUrls: {
 			success: `${BASE_URL}/carrito`,
 			pending: `${BASE_URL}/carrito`,

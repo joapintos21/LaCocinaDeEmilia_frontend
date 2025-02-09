@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import { finalizarPedido } from 'scripts/finalizarPedido';
 import { limpiarCarrito } from 'store/carritoSlice';
 import { obtenerEmpresa } from '../../scripts/obtenerEmpresa';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const TransferenciaModal = ({
 	mostrarModalTransferencia,
@@ -13,6 +13,7 @@ const TransferenciaModal = ({
 	fechaEnvio,
 	deliveryMethod = 'delivery',
 	notas,
+	cuponId,
 	token,
 	dispatch,
 }) => {
@@ -21,11 +22,13 @@ const TransferenciaModal = ({
 
 	const handleTransferencia = async () => {
 		try {
-			finalizarPedido(pedidoId, 1, '', direccionId, fechaEnvio, deliveryMethod, notas, token).then((data) => {
-				setEstadoMensaje(
-					'Pedido ingresado correctamente! Se encuentra pendiente de confirmación de pago. Por favor envíe el comprobante por WhatsApp al número +598 91123456.',
-				);
-			});
+			finalizarPedido(pedidoId, 1, '', direccionId, fechaEnvio, deliveryMethod, notas, cuponId, token).then(
+				(data) => {
+					setEstadoMensaje(
+						'Pedido ingresado correctamente! Se encuentra pendiente de confirmación de pago. Por favor envíe el comprobante por WhatsApp al número +598 91123456.',
+					);
+				},
+			);
 		} catch (error) {
 			console.error('Error al procesar el pedido:', error);
 			setEstadoMensaje(`Error: ${error.message}`);

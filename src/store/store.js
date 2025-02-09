@@ -6,17 +6,18 @@ import usuarioReducer from './usuarioSlice';
 import productoReducer from './productoSlice';
 import packReducer from './packSlice';
 import categoriaReducer from './categoriaSlice';
-import carritoReducer from './carritoSlice'; 
-import descuentoReducer from './descuentoSlice'; 
-import permisoReducer from './permisoSlice'; 
+import carritoReducer from './carritoSlice';
+import descuentoReducer from './descuentoSlice';
+import permisoReducer from './permisoSlice';
 import usuariosReducer from './usuariosSlice';
 import tiposDescuentoReducer from './tiposDescuentoSlice';
 import rolesUsuarioReducer from './rolesUsuarioSlice';
 import gestionPermisosSlice from './gestionPermisosSlice';
 import pedidosSlice from './pedidosSlice';
-import gestionAdicionalesSlice from './gestionAdicionalesSlice'
-import dashboardSlice from './dashboardSlice'
-import empresaSlice from './empresaSlice'
+import gestionAdicionalesSlice from './gestionAdicionalesSlice';
+import dashboardSlice from './dashboardSlice';
+import empresaSlice from './empresaSlice';
+import cuponSlice from './cuponSlice';
 
 // Configuración de persistencia para el estado de la aplicación
 const persistConfig = {
@@ -27,21 +28,22 @@ const persistConfig = {
 
 // Combina los reducers
 const rootReducer = combineReducers({
-    usuario: usuarioReducer,
-    productos: productoReducer,
-    categorias: categoriaReducer,
-    carrito: carritoReducer,
-    packs: packReducer,
-    descuentos : descuentoReducer,
-    permisos : permisoReducer,
-    usuarios : usuariosReducer,
-    tiposDescuento : tiposDescuentoReducer,
-    rolesUsuario : rolesUsuarioReducer,
-    gestionPermisos : gestionPermisosSlice,
-    pedidos : pedidosSlice,
-    gestionAdicionales : gestionAdicionalesSlice,
-    dashboard : dashboardSlice,
-    empresa : empresaSlice
+	usuario: usuarioReducer,
+	productos: productoReducer,
+	categorias: categoriaReducer,
+	carrito: carritoReducer,
+	packs: packReducer,
+	descuentos: descuentoReducer,
+	permisos: permisoReducer,
+	usuarios: usuariosReducer,
+	tiposDescuento: tiposDescuentoReducer,
+	rolesUsuario: rolesUsuarioReducer,
+	gestionPermisos: gestionPermisosSlice,
+	pedidos: pedidosSlice,
+	gestionAdicionales: gestionAdicionalesSlice,
+	dashboard: dashboardSlice,
+	empresa: empresaSlice,
+	cupones: cuponSlice,
 });
 
 // Aplica persistencia al rootReducer

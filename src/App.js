@@ -63,7 +63,7 @@ export default function App() {
 			};
 			fetchPacks();
 
-			if (user && user.rol === 'Cliente' && token) {
+			if (user && (user.rol === 'Cliente' || user.rol === 'Nutricionista') && token) {
 				const fetchPedido = async () => {
 					await obtenerPedidoEnProgreso(user.id, token, dispatch).catch((e) => {
 						console.log('Error en el Obtener Pedido:' + e);

@@ -13,6 +13,7 @@ import ReportManagement from 'components/AdminPanel/ReportManagement';
 import EmpresaManagement from 'components/AdminPanel/EmpresaManagement';
 import Header from 'components/headers/light.js';
 import tw from 'twin.macro';
+import CuponesManagement from 'components/AdminPanel/CuponesManagement';
 const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 overflow-hidden mt-32`;
 
 export default () => {
@@ -25,6 +26,7 @@ export default () => {
 		{ title: 'Productos', component: <ProductManagement /> },
 		{ title: 'Adicionales', component: <AdditionalManagement /> },
 		{ title: 'Descuentos', component: <DiscountManagement /> },
+		{ title: 'Cupones', component: <CuponesManagement /> },
 		{ title: 'Usuarios', component: <UserManagement /> },
 		{ title: 'Permisos', component: <PermissionsManagement /> },
 		{ title: 'Gastos', component: <GastosManagement /> },
@@ -48,8 +50,8 @@ export default () => {
 								boxSizing: 'border-box',
 								position: 'fixed',
 								top: 180,
-								overflowY: 'auto', 
-								height: 'calc(100vh - 200px)', 
+								overflowY: 'auto',
+								height: 'calc(100vh - 200px)',
 								backgroundColor: 'transparent',
 								border: 'none',
 								zIndex: 1200,
