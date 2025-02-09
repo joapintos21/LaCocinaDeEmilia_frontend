@@ -30,7 +30,7 @@ import ResetearPassword from 'pages/ResetearPassword';
 import CrearPedidoManual from 'pages/CrearPedidoManual';
 import Perfil from 'pages/Perfil';
 import Envios from 'pages/Envios';
-import WhatsAppButton from "./components/Widget/WhatsAppButton";
+import WhatsAppButton from './components/Widget/WhatsAppButton';
 
 const theme = createTheme({
 	palette: {

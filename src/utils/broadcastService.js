@@ -1,12 +1,10 @@
-let instance;
-
 class BroadcastService {
 	constructor(channelName) {
-		if (!instance) {
+		if (!BroadcastService.instance) {
 			this.channel = new BroadcastChannel(channelName);
-			instance = this;
+			BroadcastService.instance = this;
 		}
-		return instance;
+		return BroadcastService.instance;
 	}
 
 	sendMessage(message) {
@@ -20,7 +18,6 @@ class BroadcastService {
 	}
 
 	closeChannel() {
-		// Solo cierra si existe el canal
 		if (this.channel) {
 			this.channel.close();
 			this.channel = null;
@@ -29,4 +26,6 @@ class BroadcastService {
 }
 
 const broadcastService = new BroadcastService('mi-canal');
+Object.freeze(broadcastService);
+
 export default broadcastService;
