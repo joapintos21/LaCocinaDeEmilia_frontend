@@ -38,6 +38,11 @@ const TransferenciaModal = ({
 		}
 	};
 
+	const handleModalTransferencia = () => {
+		setMostrarModalTransferencia(false); // Cierra el modal de transferencia
+		setMostrarEstadoModal(true); // Abre el modal de estado
+	};
+
 	const handleEstadoModal = () => {
 		dispatch(limpiarCarrito());
 		setMostrarEstadoModal(false);
@@ -61,6 +66,7 @@ const TransferenciaModal = ({
 			{/* Modal de Transferencia */}
 			<Modal
 				isOpen={mostrarModalTransferencia}
+				onAfterClose={handleTransferencia}
 				onRequestClose={() => setMostrarModalTransferencia(false)}
 				contentLabel="Datos para Transferencia"
 				style={{
@@ -83,7 +89,7 @@ const TransferenciaModal = ({
 					<h3>Datos para la Transferencia</h3>
 					<p>{empresa.descripcion_transferencia}</p>
 					<button
-						onClick={handleTransferencia}
+						onClick={handleModalTransferencia}
 						style={{
 							marginTop: '20px',
 							padding: '10px 20px',
