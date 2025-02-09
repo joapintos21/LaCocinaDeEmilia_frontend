@@ -10,6 +10,7 @@ const initialState = {
 	pedidoId: '',
 	deliveryMethod: '',
 	notas: '',
+	cupon: '',
 };
 
 const carritoSlice = createSlice({
@@ -149,6 +150,7 @@ const carritoSlice = createSlice({
 			state.pedidoId = '';
 			state.direccionId = 0;
 			state.notas = '';
+			state.cupon = '';
 		},
 
 		setCostoEnvio: (state, action) => {
@@ -202,6 +204,9 @@ const carritoSlice = createSlice({
 		setNotas: (state, action) => {
 			state.notas = action.payload;
 		},
+		setCupon: (state, action) => {
+			state.cupon = action.payload;
+		},
 	},
 });
 
@@ -217,6 +222,7 @@ export const {
 	setDireccion,
 	setDeliveryMethod,
 	setNotas,
+	setCupon,
 } = carritoSlice.actions;
 
 export default carritoSlice.reducer;

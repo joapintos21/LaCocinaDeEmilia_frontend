@@ -31,6 +31,8 @@ const CartPage = () => {
 	const [isLoading, setIsLoading] = useState(false); // Estado para el loader
 	const [preferenceId, setPreferenceId] = useState(null);
 	const notas = useSelector((state) => state.carrito.notas);
+	const cupon = useSelector((state) => state.carrito.cupon);
+	const cuponId = cupon?.id;
 
 	const deliveryMethod = useSelector((state) => state.carrito.deliveryMethod);
 
@@ -137,7 +139,7 @@ const CartPage = () => {
 	const handleMercadoPago = async () => {
 		setIsLoading(true); // Mostrar loader mientras se genera la preferencia
 		try {
-			crearPreferencia(pedidoId, direccionId, fechaFormateada, deliveryMethod, token).then((data) => {
+			crearPreferencia(pedidoId, direccionId, fechaFormateada, deliveryMethod, cuponId, token).then((data) => {
 				if (data && data.preference_id) {
 					setPreferenceId(data.preference_id);
 				} else {
@@ -160,7 +162,7 @@ const CartPage = () => {
 
 	const handleFinalizarCompraEfectivo = () => {
 		const fetchFinalizarCompraEfectivo = async () => {
-			await finalizarPedido(pedidoId, 3, '', direccionId, fechaFormateada, deliveryMethod, notas, token)
+			await finalizarPedido(pedidoId, 3, '', direccionId, fechaFormateada, deliveryMethod, notas, cuponId, token)
 				.then(() => {
 					toast.success('¡Gracias por tu compra!');
 					dispatch(limpiarCarrito());
@@ -207,7 +209,12 @@ const CartPage = () => {
 							/>
 						</LeftColumn>
 						<RightColumn>
-							<OrderSummary subtotal={subtotal} costoEnvio={costoEnvio} comisionMP={comisionMP} />
+							<OrderSummary
+								subtotal={subtotal}
+								costoEnvio={costoEnvio}
+								comisionMP={comisionMP}
+								cupon={cupon}
+							/>
 							<NotasTextField
 								placeholder="Notas del Pedido: ej (no funciona el timbre)"
 								rows={4}
@@ -232,6 +239,7 @@ const CartPage = () => {
 							fechaEnvio={fechaFormateada}
 							deliveryMethod={deliveryMethod}
 							notas={notas}
+							cuponId={cuponId}
 							token={token}
 							dispatch={dispatch}
 						/>
@@ -245,6 +253,7 @@ const CartPage = () => {
 							fechaEnvio={fechaFormateada}
 							deliveryMethod={deliveryMethod}
 							notas={notas}
+							cuponId={cuponId}
 							dispatch={dispatch}
 						/>
 					</>

@@ -59,6 +59,7 @@ const DiscountManagement = () => {
 
 	const descuentos = useSelector((state) => state.descuentos || []);
 	const tiposDescuento = useSelector((state) => state.tiposDescuento || []);
+	const descProductos = descuentos.filter((desc) => desc.descripcion !== 'Cupon Nutricionista');
 
 	const handleOpen = (descuento = null) => {
 		const tipoId =
@@ -169,8 +170,8 @@ const DiscountManagement = () => {
 		setDialogOpen(false);
 	};
 
-	const filteredDescuentos = Array.isArray(descuentos)
-		? descuentos.filter((descuento) => {
+	const filteredDescuentos = Array.isArray(descProductos)
+		? descProductos.filter((descuento) => {
 				return descuento.descripcion.toLowerCase().includes(searchDescripcion.toLowerCase());
 		  })
 		: [];

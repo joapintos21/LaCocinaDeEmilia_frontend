@@ -1,12 +1,17 @@
 // components/cart/PaymentSelector.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 import { useDispatch } from 'react-redux';
-import { setComisionMP } from 'store/carritoSlice';
+import { setComisionMP, setCupon } from 'store/carritoSlice';
+import { toast } from 'react-toastify';
+import { validarCupon } from 'scripts/validarCupon';
 
 const Container = tw.div`flex flex-col w-full`;
 const Title = tw.h2`text-2xl font-bold mb-4`;
 const PaymentOption = tw.div`flex items-center mb-4 cursor-pointer p-3 rounded-lg border border-gray-300 hover:bg-gray-100`;
+const CuponContainer = tw.div`flex w-full items-center mb-4`;
+const Cupon = tw.input`flex mb-4 cursor-pointer p-3 rounded-lg border border-gray-300 hover:bg-gray-100`;
+const ValidateButton = tw.button`ml-2 mb-4 px-4 py-2 bg-[#99cdb6] text-white rounded hover:bg-primary-800`;
 const Label = tw.label`ml-2 text-gray-700`;
 const SelectButton = tw.button`mt-4 px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-800 self-start`;
 
@@ -19,6 +24,23 @@ const PaymentSelector = ({
 	deliveryMethod,
 }) => {
 	const dispatch = useDispatch();
+	const [codigo, setCodigo] = useState('');
+
+	const handleCuponChange = (e) => {
+		setCodigo(e.target.value.toUpperCase());
+	};
+
+	const handleValidateCupon = () => {
+		validarCupon(codigo, sessionStorage.getItem('token'))
+			.then((data) => {
+				toast.success('Cupón validado: ' + data.codigo);
+				dispatch(setCupon(data));
+			})
+			.catch((e) => {
+				toast.error(e.message);
+				dispatch(setCupon(''));
+			});
+	};
 
 	useEffect(() => {
 		if (metodoPago === 'mercado-pago') {
@@ -47,7 +69,12 @@ const PaymentSelector = ({
 					<Label>Pagar con Efectivo al retirar</Label>
 				</PaymentOption>
 			)}
-			<SelectButton onClick={() => setStep(2)}>Volver</SelectButton>
+			<Title>Cupón de descuento</Title>
+			<CuponContainer>
+				<Cupon onChange={(e) => handleCuponChange(e)} />
+				<ValidateButton onClick={handleValidateCupon}>Validar</ValidateButton>
+			</CuponContainer>
+			<SelectButton onClick={() => setStep(3)}>Volver</SelectButton>
 		</Container>
 	);
 };

@@ -9,6 +9,7 @@ export const finalizarPedido = async (
 	fechaEnvio,
 	deliveryMethod,
 	notas,
+	cupon,
 	token,
 ) => {
 	const body = {
@@ -18,6 +19,7 @@ export const finalizarPedido = async (
 		direccion_id: direccionId,
 		fecha_envio: fechaEnvio,
 		delivery_method: deliveryMethod,
+		cupon: cupon,
 		notas: notas,
 	};
 

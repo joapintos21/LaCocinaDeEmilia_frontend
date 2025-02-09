@@ -9,7 +9,7 @@ import tw from 'twin.macro';
 import PickUpScheduler from './PickUpScheduler';
 
 const Container = tw.div`flex flex-row w-full p-6`;
-const LeftColumn = tw.div`w-2/3 pr-4`;
+const LeftColumn = tw.div`w-full pr-4`;
 const ProgressBarContainer = tw.div`w-full bg-gray-200 rounded-full h-4 mb-4`;
 const ProgressBar = tw.div`bg-blue-500 h-4 rounded-full`;
 const StepDescription = tw.div`text-center text-lg font-semibold mb-2`;
