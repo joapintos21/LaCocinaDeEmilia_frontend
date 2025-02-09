@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Autocomplete, GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { toast } from 'react-toastify';
 
 const containerStyle = {
 	width: '100%',
@@ -223,7 +224,7 @@ const MapComponent = ({ onDireccionSeleccionada, setOpcional }) => {
 		mapInstance.data.addListener('click', (event) => {
 			const name = event.feature.getProperty('Name');
 			const description = event.feature.getProperty('description');
-			alert(`Zona: ${name}\n${description}`);
+			toast.info(`Zona: ${name}\n${description !== null ? description : ''}`);
 		});
 	};
 
