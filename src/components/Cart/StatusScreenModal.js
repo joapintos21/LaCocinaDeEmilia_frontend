@@ -45,6 +45,7 @@ const CheckoutStatusModal = ({
 			{/* Modal */}
 			<Modal
 				isOpen={isModalOpen}
+				onAfterClose={handleCloseModal}
 				onRequestClose={() => setIsModalOpen(false)}
 				contentLabel="Estado del Pago"
 				style={{
