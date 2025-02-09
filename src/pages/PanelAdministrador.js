@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { Box, Grid, Paper, Typography, Drawer, List, ListItem, ListItemText } from '@mui/material';
+import {
+	Box,
+	Grid,
+	Paper,
+	Typography,
+	Drawer,
+	List,
+	ListItem,
+	ListItemText,
+	useMediaQuery,
+	useTheme,
+	ThemeProvider,
+} from '@mui/material';
 import Dashboard from 'components/AdminPanel/Dashboard';
 import ProductManagement from 'components/AdminPanel/ProductManagement';
 import UserManagement from 'components/AdminPanel/UserManagement';
@@ -18,6 +30,12 @@ const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 overfl
 
 export default () => {
 	const [activeModule, setActiveModule] = useState('Dashboard');
+	const theme = useTheme();
+	const isMobileDownSm = useMediaQuery(theme.breakpoints.down('sm'));
+	const isMobileDownMd = useMediaQuery(theme.breakpoints.down('md'));
+	const isMobile = isMobileDownSm || isMobileDownMd;
+	console.log(isMobile);
+	const anchor = isMobile ? 'top' : 'left';
 
 	const modules = [
 		{ title: 'Dashboard', component: <Dashboard /> },
@@ -35,30 +53,42 @@ export default () => {
 	];
 
 	return (
-		<>
+		<ThemeProvider theme={theme}>
 			<Header />
 			<StyledDiv>
 				<Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-					{/* Barra lateral fija */}
 					<Drawer
 						variant="permanent"
+						anchor={anchor}
 						sx={{
-							width: 240,
+							// Ajusta el ancho según el tamaño de pantalla:
+							width: isMobile ? '100%' : 240,
 							flexShrink: 0,
 							'& .MuiDrawer-paper': {
-								width: 240,
+								width: isMobile ? '100%' : 240,
 								boxSizing: 'border-box',
+								// En móviles se ancla en la parte superior, en escritorio se mantiene fijo a la izquierda
 								position: 'fixed',
 								top: 180,
-								overflowY: 'auto',
-								height: 'calc(100vh - 200px)',
+								// Configuración del scroll: en móviles queremos scroll horizontal
+								overflowX: isMobile ? 'auto' : 'unset',
+								overflowY: isMobile ? 'unset' : 'auto',
+								// La altura se calcula de forma diferente según el dispositivo
+								height: isMobile ? 'auto' : 'calc(100vh - 200px)',
 								backgroundColor: 'transparent',
 								border: 'none',
-								zIndex: 1200,
+								zIndex: 1,
+								// Importante: en móviles los items se disponen en fila
+								display: 'flex',
+								flexDirection: isMobile ? 'row' : 'column',
 							},
 						}}
 					>
-						<List>
+						<List
+							sx={{
+								display: isMobile ? 'flex' : 'block',
+							}}
+						>
 							{modules.map((module, index) => (
 								<ListItem
 									button
@@ -74,11 +104,17 @@ export default () => {
 											backgroundColor: 'rgba(0, 0, 0, 0.05)', // Color de hover
 											borderRadius: 2,
 										},
+										// Opcional: en vista horizontal, ajustar el tamaño o separación
+										minWidth: { xs: 100, sm: 'auto' },
 									}}
 								>
 									<ListItemText
 										primary={module.title}
-										sx={{ textAlign: 'center', color: '#333', fontWeight: 'bold' }}
+										sx={{
+											textAlign: 'center',
+											color: '#333',
+											fontWeight: 'bold',
+										}}
 									/>
 								</ListItem>
 							))}
@@ -91,7 +127,7 @@ export default () => {
 						sx={{
 							flexGrow: 1,
 							padding: 3,
-							marginLeft: '240px',
+							marginLeft: isMobile ? '0px' : '240px',
 							marginTop: '64px',
 							height: 'calc(100vh - 64px)',
 						}}
@@ -111,13 +147,20 @@ export default () => {
 									<Typography variant="h6" gutterBottom sx={{ color: '#333', fontWeight: '600' }}>
 										{activeModule}
 									</Typography>
-									{modules.find((module) => module.title === activeModule)?.component}
+									{/* Contenedor para el contenido con scroll horizontal en pantallas pequeñas */}
+									<Box
+										sx={{
+											overflowX: { xs: 'auto', sm: 'unset' }, // En xs, scroll horizontal; en sm y superiores, comportamiento normal
+										}}
+									>
+										{modules.find((module) => module.title === activeModule)?.component}
+									</Box>
 								</Paper>
 							</Grid>
 						</Grid>
 					</Box>
 				</Box>
 			</StyledDiv>
-		</>
+		</ThemeProvider>
 	);
 };

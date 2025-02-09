@@ -23,8 +23,8 @@ const Header = tw.header`
 `;
 
 export const NavLinks = tw.div`inline-block`;
-export const NavLink = tw.a`text-white
-  text-lg my-2 lg:text-sm lg:mx-6 lg:my-0
+export const NavLink = tw.a`lg:text-white
+  text-lg my-2 lg:text-[18px] lg:mx-6 lg:my-0 sm:text-black
   font-semibold tracking-wide transition duration-300
   pb-1 border-b-2 border-transparent hover:border-primary-500 hocus:text-primary-500
 `;
@@ -43,7 +43,7 @@ export const LogoLink = styled(NavLink)`
 	}
 `;
 
-export const MobileNavLinksContainer = tw.nav`flex flex-1 items-center justify-between`;
+export const MobileNavLinksContainer = tw.nav`flex flex-1 items-center justify-between z-20`;
 export const NavToggle = tw.button`
   lg:hidden z-20 focus:outline-none hocus:text-primary-500 transition duration-300
 `;
