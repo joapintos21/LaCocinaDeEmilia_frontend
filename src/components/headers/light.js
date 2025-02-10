@@ -115,16 +115,20 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cadete') && (
 				<NavLink href="/panelcadetes">Cadetes</NavLink>
 			)}
-			<NavLink href="/productos">Productos</NavLink>
-			<NavLink href="/nosotros">Nosotros</NavLink>
-			<NavLink href="/envios">Envios</NavLink>
-			<NavLink href="/contacto">Contacto</NavLink>
+			{userInfo && (userInfo.rol === 'Administrador' || userInfo.rol === 'Cliente') && (
+				<>
+					<NavLink href="/productos">Productos</NavLink>
+					<NavLink href="/nosotros">Nosotros</NavLink>
+					<NavLink href="/envios">Envios</NavLink>
+					<NavLink href="/contacto">Contacto</NavLink>
+					<IconButton onClick={handleCartOpen}>
+						<ShoppingCartIcon style={{ color: 'white' }} />
+					</IconButton>
+				</>
+			)}
 
-			<IconButton onClick={handleCartOpen}>
-				<ShoppingCartIcon style={{ color: 'white' }} />
-			</IconButton>
 			{userInfo ? (
-				<>{userInfo && <UserDropdown userName={userInfo.nombre} />}</>
+				<>{userInfo && <UserDropdown userName={userInfo.nombre} userRol={userInfo.rol_id} />}</>
 			) : (
 				<>
 					<NavLink href="/login">Iniciar sesión</NavLink>

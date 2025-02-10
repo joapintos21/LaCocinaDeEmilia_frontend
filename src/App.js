@@ -46,6 +46,7 @@ export default function App() {
 	const dispatch = useDispatch();
 	const user = useSelector((state) => state.usuario.userInfo);
 	const token = sessionStorage.getItem('token');
+	const rolesValidos = [1, 4, 5];
 
 	useEffect(() => {
 		try {
@@ -63,7 +64,7 @@ export default function App() {
 			};
 			fetchPacks();
 
-			if (user && (user.rol === 'Cliente' || user.rol === 'Nutricionista') && token) {
+			if (user && rolesValidos.includes(user.rol_id) && token) {
 				const fetchPedido = async () => {
 					await obtenerPedidoEnProgreso(user.id, token, dispatch).catch((e) => {
 						console.log('Error en el Obtener Pedido:' + e);

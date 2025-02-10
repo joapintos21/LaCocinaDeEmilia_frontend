@@ -105,7 +105,7 @@ export default () => {
 					imageSrc:
 						producto.imagen ||
 						'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
-					title: producto.descripcion || 'Sin nombre',
+					title: producto.titulo || 'Sin nombre',
 					price: producto.precio || '$0.00',
 					category: producto.categoria.titulo || 'Otros',
 					url: `/producto/${producto.id}`,
@@ -134,7 +134,7 @@ export default () => {
 
 	const tabs = {
 		Todos: filteredProducts.length > 0 ? filteredProducts : products,
-		Packs: packs,
+		// Packs: packs, // Se oculta hasta que no empecemos a usar los combos
 		...categoriasRedux.reduce((acc, categoria) => {
 			acc[categoria.titulo] = filteredProducts.filter((product) => product.category === categoria.titulo);
 			return acc;
@@ -155,7 +155,7 @@ export default () => {
 					imageSrc:
 						producto.imagen ||
 						'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
-					title: producto.descripcion || 'Sin nombre',
+					title: producto.titulo || 'Sin nombre',
 					price: producto.precio || '$0.00',
 					category: producto.categoria.titulo || 'Otros',
 					url: `/producto/${producto.id}`,

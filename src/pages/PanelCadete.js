@@ -22,34 +22,34 @@ const PanelCadetes = () => {
 	const userId = useSelector((state) => state.usuario.userInfo.id);
 
 	const fetchPedidos = async () => {
-        try {
-            const data = await obtenerPedidosParaCadete(userId, token);
-            setPedidosHoy(data.pedidosHoy);
-            setPedidosPosteriores(data.pedidosPosteriores);
-        } catch (error) {
-            alert(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+		try {
+			const data = await obtenerPedidosParaCadete(userId, token);
+			setPedidosHoy(data.pedidosHoy);
+			setPedidosPosteriores(data.pedidosPosteriores);
+		} catch (error) {
+			alert(error.message);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	const handleMarcarComoEntregado = async (pedidoId) => {
-        try {
-            await marcarPedidoComoEntregado(pedidoId, token);
-            setPedidosHoy((prevPedidos) => prevPedidos.filter((pedido) => pedido.id !== pedidoId));
-        } catch (error) {
-            alert(error.message);
-        }
-    };
+		try {
+			await marcarPedidoComoEntregado(pedidoId, token);
+			setPedidosHoy((prevPedidos) => prevPedidos.filter((pedido) => pedido.id !== pedidoId));
+		} catch (error) {
+			alert(error.message);
+		}
+	};
 
 	const handleReasignarPedido = async (pedidoId) => {
-        try {
-            await reasignarPedidoCadete(pedidoId, userId, token);
-            fetchPedidos();
-        } catch (error) {
-            alert(error.message);
-        }
-    };
+		try {
+			await reasignarPedidoCadete(pedidoId, userId, token);
+			fetchPedidos();
+		} catch (error) {
+			alert(error.message);
+		}
+	};
 
 	useEffect(() => {
 		fetchPedidos();
@@ -146,6 +146,14 @@ const PanelCadetes = () => {
 														<Divider />
 													</div>
 												))}
+										</div>
+										<div>
+											{pedido.direccion && (
+												<div>
+													<p>Direccion: {pedido.direccion}</p>
+													<Divider />
+												</div>
+											)}
 										</div>
 										<p>
 											Fecha de entrega:{' '}

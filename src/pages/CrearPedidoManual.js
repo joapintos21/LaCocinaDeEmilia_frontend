@@ -34,6 +34,8 @@ import { obtenerProductos } from 'scripts/obtenerProductosCategoria';
 import MapComponent from '../components/Cart/MapComponent';
 import { obtenerUsuarios } from 'scripts/obtenerUsuarios';
 import { setNotas } from '../store/carritoSlice';
+import { handleAddToCart } from 'utils/carritoUtils';
+import { toast } from 'react-toastify';
 
 export default () => {
 	const navigate = useNavigate();
@@ -42,6 +44,10 @@ export default () => {
 	const NotasTextField = tw.textarea`w-full p-2 border rounded-lg mt-4`;
 	const dispatch = useDispatch();
 	const user = useSelector((state) => state.usuario);
+	let clienteId = null;
+	if (user.isLoggedIn) {
+		clienteId = user.userInfo.id;
+	}
 	const usuarios = useSelector((state) => state.usuarios || []);
 	const cartItems = useSelector((state) => state.carrito.items);
 	const costoEnvio = useSelector((state) => state.carrito.costoEnvio);
@@ -57,8 +63,8 @@ export default () => {
 	const [productToAdd, setProductToAdd] = useState(null);
 	const [cantidadProduct, setCantidadProduct] = useState(1);
 	const [adicionalProduct, setAdicionalProduct] = useState('');
-	
-		const notas = useSelector((state) => state.carrito.notas);
+
+	const notas = useSelector((state) => state.carrito.notas);
 
 	const obtenerDescuentos = (item) => {
 		if (item.tipo === 'producto') {
@@ -71,9 +77,9 @@ export default () => {
 		return [];
 	};
 
-		const handleNotasChange = (event) => {
-			dispatch(setNotas(event.target.value));
-		};
+	const handleNotasChange = (event) => {
+		dispatch(setNotas(event.target.value));
+	};
 
 	const calcularSubtotalItem = (item) => {
 		const precioConDescuento = calcularPrecioConDescuento(item.precio, obtenerDescuentos(item));
@@ -145,7 +151,28 @@ export default () => {
 	const handleAddProduct = () => {
 		if (productToAdd) {
 			setSelectedProducts([...selectedProducts, { ...productToAdd, cantidadProduct, adicionalProduct }]);
-			handleCloseProduct();
+		}
+	};
+
+	const handleAgregarACarrito = () => {
+		if (adicionalProduct === null) {
+			toast.error('Debe elegir un adicional.');
+		} else {
+			handleAddToCart(
+				productToAdd,
+				cantidadProduct,
+				adicionalProduct,
+				sessionStorage.getItem('token'),
+				clienteId,
+				'producto',
+				dispatch,
+			)
+				.then(() => {
+					toast.success('Producto agregado al carrito.');
+				})
+				.catch((e) => {
+					console.log(e.message);
+				});
 		}
 	};
 
@@ -165,7 +192,6 @@ export default () => {
 		<>
 			<Header />
 			<Container maxWidth="md" sx={{ marginTop: '180px', padding: '20px', borderRadius: '10px' }}>
-				
 				{/* Tabla de clientes */}
 				<SectionTitle>Cliente</SectionTitle>
 				<FormControlLabel
@@ -271,7 +297,7 @@ export default () => {
 					<Grid container spacing={2} alignItems="center">
 						<Grid item xs={12} sm={6}>
 							<TextField
-								label="Buscar por descripción"
+								label="Buscar por titulo"
 								variant="outlined"
 								fullWidth
 								value={searchTerm}
@@ -294,7 +320,7 @@ export default () => {
 					<Table>
 						<TableHead sx={{ position: 'sticky', top: 0, backgroundColor: '#FFFFFF', zIndex: 1 }}>
 							<TableRow>
-								<TableCell>Descripción</TableCell>
+								<TableCell>Titulo</TableCell>
 								<TableCell>Precio</TableCell>
 								<TableCell>Categoría</TableCell>
 								<TableCell>Acciones</TableCell>
@@ -304,14 +330,14 @@ export default () => {
 							{filteredProducts.length > 0 ? (
 								filteredProducts.map((product) => (
 									<TableRow key={product.id}>
-										<TableCell>{product.descripcion}</TableCell>
+										<TableCell>{product.titulo}</TableCell>
 										<TableCell>{product.precio}</TableCell>
 										<TableCell>{product.categoria?.titulo}</TableCell>
 										<TableCell>
 											<Button
 												variant="outlined"
 												color="primary"
-												onClick={() => handleOpen(product)}
+												onClick={() => handleOpenProduct(product)}
 											>
 												Agregar
 											</Button>
@@ -329,7 +355,7 @@ export default () => {
 					</Table>
 				</TableContainer>
 
-				<Dialog open={openModalProduct} onClose={handleCloseProduct}>
+				<Dialog open={openModalProduct} onClose={openModalProduct && handleCloseProduct}>
 					<DialogTitle>Seleccionar Cantidad y Adicionales</DialogTitle>
 					<DialogContent>
 						<TextField
@@ -337,8 +363,8 @@ export default () => {
 							type="number"
 							fullWidth
 							value={cantidadProduct}
-							onChange={(e) => setCantidadProduct(Number(e.target.value))}
-							sx={{ marginBottom: 2 }}
+							onChange={(e) => setCantidadProduct(e.target.value)}
+							sx={{ marginBottom: 2, marginTop: 2 }}
 						/>
 						<Select
 							fullWidth
@@ -355,7 +381,7 @@ export default () => {
 						<Button onClick={handleCloseProduct} color="secondary">
 							Cancelar
 						</Button>
-						<Button onClick={handleAddProduct} color="primary">
+						<Button onClick={handleAgregarACarrito} color="primary">
 							Agregar
 						</Button>
 					</DialogActions>
@@ -366,7 +392,7 @@ export default () => {
 					<Table>
 						<TableHead>
 							<TableRow>
-								<TableCell>Descripción</TableCell>
+								<TableCell>Titulo</TableCell>
 								<TableCell>Precio</TableCell>
 								<TableCell>Cantidad</TableCell>
 								<TableCell>Adicional</TableCell>
@@ -376,7 +402,7 @@ export default () => {
 						<TableBody>
 							{selectedProducts.map((product, index) => (
 								<TableRow key={index}>
-									<TableCell>{product.descripcion}</TableCell>
+									<TableCell>{product.titulo}</TableCell>
 									<TableCell>{product.precio}</TableCell>
 									<TableCell>{product.cantidad}</TableCell>
 									<TableCell>{product.adicional || 'Ninguno'}</TableCell>

@@ -1,8 +1,9 @@
 import { toast } from 'react-toastify';
 import apiClient from '../utils/apiCliente';
 
-export const crearProducto = async ({ descripcion, precio, categoria_id, visible, imagen }, token) => {
+export const crearProducto = async ({ titulo, descripcion, precio, categoria_id, visible, imagen }, token) => {
 	const body = {
+		titulo: titulo,
 		descripcion: descripcion,
 		precio: parseFloat(precio),
 		categoria_id: parseInt(categoria_id),

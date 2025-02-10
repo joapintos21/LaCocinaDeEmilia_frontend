@@ -25,7 +25,7 @@ const DropdownDivider = styled.div`
 	${tw`border-t border-gray-200`}
 `;
 
-const UserDropdown = ({ userName }) => {
+const UserDropdown = ({ userName, userRol }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -44,8 +44,12 @@ const UserDropdown = ({ userName }) => {
 			<DropdownButton onClick={toggleDropdown}>{userName}</DropdownButton>
 			{isOpen && (
 				<DropdownMenu>
-					<DropdownItem onClick={() => navigate('/perfil')}>Perfil</DropdownItem>
-					<DropdownItem onClick={() => navigate('/mis_pedidos')}>Mis Pedidos</DropdownItem>
+					{(userRol === 1 || userRol === 4) && (
+						<>
+							<DropdownItem onClick={() => navigate('/perfil')}>Perfil</DropdownItem>
+							<DropdownItem onClick={() => navigate('/mis_pedidos')}>Mis Pedidos</DropdownItem>
+						</>
+					)}
 					<DropdownDivider />
 					<DropdownItem onClick={handleLogout}>Cerrar Sesión</DropdownItem>
 				</DropdownMenu>
