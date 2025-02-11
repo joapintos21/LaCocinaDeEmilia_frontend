@@ -26,6 +26,7 @@ import EmpresaManagement from 'components/AdminPanel/EmpresaManagement';
 import Header from 'components/headers/light.js';
 import tw from 'twin.macro';
 import CuponesManagement from 'components/AdminPanel/CuponesManagement';
+import PedidosManagement from 'components/AdminPanel/PedidosManagement';
 const StyledDiv = tw.div`font-display min-h-screen text-secondary-500 p-8 overflow-hidden mt-32`;
 
 export default () => {
@@ -34,12 +35,12 @@ export default () => {
 	const isMobileDownSm = useMediaQuery(theme.breakpoints.down('sm'));
 	const isMobileDownMd = useMediaQuery(theme.breakpoints.down('md'));
 	const isMobile = isMobileDownSm || isMobileDownMd;
-	console.log(isMobile);
 	const anchor = isMobile ? 'top' : 'left';
 
 	const modules = [
 		{ title: 'Dashboard', component: <Dashboard /> },
-		{ title: 'Pedidos', component: <OrderManagement /> },
+		{ title: 'Pagos Pendientes', component: <OrderManagement /> },
+		{ title: 'Pedidos (últimos 50)', component: <PedidosManagement /> },
 		{ title: 'Categorías', component: <CategoryManagement /> },
 		{ title: 'Productos', component: <ProductManagement /> },
 		{ title: 'Adicionales', component: <AdditionalManagement /> },
@@ -75,7 +76,7 @@ export default () => {
 								overflowY: isMobile ? 'unset' : 'auto',
 								// La altura se calcula de forma diferente según el dispositivo
 								height: isMobile ? 'auto' : 'calc(100vh - 200px)',
-								backgroundColor: 'transparent',
+								backgroundColor: 'white',
 								border: 'none',
 								zIndex: 1,
 								// Importante: en móviles los items se disponen en fila
@@ -129,7 +130,7 @@ export default () => {
 							padding: 3,
 							marginLeft: isMobile ? '0px' : '240px',
 							marginTop: '64px',
-							height: 'calc(100vh - 64px)',
+							height: '1000px',
 						}}
 					>
 						{/* Renderizar el módulo activo */}

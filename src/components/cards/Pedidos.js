@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { obtenerPedidosUsuario } from 'scripts/obtenerPedidosUsuario';
 import { toast } from 'react-toastify';
+import { estadosPedidosDescripcion } from 'utils/enums';
 
 const Container = tw.div`p-6 bg-white rounded-lg w-full mx-auto`;
 const Title = tw.h2`text-2xl font-bold mb-6 text-center`;
@@ -44,18 +45,12 @@ const EstadoPago = styled.span`
 `;
 const Total = tw.p`text-lg font-bold text-gray-700`;
 const Fecha = tw.p`text-sm text-gray-500`;
+const Notas = tw.p`text-[15px] font-bold text-gray-700`;
 const ProductosList = tw.div`mt-4 border-t pt-4`;
 const ProductoItem = tw.div`flex justify-between items-center py-2`; // Flex para alineación horizontal
 const ProductoNombre = tw.div`text-gray-700 font-medium flex-1`; // Ocupa el espacio restante
 const ProductoCantidad = tw.div`text-gray-500 w-24 text-right`; // Alineación a la derecha y ancho fijo
 const ProductoPrecio = tw.div`text-gray-700 font-semibold w-24 text-right`; // Alineación a la derecha y ancho fijo
-
-const estadosPedidos = {
-	1: 'Su pedido está siendo procesado',
-	2: 'Estamos preparando su pedido',
-	3: 'Pedido listo para su envío',
-	4: 'Pedido entregado',
-};
 
 const PedidosPage = () => {
 	const [pedidos, setPedidos] = useState([]);
@@ -97,8 +92,9 @@ const PedidosPage = () => {
 					<PedidoHeader>
 						<div>
 							<PedidoId>Pedido #{pedido.id}</PedidoId>
-							<Estado estado={pedido.estado}>{estadosPedidos[pedido.estado]}</Estado>
+							<Estado estado={pedido.estado}>{estadosPedidosDescripcion[pedido.estado]}</Estado>
 							<EstadoPago estado={pedido.estado_pago}>Estado de pago: {pedido.estado_pago}</EstadoPago>
+							<Notas>Notas: {pedido.notas}</Notas>
 							<Fecha>Fecha: {pedido.fechaCreacion}</Fecha>
 						</div>
 						<Total>${pedido.total}</Total>

@@ -54,6 +54,7 @@ const ProductManagement = () => {
 	const [descuentoCategoria, setDescuentoCategoria] = useState(null);
 	const [newProduct, setNewProduct] = useState({
 		id: null,
+		titulo: '',
 		descripcion: '',
 		precio: '',
 		categoria: { id: '' },
@@ -88,7 +89,7 @@ const ProductManagement = () => {
 	);
 
 	const filteredProducts = productos.filter((product) => {
-		const matchesSearchTerm = product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
+		const matchesSearchTerm = product.titulo.toLowerCase().includes(searchTerm.toLowerCase());
 		const matchesCategory = selectedCategory
 			? product.categoria?.titulo?.toLowerCase().includes(selectedCategory.toLowerCase())
 			: true;
@@ -157,6 +158,7 @@ const ProductManagement = () => {
 		} else {
 			setNewProduct({
 				id: null,
+				titulo: '',
 				descripcion: '',
 				precio: '',
 				categoria: { id: '' },
@@ -214,7 +216,7 @@ const ProductManagement = () => {
 	};
 
 	const handleSaveProduct = async () => {
-		if (newProduct.descripcion && newProduct.precio && newProduct.categoria) {
+		if (newProduct.titulo && newProduct.descripcion && newProduct.precio && newProduct.categoria) {
 			try {
 				let imageUrl = newProduct.imagen === null ? '' : newProduct.imagen; //Mantener la URL existente si no hay nueva imagen
 				let productId = newProduct.id;
@@ -228,6 +230,7 @@ const ProductManagement = () => {
 				}
 
 				const productoData = {
+					titulo: newProduct.titulo,
 					descripcion: newProduct.descripcion,
 					precio: newProduct.precio,
 					categoria_id: newProduct.categoria.id,
@@ -341,6 +344,7 @@ const ProductManagement = () => {
 
 				// Resetear el formulario
 				setNewProduct({
+					titulo: '',
 					descripcion: '',
 					precio: '',
 					categoria: '',
@@ -437,6 +441,7 @@ const ProductManagement = () => {
 						}}
 					>
 						<TableRow>
+							<TableCell>Titulo</TableCell>
 							<TableCell>Descripción</TableCell>
 							<TableCell>Precio</TableCell>
 							<TableCell>Categoría</TableCell>
@@ -448,6 +453,7 @@ const ProductManagement = () => {
 						{filteredProducts.length > 0 ? (
 							filteredProducts.map((product) => (
 								<TableRow key={product.id}>
+									<TableCell>{product.titulo}</TableCell>
 									<TableCell>{product.descripcion}</TableCell>
 									<TableCell>{product.precio}</TableCell>
 									<TableCell>{product.categoria?.titulo}</TableCell>
@@ -487,6 +493,15 @@ const ProductManagement = () => {
 				<DialogTitle>{newProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</DialogTitle>
 				<DialogContent>
 					{/* Descripción */}
+					Titulo
+					<TextField
+						name="titulo"
+						variant="outlined"
+						value={newProduct.titulo}
+						onChange={handleInputChange}
+						fullWidth
+						style={{ marginBottom: '10px' }}
+					/>
 					Descripción
 					<TextField
 						name="descripcion"

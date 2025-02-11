@@ -2,11 +2,12 @@ import apiCliente from 'utils/apiCliente';
 
 let request, body;
 
-export const actualizarProducto = async (id, { descripcion, precio, categoria_id, visible, imagen }, token) => {
+export const actualizarProducto = async (id, { titulo, descripcion, precio, categoria_id, visible, imagen }, token) => {
 	request = '/productos/update';
 
 	body = {
 		id: id,
+		titulo: titulo,
 		descripcion: descripcion,
 		precio: precio,
 		categoria_id: categoria_id,
@@ -17,10 +18,10 @@ export const actualizarProducto = async (id, { descripcion, precio, categoria_id
 	try {
 		const response = await apiCliente.put(request, body, {
 			headers: {
-				Authorization: `Bearer ${token}`, 
+				Authorization: `Bearer ${token}`,
 			},
 		});
-		return response.data; 
+		return response.data;
 	} catch (error) {
 		if (error.response) {
 			const errorData = error.response.data;

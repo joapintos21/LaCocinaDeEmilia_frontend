@@ -139,7 +139,7 @@ const Producto = ({ producto }) => {
 				<Image src={imageUrl} alt={producto.titulo} />
 			</ImageContainer>
 			<Details>
-				<Title>{producto.descripcion || 'Producto sin título'}</Title>
+				<Title>{producto.titulo || 'Producto sin título'}</Title>
 				<Description>{producto.descripcion || 'Este producto no tiene descripción disponible.'}</Description>
 				<PriceContainer>
 					{producto.descuentos && producto.descuentos.length > 0 && (

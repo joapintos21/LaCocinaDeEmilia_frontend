@@ -1,7 +1,7 @@
 // components/cart/PaymentSelector.js
 import React, { useEffect, useState } from 'react';
 import tw from 'twin.macro';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setComisionMP, setCupon } from 'store/carritoSlice';
 import { toast } from 'react-toastify';
 import { validarCupon } from 'scripts/validarCupon';
@@ -25,6 +25,7 @@ const PaymentSelector = ({
 }) => {
 	const dispatch = useDispatch();
 	const [codigo, setCodigo] = useState('');
+	const user = useSelector((state) => state.usuario.userInfo);
 
 	const handleCuponChange = (e) => {
 		setCodigo(e.target.value.toUpperCase());
@@ -55,10 +56,12 @@ const PaymentSelector = ({
 	return (
 		<Container>
 			<Title>Selecciona un método de pago</Title>
-			<PaymentOption onClick={() => setMetodoPago('mercado-pago')}>
-				<input type="radio" name="metodo-pago" checked={metodoPago === 'mercado-pago'} readOnly />
-				<Label>Pagar con Mercado Pago (+5,99% de comisión)</Label>
-			</PaymentOption>
+			{user.rol_id !== 1 && (
+				<PaymentOption onClick={() => setMetodoPago('mercado-pago')}>
+					<input type="radio" name="metodo-pago" checked={metodoPago === 'mercado-pago'} readOnly />
+					<Label>Pagar con Mercado Pago (+5,99% de comisión)</Label>
+				</PaymentOption>
+			)}
 			<PaymentOption onClick={() => setMetodoPago('transferencia')}>
 				<input type="radio" name="metodo-pago" checked={metodoPago === 'transferencia'} readOnly />
 				<Label>Pagar por Transferencia</Label>
