@@ -13,13 +13,16 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { obtenerPedidos } from 'scripts/obtenerPedidos';
 import { metodosPago, pedidoEstados } from 'utils/enums';
+import { toast } from 'react-toastify';
 
 const PedidosManagement = () => {
 	const dispatch = useDispatch();
 
 	// Fetch de datos (pedidos)
 	const fetchPedidos = async () => {
-		await obtenerPedidos(dispatch, sessionStorage.getItem('token'));
+		obtenerPedidos(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 
 	useEffect(() => {

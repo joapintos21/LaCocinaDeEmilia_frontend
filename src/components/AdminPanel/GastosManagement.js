@@ -36,12 +36,13 @@ const GastosManagement = () => {
 	const token = sessionStorage.getItem('token');
 
 	const fetchGastos = async () => {
-		try {
-			const data = await obtenerUltimosGastos(token);
-			setGastos(data);
-		} catch (error) {
-			toast.error(error.message);
-		}
+		obtenerUltimosGastos(token)
+			.then((data) => {
+				setGastos(data);
+			})
+			.catch((e) => {
+				toast.error(e.message);
+			});
 	};
 
 	useEffect(() => {
@@ -179,30 +180,31 @@ const GastosManagement = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{gastos.map((gasto) => (
-							<TableRow key={gasto.id}>
-								<TableCell>{gasto.descripcion}</TableCell>
-								<TableCell>{gasto.monto}</TableCell>
-								<TableCell>{gasto.fecha}</TableCell>
-								<TableCell>
-									<Button
-										variant="outlined"
-										color="primary"
-										onClick={() => handleEdit(gasto)}
-										sx={{ marginRight: 1 }}
-									>
-										Editar
-									</Button>
-									<Button
-										variant="outlined"
-										color="secondary"
-										onClick={() => handleOpenDialog(gasto.id)}
-									>
-										Eliminar
-									</Button>
-								</TableCell>
-							</TableRow>
-						))}
+						{gastos?.length > 0 &&
+							gastos.map((gasto) => (
+								<TableRow key={gasto.id}>
+									<TableCell>{gasto.descripcion}</TableCell>
+									<TableCell>{gasto.monto}</TableCell>
+									<TableCell>{gasto.fecha}</TableCell>
+									<TableCell>
+										<Button
+											variant="outlined"
+											color="primary"
+											onClick={() => handleEdit(gasto)}
+											sx={{ marginRight: 1 }}
+										>
+											Editar
+										</Button>
+										<Button
+											variant="outlined"
+											color="secondary"
+											onClick={() => handleOpenDialog(gasto.id)}
+										>
+											Eliminar
+										</Button>
+									</TableCell>
+								</TableRow>
+							))}
 					</TableBody>
 				</Table>
 			</TableContainer>

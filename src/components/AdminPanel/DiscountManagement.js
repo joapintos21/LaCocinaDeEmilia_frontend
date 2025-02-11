@@ -32,10 +32,14 @@ import CustomDialog from 'helpers/Dialog';
 const DiscountManagement = () => {
 	const dispatch = useDispatch();
 	const fetchDescuentos = async () => {
-		await obtenerDescuentos(dispatch, sessionStorage.getItem('token'));
+		obtenerDescuentos(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	const fetchtiposDescuento = async () => {
-		await obtenerTiposDescuento(dispatch, sessionStorage.getItem('token'));
+		obtenerTiposDescuento(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	const [open, setOpen] = useState(false);
 	const [newDescuento, setNewDescuento] = useState({

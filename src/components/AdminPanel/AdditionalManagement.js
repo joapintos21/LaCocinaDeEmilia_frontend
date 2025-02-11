@@ -33,7 +33,9 @@ import CustomDialog from 'helpers/Dialog';
 const AdditionalManagement = () => {
 	const dispatch = useDispatch();
 	const fetchAdicionales = async () => {
-		await obtenerTodosAdicionales(dispatch, sessionStorage.getItem('token'));
+		obtenerTodosAdicionales(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	useEffect(() => {
 		try {

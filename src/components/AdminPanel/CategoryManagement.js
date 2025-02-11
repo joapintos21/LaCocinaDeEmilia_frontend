@@ -32,7 +32,9 @@ const CategoryManagement = () => {
 	const dispatch = useDispatch();
 	const categories = useSelector((state) => state.categorias);
 	const fetchCategorias = async () => {
-		await obtenerCategorias(dispatch);
+		obtenerCategorias(dispatch).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 
 	const [open, setOpen] = useState(false);

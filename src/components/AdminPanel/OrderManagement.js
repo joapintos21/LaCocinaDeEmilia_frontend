@@ -42,7 +42,9 @@ const OrderManagement = () => {
 
 	// Fetch de datos (pedidos)
 	const fetchPedidos = async () => {
-		await obtenerPedidos(dispatch, sessionStorage.getItem('token'));
+		obtenerPedidos(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 
 	useEffect(() => {

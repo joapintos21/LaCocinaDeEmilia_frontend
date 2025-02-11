@@ -65,8 +65,8 @@ const PedidosPage = () => {
 
 	// Cargar productos y packs desde Redux
 	useEffect(() => {
-		const fetchPedidos = async () => {
-			await obtenerPedidosUsuario(user.id, token)
+		const fetchPedidos = () => {
+			obtenerPedidosUsuario(user.id, token)
 				.then((data) => {
 					setPedidos(data);
 				})

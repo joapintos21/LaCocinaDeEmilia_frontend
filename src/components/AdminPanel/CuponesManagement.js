@@ -33,13 +33,19 @@ import { borrarCupon } from 'scripts/borrarCupon';
 const CuponesManagement = () => {
 	const dispatch = useDispatch();
 	const fetchCupones = async () => {
-		await obtenerCupones(dispatch, sessionStorage.getItem('token'));
+		obtenerCupones(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	const fetchTiposDescuento = async () => {
-		await obtenerTiposDescuento(dispatch, sessionStorage.getItem('token'));
+		obtenerTiposDescuento(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	const fetchUsuarios = async () => {
-		await obtenerUsuarios(dispatch, sessionStorage.getItem('token'));
+		obtenerUsuarios(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	const [open, setOpen] = useState(false);
 	const [newCupon, setNewCupon] = useState({

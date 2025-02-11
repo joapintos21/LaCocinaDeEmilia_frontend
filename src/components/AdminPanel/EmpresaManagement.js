@@ -16,14 +16,17 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
-	Box
+	Box,
 } from '@mui/material';
+import { toast } from 'react-toastify';
 
 const EmpresaManagement = () => {
 	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 	const fetchEmpresa = async () => {
-		await obtenerEmpresa(dispatch, sessionStorage.getItem('token'));
+		obtenerEmpresa(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	const [open, setOpen] = useState(false);
 	const [newEmpresa, setNewEmpresa] = useState({
@@ -71,29 +74,25 @@ const EmpresaManagement = () => {
 	};
 
 	const handleSaveEmpresa = () => {
-		if (
-			newEmpresa.nombre
-		) {
+		if (newEmpresa.nombre) {
 			if (newEmpresa.id != null) {
-                if(newEmpresa.nombre === null || newEmpresa.nombre=== ""){
-                    setError('El campo nombre es obligatorio.');
-                } else{
-                    if(newEmpresa.direccion===null || newEmpresa.direccion==="") newEmpresa.direccion=" ";
-                    if(newEmpresa.descripcion_transferencia===null || newEmpresa.descripcion_transferencia==="") newEmpresa.descripcion_transferencia=" ";
-                    if(newEmpresa.telefono===null || newEmpresa.telefono=="") newEmpresa.telefono=" ";
-                    if(newEmpresa.correo===null || newEmpresa.correo==="") newEmpresa.correo=" ";
-                    actualizarEmpresa(
-                        newEmpresa,
-                        sessionStorage.getItem('token'),
-                    )
-                        .then((data) => {
-                            fetchEmpresa();
-                            setError('');
-                        })
-                        .catch((error) => {
-                            setError('Error al actualizar la empresa.');
-                        });
-                }
+				if (newEmpresa.nombre === null || newEmpresa.nombre === '') {
+					setError('El campo nombre es obligatorio.');
+				} else {
+					if (newEmpresa.direccion === null || newEmpresa.direccion === '') newEmpresa.direccion = ' ';
+					if (newEmpresa.descripcion_transferencia === null || newEmpresa.descripcion_transferencia === '')
+						newEmpresa.descripcion_transferencia = ' ';
+					if (newEmpresa.telefono === null || newEmpresa.telefono == '') newEmpresa.telefono = ' ';
+					if (newEmpresa.correo === null || newEmpresa.correo === '') newEmpresa.correo = ' ';
+					actualizarEmpresa(newEmpresa, sessionStorage.getItem('token'))
+						.then((data) => {
+							fetchEmpresa();
+							setError('');
+						})
+						.catch((error) => {
+							setError('Error al actualizar la empresa.');
+						});
+				}
 			} else {
 				setError('Error al actualizar la empresa.');
 			}

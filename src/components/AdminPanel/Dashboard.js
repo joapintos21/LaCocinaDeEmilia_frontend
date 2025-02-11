@@ -15,6 +15,7 @@ import {
 } from 'chart.js';
 
 import { obtenerDatosDashboard } from 'scripts/obtenerDatosDashboard';
+import { toast } from 'react-toastify';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement);
 
@@ -30,7 +31,9 @@ const Dashboard = () => {
 	};
 	const dispatch = useDispatch();
 	const fetchDatosDashboard = async () => {
-		await obtenerDatosDashboard(dispatch, sessionStorage.getItem('token'));
+		obtenerDatosDashboard(dispatch, sessionStorage.getItem('token')).catch((e) => {
+			toast.error(e.message);
+		});
 	};
 	useEffect(() => {
 		try {
