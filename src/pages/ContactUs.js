@@ -86,9 +86,8 @@ export default () => {
 					</ContactContainer>
 				</ContactSection>
 			)}
-			
+
 			<ContactUsForm />
-			<FAQ />
 			<Footer />
 		</AnimationRevealPage>
 	);

@@ -35,13 +35,12 @@ export default () => {
 	const isMobileDownSm = useMediaQuery(theme.breakpoints.down('sm'));
 	const isMobileDownMd = useMediaQuery(theme.breakpoints.down('md'));
 	const isMobile = isMobileDownSm || isMobileDownMd;
-	console.log(isMobile);
 	const anchor = isMobile ? 'top' : 'left';
 
 	const modules = [
 		{ title: 'Dashboard', component: <Dashboard /> },
-		{ title: 'Pedidos Pendientes', component: <OrderManagement /> },
-		{ title: 'Pedidos', component: <PedidosManagement /> },
+		{ title: 'Pagos Pendientes', component: <OrderManagement /> },
+		{ title: 'Pedidos (últimos 50)', component: <PedidosManagement /> },
 		{ title: 'Categorías', component: <CategoryManagement /> },
 		{ title: 'Productos', component: <ProductManagement /> },
 		{ title: 'Adicionales', component: <AdditionalManagement /> },

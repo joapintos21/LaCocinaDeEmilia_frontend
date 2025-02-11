@@ -23,10 +23,13 @@ import { obtenerPedidos } from 'scripts/obtenerPedidos';
 import { metodosPago, pedidoEstados } from 'utils/enums';
 import { toast } from 'react-toastify';
 import { crearPago } from 'scripts/crearPago';
+import CustomDialog from 'helpers/Dialog';
+import { cancelarPedido } from 'scripts/cancelarPedido';
 
 const OrderManagement = () => {
 	const dispatch = useDispatch();
 	const [open, setOpen] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
 	const [pedidoOpen, setPedidoOpen] = useState(null);
 	const [pago, setPago] = useState({
 		pedido_id: '',
@@ -66,6 +69,7 @@ const OrderManagement = () => {
 
 	const handleClose = () => {
 		setOpen(false);
+		setPedidoOpen(null);
 	};
 
 	const handleInputChange = (e) => {
@@ -77,12 +81,12 @@ const OrderManagement = () => {
 		crearPago(pago, sessionStorage.getItem('token'))
 			.then((data) => {
 				toast.success('Pago registrado exitosamente.');
+				fetchPedidos();
 			})
 			.catch((e) => {
 				toast.error('Error al registrar el pago: ' + e.message);
 			});
 		handleClose();
-		fetchPedidos();
 	};
 
 	const renderPaymentMethods = () => {
@@ -104,6 +108,29 @@ const OrderManagement = () => {
 		}
 	};
 
+	const handleOpenDialog = (id) => {
+		setPedidoOpen(id);
+		setDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setPedidoOpen(null);
+		setDialogOpen(false);
+	};
+
+	const handleConfirmDialog = async () => {
+		cancelarPedido(pedidoOpen, sessionStorage.getItem('token'))
+			.then((data) => {
+				toast.success(data.message);
+				fetchPedidos();
+			})
+			.catch((e) => {
+				toast.error(e.error);
+			});
+		setPedidoOpen(null);
+		setDialogOpen(false);
+	};
+
 	return (
 		<div style={{ marginTop: '20px' }}>
 			{/* Tabla de pedidos */}
@@ -115,7 +142,7 @@ const OrderManagement = () => {
 							<TableCell>Estado</TableCell>
 							<TableCell>Pago</TableCell>
 							<TableCell>Total</TableCell>
-							<TableCell>Cocinera asignada</TableCell>
+							<TableCell>Notas del Cadete</TableCell>
 							<TableCell>Fecha de creacion</TableCell>
 							<TableCell>Cliente</TableCell>
 							<TableCell>Acciones</TableCell>
@@ -131,7 +158,7 @@ const OrderManagement = () => {
 										{metodosPago[order.metodo_pago - 1].nombre + '\n' + order.estado_pago}
 									</TableCell>
 									<TableCell>${order.total?.toFixed(2) || '0.00'}</TableCell>
-									<TableCell>{order.cocinera_nombre}</TableCell>
+									<TableCell>{order.notas_cadete}</TableCell>
 									<TableCell>{order.fechaCreacion}</TableCell>
 									<TableCell>{order.cliente_nombre}</TableCell>
 									<TableCell>
@@ -142,6 +169,14 @@ const OrderManagement = () => {
 											sx={{ marginRight: 2 }}
 										>
 											Ingresar Pago
+										</Button>
+										<Button
+											variant="outlined"
+											color="secondary"
+											onClick={() => handleOpenDialog(order.id)}
+											sx={{ marginRight: 2 }}
+										>
+											Cancelar
 										</Button>
 									</TableCell>
 								</TableRow>
@@ -219,6 +254,13 @@ const OrderManagement = () => {
 					</Button>
 				</DialogActions>
 			</Dialog>
+			<CustomDialog
+				open={dialogOpen}
+				title="Confirmar cancelación"
+				content="¿Está seguro de que desea cancelar este pedido?"
+				onClose={handleCloseDialog}
+				onConfirm={handleConfirmDialog}
+			/>
 		</div>
 	);
 };

@@ -44,7 +44,7 @@ const UserDropdown = ({ userName, userRol }) => {
 			<DropdownButton onClick={toggleDropdown}>{userName}</DropdownButton>
 			{isOpen && (
 				<DropdownMenu>
-					{(userRol === 1 || userRol === 4) && (
+					{(userRol === 1 || userRol === 4 || userRol === 5) && (
 						<>
 							<DropdownItem onClick={() => navigate('/perfil')}>Perfil</DropdownItem>
 							<DropdownItem onClick={() => navigate('/mis_pedidos')}>Mis Pedidos</DropdownItem>

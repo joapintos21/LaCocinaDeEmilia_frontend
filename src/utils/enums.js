@@ -3,6 +3,7 @@ export const estadosPedidosDescripcion = {
 	2: 'Estamos preparando su pedido',
 	3: 'Pedido listo para su envío',
 	4: 'Pedido entregado',
+	5: 'Pedido cancelado',
 };
 
 export const pedidoEstados = {
