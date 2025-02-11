@@ -10,6 +10,7 @@ import { ReactComponent as SignUpIcon } from 'feather-icons/dist/icons/user-plus
 import { ReactComponent as EyeIcon } from 'feather-icons/dist/icons/eye.svg';
 import { ReactComponent as EyeOffIcon } from 'feather-icons/dist/icons/eye-off.svg';
 import { crearUsuario } from 'scripts/signUp';
+import { toast } from 'react-toastify';
 
 const Container = tw(ContainerBase)`min-h-screen bg-[#99cdb6] text-white font-medium flex justify-center`;
 const Content = tw.div`max-w-screen-xl m-0 sm:mx-20 sm:my-16 bg-white text-gray-900 shadow sm:rounded-lg flex justify-center flex-1`;
@@ -77,12 +78,17 @@ export default function SignUp({
 			return;
 		}
 
-		try {
-			await crearUsuario(email, password, nombre, telefono, rol_id);
-			limpiarFormulario();
-		} catch (error) {
-			setErrores(error);
-		}
+		crearUsuario(email, password, nombre, telefono, rol_id)
+			.then((data) => {
+				toast.warn(
+					'Usuario creado con éxito. Por favor, vaya a su casilla de correo electrónico para verificar su cuenta.',
+				);
+				limpiarFormulario();
+			})
+			.catch((error) => {
+				setErrores(error);
+				toast.error(error.message); // Asigna el mensaje de error a un estado para mostrarlo
+			});
 	};
 
 	return (
@@ -167,7 +173,7 @@ export default function SignUp({
 						</FormContainer>
 					</MainContent>
 				</MainContainer>
-				
+
 				{/* ✅ Imagen SVG a la derecha */}
 				<IllustrationContainer>
 					<IllustrationImage imageSrc={illustrationImageSrc} />

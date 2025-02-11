@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setPermisos, addPermiso, updatePermiso, deletePermiso } from 'store/gestionPermisosSlice'; // Asegúrate de crear las acciones correspondientes en tu slice
 import { crearPermiso } from 'scripts/crearPermiso'; // Función para crear permiso
 import { actualizarPermiso } from 'scripts/actualizarPermiso'; // Función para actualizar permiso
 import { borrarPermiso } from 'scripts/borrarPermiso'; // Función para eliminar permiso
@@ -271,6 +270,7 @@ const PermissionsManagement = () => {
 						<option value={'adicionales'}>Adicionales</option>
 						<option value={'pagos'}>Pagos</option>
 						<option value={'productos'}>Productos</option>
+						<option value={'cupones'}>Cupones</option>
 					</TextField>
 					Tipo de permiso
 					<TextField
